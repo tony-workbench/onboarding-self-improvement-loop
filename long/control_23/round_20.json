@@ -1,0 +1,467 @@
+{
+ "round": 20,
+ "starts_week": 20,
+ "funnel": {
+  "choose_path": 0.7906559396399999,
+  "sign_in": 0.8531260730273018,
+  "adoption": 0.7803816287648103,
+  "home": 0.91904716716,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Interactive Controls Practice Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert an interactive sandbox practice screen at the end of onboarding where users test dragging, minimizing, and interacting with their pet before finishing.",
+   "why": "3 support tickets reported post-onboarding confusion on how to control or hide the pet, and finish step conversion drops to 64.8%.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_controls_practice"
+    ],
+    "new_controls_practice": {
+     "headline": "Practice Controlling Your Desktop Pet",
+     "body": "Try moving, minimizing, and interacting with your pet right on your screen before completing setup.",
+     "layout": "spotlight",
+     "components": [
+      {
+       "type": "mascot",
+       "asset": "asset:pet_interactive",
+       "style": "playful",
+       "action": "play"
+      },
+      {
+       "type": "checklist",
+       "text": "1. Drag pet across screen | 2. Click for context menu | 3. Double click to hide",
+       "style": "emphasis"
+      },
+      {
+       "type": "button",
+       "label": "I'm ready!",
+       "action": "next",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'new_controls_practice.components[1].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Home Intro Dual Column Companion Guide Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign the home_intro screen into a two-column layout highlighting shortcut keys and desktop pet control badges.",
+   "why": "Finish conversion drops to 64.8% with a long mean duration (5815s), and users frequently ask support how to interact with their pet after setup.",
+   "config": {
+    "home_intro": {
+     "layout": "two_column",
+     "headline": "Your Companion is Ready on Desktop",
+     "body": "Keep your pet happy with quick hotkeys and desktop gestures.",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "badge",
+        "text": "Shortcut: Ctrl+Shift+P to Summon/Hide",
+        "style": "highlight"
+       },
+       {
+        "role": "home_welcome",
+        "type": "badge",
+        "text": "Right-click Pet for Feeding & Voice Chat",
+        "style": "rounded"
+       },
+       {
+        "role": "home_welcome",
+        "type": "preview",
+        "asset": "asset:desktop_pet_preview",
+        "style": "large"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.replace.home_welcome[0]': a badge cannot do the home_welcome job (use ['animation', 'button', 'checklist', 'image', 'mascot', 'text'])"
+   }
+  },
+  {
+   "title": "Custom Pet Trait Selector Subflow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Add a new trait and personality customization screen during adoption to let users define pet temperament before completing setup.",
+   "why": "Adoption step has 78.0% conversion and 1017s mean duration; structured trait choices improve attachment and reduce custom generation dissatisfaction.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "new_trait_selector",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_trait_selector": {
+     "headline": "Customize Your Pet's Personality",
+     "body": "Select temperament and voice traits to make your desktop pet truly unique.",
+     "layout": "grid",
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Playful | Calm | Energetic | Studio Companion",
+       "style": "rounded",
+       "action": "choose"
+      },
+      {
+       "type": "button",
+       "label": "Save Traits",
+       "action": "next",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'new_trait_selector.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Certificate First Adoption Sequence Reorder",
+   "target_step": "adoption",
+   "type": "reorder",
+   "change": "Reorder the adoption sequence so that naming and issuing the adoption certificate happens prior to photo upload.",
+   "why": "Adoption has high drop-off and long duration (1017s mean); establishing emotional ownership early via naming reduces abandonment during photo setup.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "adoption_certificate",
+     "upload_photos",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "existing screens must keep their order; only sign_in may move"
+   }
+  },
+  {
+   "title": "Waiting Screen Desktop Render Live Progress",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Replace wait status on the waiting screen with a live checklist tracking background asset rendering and desktop overlay initialization.",
+   "why": "Waiting step has a mean duration of 2336s, and 3 users reported that the pet failed to appear on desktop after waiting.",
+   "config": {
+    "waiting": {
+     "layout": "checklist",
+     "headline": "Preparing Your Pet's Desktop Workspace",
+     "show_progress": true,
+     "show_time_estimate": true,
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "checklist",
+        "text": "Initializing graphics engine... | Loading pet animation sprites... | Checking desktop display permissions...",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.replace.wait_status[0]': a checklist cannot do the wait_status job (use ['animation', 'mascot', 'preview', 'progress', 'text', 'timer', 'tip_carousel'])"
+   }
+  },
+  {
+   "title": "Multi-Device Existing Account Pet Sync Callout",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add a prominent account sync badge and hint explaining that signing into an existing account recovers previously created pets.",
+   "why": "The single largest support issue (8 emails) is users reporting missing or reset pets after signing back into their account.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing into your existing account automatically restores all previously adopted pets.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Account Pet Protection: Existing pets automatically sync.",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an account pet sync callout on the sign-in screen is valid inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 6.67,
+   "score_note": "Directly targets the #1 support issue with clear evidence from sign-in time skew.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 175.4
+  },
+  {
+   "title": "Story Screen Stage Layout Transformation",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Transform the story screen into a stage layout with preview graphics illustrating companion interaction styles.",
+   "why": "choose_path step conversion is 79.1% with a high mean time of 514s; visual stage framing speeds up path selection.",
+   "config": {
+    "story": {
+     "layout": "stage",
+     "headline": "Choose Your Desktop Companion Adventure",
+     "body": "Select how you want to interact with your pet daily.",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "preview",
+        "asset": "asset:story_stage_preview",
+        "style": "large"
+       },
+       {
+        "role": "intro_story",
+        "type": "text",
+        "text": "Choose between a relaxed ambient desktop pet or an active focus companion.",
+        "style": "plain"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'story.replace.intro_story[0]': a preview cannot do the intro_story job (use ['animation', 'button', 'image', 'mascot', 'text', 'video'])"
+   }
+  },
+  {
+   "title": "Background Engine Audio Notification Prompt",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable ready notifications and add a sound cue component on the waiting screen when desktop rendering completes.",
+   "why": "Home wait time median is 201s and mean is 2336s; users switch away while waiting and need audio/notification alerts when initialization finishes.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "asset": "asset:completion_chime",
+       "style": "playful",
+       "action": "play"
+      },
+      {
+       "type": "text",
+       "text": "We will play a chime as soon as your pet is active on screen.",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding completion audio and notifications to the waiting screen is permitted."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.06,
+   "score": 5.42,
+   "score_note": "Addresses severe wait times (median 201s, mean 2336s) causing drop-off before completion.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 175.4
+  },
+  {
+   "title": "Instant Companion Setup Path Copy Clarification",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update choose_path headline and choice cards to highlight speed differences between pre-made pets and custom photo uploads.",
+   "why": "Users take a mean of 514s on choose_path; explicit copy regarding quick setup helps fast-track users hesitant about long creation flows.",
+   "config": {
+    "choose_path": {
+     "headline": "How Would You Like to Meet Your Pet?",
+     "body": "Choose Instant Pick to get started in seconds, or Custom Creator for a personalized pet.",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "text": "Instant Pick (Ready in 5s) | Custom Creator (Upload photos)",
+        "style": "emphasis",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'choose_path.replace.path_options[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Companion Starter Pack Reward Callout",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Add an unlocked starter pack incentive badge and callout on the home_intro screen upon completing setup.",
+   "why": "Overall onboarding completion is low (31.3%) with drop-off at finish (64.8%); offering immediate rewards encourages flow completion.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Unlocked: Free Starter Toy & Snack Pack!",
+       "style": "playful"
+      },
+      {
+       "type": "text",
+       "text": "Finish setup to claim your bonus desktop pet starter kit.",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions 'Free' and 'bonus' extras, violating Rule 3."
+   }
+  }
+ ],
+ "picked": [
+  "Multi-Device Existing Account Pet Sync Callout",
+  "Background Engine Audio Notification Prompt"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 350.8,
+ "decisions": [
+  {
+   "test": "sim-75",
+   "title": "Multi-Device Existing Account Pet Sync Callout",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 175.4,
+   "result": {
+    "step": {
+     "control": 0.8705,
+     "treatment": 0.8962,
+     "lift": 0.0295,
+     "lift_se": 0.0108,
+     "p": 0.005479
+    },
+    "finish": {
+     "control": 0.3177,
+     "treatment": 0.3453,
+     "lift": 0.0871,
+     "lift_se": 0.0399,
+     "p": 0.022834
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 6.67,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": 0.0326,
+   "finishers_delta_hidden": 31.6
+  },
+  {
+   "test": "sim-76",
+   "title": "Background Engine Audio Notification Prompt",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 175.4,
+   "result": {
+    "step": {
+     "control": 0.9208,
+     "treatment": 0.911,
+     "lift": -0.0106,
+     "lift_se": 0.0106,
+     "p": 0.3172
+    },
+    "finish": {
+     "control": 0.33,
+     "treatment": 0.3247,
+     "lift": -0.0162,
+     "lift_se": 0.0364,
+     "p": 0.659793
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.42,
+   "predicted_lift": 0.06,
+   "true_lift_hidden": -0.0016,
+   "finishers_delta_hidden": -1.55
+  }
+ ],
+ "shipped": [
+  "Multi-Device Existing Account Pet Sync Callout"
+ ],
+ "ends_week": 20,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

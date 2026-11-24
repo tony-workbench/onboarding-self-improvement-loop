@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, reorder] Move Sign In After Pet Customization: Move account sign-in to take place after pet adoption choice and certificate creation so users build connection before creating an account.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n1: [finish, new_screen] Interactive Controls Guide Screen: Add a dedicated interactive controls guide screen before final launch teaching users how to drag, hide, and interact with desktop pets.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_controls_guide\", \"home_intro\"], \"new_controls_guide\": {\"headline\": \"Learn How to Interact With Your Pet\", \"body\": \"Try clicking, dragging, and right-clicking your companion to access actions.\", \"layout\": \"centered\", \"components\": [{\"type\": \"choice_cards\", \"text\": \"Practice Desktop Controls\", \"style\": \"playful\"}]}}\n2: [adoption, redesign] Redesign Pick Friend Grid Layout: Redesign the pet selection screen into a visual grid layout showcasing ready-to-adopt pets with instant preview cards.\n   config: {\"pick_friend\": {\"layout\": \"grid\", \"headline\": \"Choose Your Ready-to-Adopt Companion\", \"replace\": {\"pet_choices\": [{\"type\": \"choice_cards\", \"role\": \"pet_choices\", \"text\": \"Select Companion\", \"style\": \"playful\"}]}}}\n3: [home, new_flow] Desktop Display Verification Flow: Insert a desktop visibility check sub-flow right after waiting step to confirm pet overlay renders correctly.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_check\", \"home_intro\"], \"waiting\": {\"show_progress\": true}, \"new_desktop_check\": {\"headline\": \"Verifying Desktop Visibility\", \"body\": \"Checking screen overlay permissions and display bounds.\", \"layout\": \"spotlight\"}}\n4: [sign_in, hint] Sign In Existing Account Notice: Add explicit hint text on sign in advising returning users to sign in with their existing account to restore pets.\n   config: {\"sign_in\": {\"hint\": \"Sign in with your original account to restore previous pets and desktop items.\"}}\n5: [home, wait_info] Waiting Screen Tips Carousel: Add a dynamic tips carousel and precise progress ETA on the waiting screen.\n   config: {\"waiting\": {\"headline\": \"Creating Your Desktop Pet...\", \"show_time_estimate\": true, \"tip_delay_seconds\": 5, \"components\": [{\"type\": \"tip_carousel\", \"text\": \"Right click your pet anytime on your desktop for quick actions.\", \"style\": \"calm\"}]}}\n6: [choose_path, copy] Clarify Path Choice Headline: Update headline and body on path selection screen to clearly distinguish quick preset adoption vs custom creation.\n   config: {\"choose_path\": {\"headline\": \"How Would You Like to Meet Your Companion?\", \"body\": \"Choose an instant ready-to-play pet or design a custom companion.\"}}\n7: [adoption, incentive] Starter Accessory Adoption Badge: Display an unlocked starter item badge on the adoption certificate screen as an extra adoption reward.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Adoption Certificate\", \"components\": [{\"type\": \"badge\", \"text\": \"Starter Desktop Toy Unlocked!\", \"style\": \"highlight\"}]}}\n8: [home, notification] Background Desktop Notification Toggle: Enable desktop notification prompt on the waiting screen so users get alerted when pet rendering completes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"hint\": \"We'll send a notification when your desktop pet is ready to spawn!\"}}\n9: [finish, layout] Split Controls Cheatsheet Layout: Change home_intro layout to split format containing a desktop controls cheatsheet component.\n   config: {\"home_intro\": {\"layout\": \"split\", \"components\": [{\"type\": \"checklist\", \"text\": \"Desktop Pet Controls Cheatsheet\", \"style\": \"plain\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to take place after adoption setup is explicitly allowed by Rule 4."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new interactive controls guide screen inside onboarding is allowed by Rule 4."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the pet selection screen into a grid layout while preserving pet choice functionality is allowed by Rule 2."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new verification sub-flow screen after waiting step is allowed by Rule 4."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an account restoration hint to the sign-in screen is allowed."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating waiting screen information with a real estimate and tips carousel is permitted by Rules 4 and 5."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Clarifying copy on path selection screen while retaining both adoption options preserves the job required by Rule 2."
+   },
+   {
+    "index": 7,
+    "pass": false,
+    "rule": 3,
+    "reason": "Adding an unlocked starter toy badge violates Rule 3, which prohibits onboarding copy from mentioning free extras or gifts."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding desktop notification settings to the waiting screen is explicitly allowed by Rule 4."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro screen layout within onboarding is allowed by Rule 4."
+   }
+  ]
+ }
+}

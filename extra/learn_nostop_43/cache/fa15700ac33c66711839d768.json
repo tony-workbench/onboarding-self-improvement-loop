@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, new_flow] Adoption Ceremony Experience Flow: Transform the adoption certificate step into an interactive ceremony experience where users sign their name with visual sparkles.\n   config: {\"adoption_certificate\": {\"layout\": \"stage\", \"headline\": \"Official Adoption Ceremony\", \"body\": \"Welcome your new companion into your digital home with an official signing ceremony.\", \"components\": [{\"type\": \"animation\", \"asset\": \"asset:ceremony_sparkles\", \"style\": \"playful\"}, {\"type\": \"name_input\", \"text\": \"Name your companion\", \"style\": \"rounded\"}]}}\n1: [choose_path, redesign] Story Scroll Path Discovery Redesign: Redesign the welcome story into a continuous story scroll layout that showcases paths visually as users scroll down.\n   config: {\"story\": {\"layout\": \"story_scroll\", \"headline\": \"Begin Your Pet Companion Journey\", \"body\": \"Scroll to explore custom creations or adoption paths tailored to your desktop experience.\", \"replace\": {\"intro_story\": [{\"role\": \"intro_story\", \"type\": \"choice_cards\", \"text\": \"Select your journey path\", \"style\": \"emphasis\"}]}}}\n2: [finish, new_screen] Desktop Pet Care Basics Screen: Insert a dedicated onboarding screen demonstrating desktop controls, right-click menus, and pet interaction features before completing setup.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_care_basics\"], \"home_intro\": {\"headline\": \"Your Desktop Pet is Ready!\", \"body\": \"Let us quickly review how to interact with your pet on your screen.\"}, \"new_care_basics\": {\"headline\": \"How to Interact with Your Pet\", \"body\": \"Right-click your pet on the desktop to talk, feed, or hide them at any time.\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:desktop_controls_demo\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Got it!\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n3: [sign_in, reorder] Deferred Sign In Path Reorder: Move the sign_in screen after pet creation screens (pick_friend and upload_photos), allowing users to pick or design their pet before authenticating.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"sign_in\": {\"headline\": \"Save Your New Companion\", \"body\": \"Sign in now to sync your chosen companion to the cloud and ensure they are never lost.\"}}\n4: [home, new_flow] Companion Stage Live Audio Waiting Room: Add an ambient sound player and stage loading animation on the waiting screen while pet generation processes in the background.\n   config: {\"waiting\": {\"layout\": \"stage\", \"headline\": \"Your Companion is Hatching...\", \"body\": \"Listen to gentle ambient sounds while your desktop pet is prepared for arrival.\", \"components\": [{\"type\": \"sound\", \"asset\": \"asset:ambient_hatching\", \"action\": \"play\", \"style\": \"calm\"}, {\"type\": \"timer\", \"label\": \"Preparing desktop environment\", \"style\": \"subtle\"}]}}\n5: [adoption, incentive] Special Adoption Certificate Crest Incentive: Display a verified ownership crest badge on the adoption certificate screen to celebrate completing pet adoption.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Digital Pet Adoption Certificate\", \"body\": \"Complete adoption to receive your verified digital ownership crest.\", \"components\": [{\"type\": \"badge\", \"label\": \"Verified Desktop Companion Crest\", \"style\": \"highlight\"}]}}\n6: [sign_in, notification] Account Retrieval & Lost Pet Recovery Option: Add explicit account recovery guidance text on the sign-in screen reminding returning users to use their original sign-in method.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Your Pet Account\", \"body\": \"Sign in with your existing account to recover existing pets and prevent account resets.\", \"components\": [{\"type\": \"text\", \"text\": \"Looking for a previously adopted pet? Make sure to use your original sign-in provider.\", \"style\": \"highlight\"}]}}\n7: [adoption, layout] Full Bleed Companion Discovery Showcase: Switch the pet selection screen layout to full bleed, highlighting full artwork previews of available pets.\n   config: {\"pick_friend\": {\"layout\": \"full_bleed\", \"headline\": \"Meet Your Next Desktop Companion\", \"body\": \"Explore available pets in full visual resolution.\"}}\n8: [home, copy] Desktop Display Verification Readiness Headline: Update waiting screen text to explicitly inform users that the pet will appear directly on their desktop screen once loading completes.\n   config: {\"waiting\": {\"headline\": \"Preparing Companion Desktop Display\", \"body\": \"Ensure your desktop is visible. Your pet will spawn directly on your main monitor once loading finishes.\"}}\n9: [finish, new_screen] Desktop Pet Sound & Behavior Setup Screen: Add a pre-arrival behavior preferences screen where users configure initial pet sound effects and activity levels.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_behavior_setup\", \"home_intro\"], \"new_behavior_setup\": {\"headline\": \"Pet Behavior & Interaction Setup\", \"body\": \"Choose how active and vocal you want your pet to be on your desktop.\", \"components\": [{\"type\": \"checklist\", \"text\": \"Enable desktop sound effects\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Save Preferences\", \"action\": \"next\", \"style\": \"emphasis\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": false,
+    "rule": 2,
+    "reason": "The adoption certificate layout replaces existing components and loses the required official stamp."
+   },
+   {
+    "index": 1,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replacing the intro story with choice cards removes the story screen's core job of introducing the pet."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a care basics onboarding screen after home_intro is allowed and preserves all required steps."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Moving the sign-in step after pet creation is explicitly permitted and retains all required onboarding steps."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding ambient audio and visual loading elements to the waiting screen keeps its core job of showing the pet being made."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a verified companion crest badge maintains the official stamp requirement on the adoption certificate without violating pricing rules."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding sign-in recovery guidance text is allowed inside onboarding and does not violate any base rules."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating the pet selection screen to a full-bleed layout preserves its function of letting the user pick a pet."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating waiting screen text to clarify desktop appearance still conveys that the pet is being prepared."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a pet behavior setup screen before home_intro is permitted and maintains all required steps."
+   }
+  ]
+ }
+}

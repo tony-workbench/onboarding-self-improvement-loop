@@ -1,0 +1,459 @@
+{
+ "round": 8,
+ "starts_week": 8,
+ "funnel": {
+  "choose_path": 0.7939278000000001,
+  "sign_in": 0.729,
+  "adoption": 0.6621657,
+  "home": 0.91617369641532,
+  "finish": 0.7090416
+ },
+ "weights_used": {
+  "impact": 1.43,
+  "evidence": 0.092,
+  "confidence": 0.96,
+  "cost": 1.518
+ },
+ "lessons_used": [
+  "Predictions were generally too optimistic, except for winning home wait_info tests where predictions were too low.",
+  "Adding a new screen at the finish stage (2 tests) or adoption stage (2 tests) consistently hurt performance and had to be stopped early.",
+  "Reordering sign-in steps (2 tests) and adding sign-in hints (2 tests) consistently showed no clear effect.",
+  "Home wait_info changes (7 tests) were helpful in three significant wins, though four tests showed no clear effect.",
+  "Evidence for most other specific kinds of change remains thin because few categories have at least two agreeing tests."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Live Desktop Arrival Stage Layout",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesign the waiting screen into a stage layout featuring live companion render previews and animated generation updates while the desktop pet builds in the background.",
+   "why": "Home wait time has a high mean of 2336s and home wait_info tests previously produced major conversion wins.",
+   "config": {
+    "waiting": {
+     "layout": "stage",
+     "show_progress": true,
+     "show_time_estimate": true,
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "preview",
+        "asset": "asset:pet_arrival_preview",
+        "style": "large"
+       },
+       {
+        "role": "wait_status",
+        "type": "progress",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'waiting.wait_status' does not do the job: needs 1 of ['preview', 'progress', 'timer']"
+   }
+  },
+  {
+   "title": "Background Desktop Readiness Notification",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add desktop system notifications and estimated completion timers to the waiting screen so users know they can safely minimize the app during generation.",
+   "why": "Mean home wait time is over 38 minutes (2336s); users need assurance that generation continues seamlessly in the background.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "show_time_estimate": true,
+     "hint": "You can minimize this window. We'll notify you when your pet arrives on your desktop."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful notification and time estimate information to the waiting screen within onboarding limits."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.025,
+   "score": 3.75,
+   "score_note": "Home wait_info has a strong track record of wins, but OS notifications require native app updates."
+  },
+  {
+   "title": "Desktop Pet Controls & Docking Stage",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign the home_intro screen into a split layout showcasing quick toggle controls and system tray docking tips.",
+   "why": "Finish step conversion drops to 70.9% (mean 5815s) and support emails highlight confusion around controlling, hiding, or summoning the pet.",
+   "config": {
+    "home_intro": {
+     "layout": "split",
+     "headline": "Your Pet is Ready on Your Desktop!",
+     "body": "Use the system tray icon anytime to summon, hide, or interact with your new companion.",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "mascot",
+        "asset": "asset:desktop_mascot",
+        "style": "playful"
+       },
+       {
+        "role": "home_welcome",
+        "type": "checklist",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  },
+  {
+   "title": "Desktop Pet Visibility & Tray Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Add an explicit hint and callout component on the finish screen explaining how to locate and show the pet if it spawns behind desktop windows.",
+   "why": "Support mails report pets not showing on desktop (3 emails) and confusion on controlling or hiding the pet (3 emails).",
+   "config": {
+    "home_intro": {
+     "hint": "Can't see your pet? Check your taskbar or system tray icon to bring your pet to the front anytime.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Taskbar Tip",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds visibility tips and callout badge to the home intro screen within allowed onboarding modifications."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.015,
+   "score": 5.71,
+   "score_note": "High evidence from support mail and high finish drop-off, though hints historically show modest effects.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 99.0
+  },
+  {
+   "title": "Grid View Path Selection Stage",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Overhaul the path selection screen into a balanced grid layout showcasing path benefits side-by-side with visual companion badges.",
+   "why": "Choose path screen has a mean time of 514s despite a median of 8s, indicating substantial user hesitation at entry.",
+   "config": {
+    "choose_path": {
+     "layout": "grid",
+     "headline": "Select Your Companion Journey",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Two-Column Friend Selection Stage",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the pick_friend screen into a two-column layout displaying high-resolution companion previews alongside pet personality choice cards.",
+   "why": "Adoption step has the lowest conversion in the main funnel (66.2%) and users spend a mean of 1017s.",
+   "config": {
+    "pick_friend": {
+     "layout": "two_column",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "preview",
+        "asset": "asset:friend_preview",
+        "style": "large"
+       },
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Photo Upload Clarity Guidance",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Update headline and body on the photo upload screen to emphasize clear lighting and single-subject framing.",
+   "why": "Support emails cite custom pet generation failures and unexpected visual results (3 emails).",
+   "config": {
+    "upload_photos": {
+     "headline": "Upload a Clear, Well-Lit Photo",
+     "body": "For best results, pick a bright photo with one subject centered against a simple background.",
+     "hint": "Avoid blurry images or heavy filters for accurate pet creation."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates guidance copy on the photo upload screen without changing functionality or pricing."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 8.8,
+   "score_note": "Targets largest funnel drop-off and supported by emails; copy changes have low implementation cost but mixed results.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 163.3
+  },
+  {
+   "title": "Desktop Assembly Progress Timer",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display active progress percentage and an estimated countdown timer on the waiting screen with periodic tip rotations every 15 seconds.",
+   "why": "Home waiting step has a 201s median / 2336s mean, and structured wait info has proven effective in past wins.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "tip_delay_seconds": 15,
+     "components": [
+      {
+       "type": "timer",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Displays progress percentage and time estimates for a real generation wait process."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 5.64,
+   "score_note": "Home wait_info pattern consistently succeeds for long wait times with straightforward UI additions.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 163.3
+  },
+  {
+   "title": "Centered Story Intro Experience",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Rebuild the initial story screen using a centered layout with animated mascot greetings to immediately engage users.",
+   "why": "Streamlining the initial impression reduces early drop-off and sets clear expectations prior to path choice.",
+   "config": {
+    "story": {
+     "layout": "centered",
+     "headline": "Welcome to Your Desktop Companion",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "animation",
+        "asset": "asset:intro_anim",
+        "style": "large"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'story.intro_story' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'video'] with an asset:story/ asset"
+   }
+  },
+  {
+   "title": "Instant Companion Launch Commitment",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Add an encouraging completion badge component and explicit launch promise button copy to the path choice screen.",
+   "why": "The initial choose_path step sees 20.6% drop-off right at the start of onboarding.",
+   "config": {
+    "choose_path": {
+     "button_label": "Adopt & Launch Pet",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Free Companion Included",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions 'Free Companion Included', violating Rule 3 which prohibits mentioning prices, discounts, gifts, or free extras."
+   }
+  }
+ ],
+ "picked": [
+  "Photo Upload Clarity Guidance",
+  "Desktop Pet Visibility & Tray Hint",
+  "Desktop Assembly Progress Timer"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 425.6,
+ "decisions": [
+  {
+   "test": "sim-30",
+   "title": "Photo Upload Clarity Guidance",
+   "target_step": "adoption",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 163.3,
+   "result": {
+    "step": {
+     "control": 0.6536,
+     "treatment": 0.6058,
+     "lift": -0.0731,
+     "lift_se": 0.0243,
+     "p": 0.003765
+    },
+    "finish": {
+     "control": 0.2413,
+     "treatment": 0.221,
+     "lift": -0.0843,
+     "lift_se": 0.0432,
+     "p": 0.061763
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 8.8,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": -0.0816,
+   "finishers_delta_hidden": -61.39
+  },
+  {
+   "test": "sim-31",
+   "title": "Desktop Pet Visibility & Tray Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 99.0,
+   "result": {
+    "step": {
+     "control": 0.7174,
+     "treatment": 0.6721,
+     "lift": -0.0631,
+     "lift_se": 0.0273,
+     "p": 0.024802
+    },
+    "finish": {
+     "control": 0.2513,
+     "treatment": 0.2317,
+     "lift": -0.0782,
+     "lift_se": 0.0422,
+     "p": 0.07513
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 5.71,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": -0.0787,
+   "finishers_delta_hidden": -59.21
+  },
+  {
+   "test": "sim-32",
+   "title": "Desktop Assembly Progress Timer",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 163.3,
+   "result": {
+    "step": {
+     "control": 0.914,
+     "treatment": 0.9115,
+     "lift": -0.0027,
+     "lift_se": 0.0127,
+     "p": 0.83052
+    },
+    "finish": {
+     "control": 0.2533,
+     "treatment": 0.2437,
+     "lift": -0.0382,
+     "lift_se": 0.0432,
+     "p": 0.386297
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.64,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": 0.0,
+   "finishers_delta_hidden": 0.0
+  }
+ ],
+ "shipped": [],
+ "ends_week": 8,
+ "weights_next": {
+  "impact": 1.297,
+  "evidence": 0.095,
+  "confidence": 1.128,
+  "cost": 1.479
+ },
+ "lessons_next": [
+  "Predictions were generally too optimistic, except for winning home wait_info tests where predictions were too low.",
+  "Adding a new screen at the adoption stage (2 tests) or finish stage (2 tests) consistently hurt performance and was stopped early.",
+  "Home wait_info changes (8 tests) were helpful in three significant wins, though five tests showed no clear effect.",
+  "Reordering sign-in steps (2 tests), adding sign-in hints (2 tests), and modifying finish layouts (2 tests) consistently showed no clear effect.",
+  "Evidence for most other specific kinds of change remains thin because few categories have at least two agreeing tests."
+ ]
+}

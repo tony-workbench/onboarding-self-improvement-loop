@@ -1,0 +1,530 @@
+{
+ "round": 14,
+ "starts_week": 14,
+ "funnel": {
+  "choose_path": 0.8040624,
+  "sign_in": 0.9130376689951111,
+  "adoption": 0.730849591044783,
+  "home": 0.914682453089691,
+  "finish": 0.7480512000000001
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Path Choice Interactive Preview Workspace",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the choose_path screen into a split interactive workspace where selecting a path immediately animates preview behaviors of the pet.",
+   "why": "The choose_path stage has a long mean time of 514s and a 19.6% drop-off rate; showing instant pet animation previews helps users decide faster.",
+   "config": {
+    "choose_path": {
+     "layout": "split",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Select Companion Journey",
+        "style": "playful"
+       },
+       {
+        "role": "path_options",
+        "type": "animation",
+        "asset": "asset:path_preview_anim",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Deferred Auth Reorder After Adoption",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder the sign_in step to occur right after adoption_certificate instead of before adoption, letting users choose and name their pet first.",
+   "why": "Adoption has a 73.1% conversion rate; allowing users to customize their pet before sign-in increases motivation to complete authentication.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign_in after adoption is explicitly permitted by Rule 4."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.1,
+   "score": 7.08,
+   "score_note": "Deferring auth increases user investment before sign-in, supported by high adoption dropoff.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 183.4
+  },
+  {
+   "title": "Pet Personality Temperament Calibration Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Insert a new screen called new_personality_calibration between pick_friend and upload_photos to set pet behavioral traits.",
+   "why": "3 support emails reported custom pets looking or behaving unexpectedly, and adoption has a drop-off of nearly 27%.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "new_personality_calibration",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_personality_calibration": {
+     "headline": "Calibrate Pet Temperament",
+     "body": "Set how active, quiet, or playful your desktop pet will act on your screen.",
+     "layout": "card",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Select Temperament Profile",
+       "style": "playful",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new calibration screen within onboarding is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 5.42,
+   "score_note": "High evidence from support mail and funnel, but adding a screen adds friction."
+  },
+  {
+   "title": "Spawntime Interactive Mini Game Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Replace passive waiting with an interactive mini-game sub-flow while pet assets generate.",
+   "why": "The home stage waiting step takes a median of 201s and mean of 2336s, causing drop-offs during pet generation.",
+   "config": {
+    "waiting": {
+     "layout": "spotlight",
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "animation",
+        "asset": "asset:spawntime_game",
+        "style": "playful"
+       },
+       {
+        "role": "wait_status",
+        "type": "button",
+        "label": "Play Spawntime Game",
+        "action": "play",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.replace.wait_status[1]': a button cannot do the wait_status job (use ['animation', 'mascot', 'preview', 'progress', 'text', 'timer', 'tip_carousel'])"
+   }
+  },
+  {
+   "title": "Account Session Recovery Warning Banner",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit account recovery hint banner on the sign_in screen explaining how to prevent pet profile resets.",
+   "why": "8 support emails complained about missing or reset pets after signing in again with a different account.",
+   "config": {
+    "sign_in": {
+     "hint": "Sign in with your original social or email account to retain existing pets. New logins create fresh accounts.",
+     "components": [
+      {
+       "type": "text",
+       "text": "Account Tip: Re-use your primary sign-in to restore saved desktop pets.",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Dual View Adoption Certificate Spotlight Layout",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Update the adoption_certificate screen layout to spotlight mode featuring a visual certificate badge alongside the name input.",
+   "why": "Adoption stage takes a median 89s and mean 1017s with a 26.9% drop-off; a formal certificate badge increases psychological ownership.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "spotlight",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Official Adoption Certificate Sealed",
+       "style": "emphasis"
+      },
+      {
+       "type": "name_input",
+       "label": "Name your desktop pet",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.components[1]': inputs may only ask for the pet's name"
+   }
+  },
+  {
+   "title": "Spawntime Ready Sound Chime Notification",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add sound chime alert and taskbar docking status text to the waiting screen when desktop spawning completes.",
+   "why": "3 support emails reported pets not showing up on desktop or app not launching after wait step; median waiting time is 201s.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "label": "Play Audio Notification When Pet Spawns",
+       "asset": "asset:ready_chime",
+       "style": "playful"
+      },
+      {
+       "type": "text",
+       "text": "Your pet will automatically anchor to your system taskbar once loading completes.",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds audio and status notifications to the waiting screen as allowed by Rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 7.08,
+   "score_note": "Strong alignment between support emails and wait duration; notifications reliably resolve dropoff.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 183.4
+  },
+  {
+   "title": "First Desktop Interaction Achievement Badge",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Offer an unlockable achievement badge on the home_intro screen for completing the first pet interaction on desktop.",
+   "why": "Finish conversion drops to 74.8% with a long mean duration of 5815s; clear rewards drive immediate engagement.",
+   "config": {
+    "home_intro": {
+     "headline": "Welcome Your Companion!",
+     "body": "Interact with your pet on the desktop now to earn your First Friend Achievement Badge.",
+     "components": [
+      {
+       "type": "badge",
+       "label": "First Friend Badge Ready",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an intro welcome badge and interaction prompt on home_intro."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.06,
+   "score": 5.0,
+   "score_note": "Targets 25.2% drop at finish step with gamification incentive, supported by funnel stats.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 112.0
+  },
+  {
+   "title": "Companion Path Selection Recommendation Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Add a recommendation tip carousel on choose_path matching app playstyles with system CPU usage.",
+   "why": "choose_path has a high mean time of 514s, indicating user confusion or indecision between options.",
+   "config": {
+    "choose_path": {
+     "hint": "Interactive path includes mini-games; Passive path runs lightweight in the taskbar background.",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Passive path uses low system resources. Interactive path unlocks direct desktop chatter.",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds path selection recommendation hints on choose_path."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.07,
+   "score": 5.0,
+   "score_note": "Addresses high mean duration (514s) and 19.6% drop on choose_path using decision hints.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 183.4
+  },
+  {
+   "title": "Desktop Pet Control Hub Split Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign home_intro into a split hub highlighting a desktop controls cheat-sheet and control practice button.",
+   "why": "7 support emails asked how to control, hide, talk to, or fix misbehaving desktop pets after setup.",
+   "config": {
+    "home_intro": {
+     "layout": "split",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "checklist",
+        "label": "Controls: Drag to move, right-click to hide/open settings, double-click to chat.",
+        "style": "rounded"
+       },
+       {
+        "role": "home_welcome",
+        "type": "button",
+        "label": "Try Controls Now",
+        "action": "next",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.replace.home_welcome[0].label' must be text up to 40 characters"
+   }
+  }
+ ],
+ "picked": [
+  "Deferred Auth Reorder After Adoption",
+  "Spawntime Ready Sound Chime Notification",
+  "First Desktop Interaction Achievement Badge",
+  "Companion Path Selection Recommendation Hint"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 662.2,
+ "decisions": [
+  {
+   "test": "sim-57",
+   "title": "Deferred Auth Reorder After Adoption",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 183.4,
+   "result": {
+    "step": {
+     "control": 0.9069,
+     "treatment": 0.9286,
+     "lift": 0.0239,
+     "lift_se": 0.0088,
+     "p": 0.006159
+    },
+    "finish": {
+     "control": 0.3487,
+     "treatment": 0.3847,
+     "lift": 0.1033,
+     "lift_se": 0.0375,
+     "p": 0.003812
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 7.08,
+   "predicted_lift": 0.1,
+   "true_lift_hidden": 0.0154,
+   "finishers_delta_hidden": 16.68
+  },
+  {
+   "test": "sim-58",
+   "title": "Spawntime Ready Sound Chime Notification",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 183.4,
+   "result": {
+    "step": {
+     "control": 0.9119,
+     "treatment": 0.9444,
+     "lift": 0.0356,
+     "lift_se": 0.0103,
+     "p": 0.000427
+    },
+    "finish": {
+     "control": 0.372,
+     "treatment": 0.369,
+     "lift": -0.0081,
+     "lift_se": 0.0334,
+     "p": 0.809874
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 7.08,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.0235,
+   "finishers_delta_hidden": 25.46
+  },
+  {
+   "test": "sim-59",
+   "title": "First Desktop Interaction Achievement Badge",
+   "target_step": "finish",
+   "type": "incentive",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 112.0,
+   "result": {
+    "step": {
+     "control": 0.7467,
+     "treatment": 0.7826,
+     "lift": 0.048,
+     "lift_se": 0.0217,
+     "p": 0.023308
+    },
+    "finish": {
+     "control": 0.3597,
+     "treatment": 0.3743,
+     "lift": 0.0408,
+     "lift_se": 0.0353,
+     "p": 0.238584
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 5.0,
+   "predicted_lift": 0.06,
+   "true_lift_hidden": 0.0172,
+   "finishers_delta_hidden": 18.63
+  },
+  {
+   "test": "sim-60",
+   "title": "Companion Path Selection Recommendation Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 183.4,
+   "result": {
+    "step": {
+     "control": 0.8087,
+     "treatment": 0.8293,
+     "lift": 0.0256,
+     "lift_se": 0.0125,
+     "p": 0.037626
+    },
+    "finish": {
+     "control": 0.3527,
+     "treatment": 0.3753,
+     "lift": 0.0643,
+     "lift_se": 0.0364,
+     "p": 0.06807
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 5.0,
+   "predicted_lift": 0.07,
+   "true_lift_hidden": 0.0328,
+   "finishers_delta_hidden": 35.53
+  }
+ ],
+ "shipped": [
+  "Deferred Auth Reorder After Adoption",
+  "Spawntime Ready Sound Chime Notification",
+  "First Desktop Interaction Achievement Badge",
+  "Companion Path Selection Recommendation Hint"
+ ],
+ "ends_week": 14,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

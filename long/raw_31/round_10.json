@@ -1,0 +1,560 @@
+{
+ "round": 10,
+ "starts_week": 10,
+ "funnel": {
+  "choose_path": 0.7908036,
+  "sign_in": 0.80190056133,
+  "adoption": 0.6270873,
+  "home": 0.8761650594,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.408,
+  "evidence": 0.433,
+  "confidence": 2.477,
+  "cost": 0.682
+ },
+ "lessons_used": [
+  "Sign-in hints, interactive wait screen flows and tips, a preset customization fallback flow, and story screen sequence reordering were helpful.",
+  "Hints outside sign-in, sign-in step reordering, and most wait screen info updates showed no clear effect.",
+  "Layout changes, new screens, and copy updates showed no clear effect or significantly hurt performance.",
+  "Predictions were too high for failed or harmful changes, overestimating gains for tests that saw no clear effect or severe drops.",
+  "Predictions were too low for winning sequence reorderings and interactive waiting flows that were expected to fail."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Adoption Certificate Interactive Mascot Signature Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen with interactive mascot visuals and a signature component to build emotional connection.",
+   "why": "Adoption step drops conversion to 62.7% with high completion variance; interactive signature components increase commitment.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "centered",
+     "headline": "Official Companion Adoption",
+     "body": "Sign below to officially welcome your new desktop companion.",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "mascot",
+        "asset": "asset:mascot_signature",
+        "style": "playful",
+        "action": "next"
+       },
+       {
+        "role": "certificate",
+        "type": "name_input",
+        "text": "Companion Name",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[0]': a mascot cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Launch Readiness Check Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a dedicated readiness check screen right before finish to verify desktop pet rendering and window permissions.",
+   "why": "Support received 3 separate bug reports stating pets fail to show on desktop or the app fails to open after onboarding.",
+   "config": {
+    "new_desktop_check": {
+     "headline": "Verifying Desktop Workspace",
+     "body": "Ensuring pet display permissions and screen placement are active.",
+     "layout": "centered",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:check_desktop",
+       "style": "calm"
+      },
+      {
+       "type": "button",
+       "label": "Launch Desktop Pet",
+       "action": "next",
+       "style": "highlight"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_check",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a launch readiness check screen inside onboarding is allowed and preserves all existing steps and jobs."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.144,
+   "score": 1.74,
+   "score_note": "New screens at finish step historically hurt conversion significantly (-14.4%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 101.6
+  },
+  {
+   "title": "Story Intro After Path Choice Sequence Reorder",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Move path selection to the very beginning of onboarding prior to showing the story intro screen.",
+   "why": "Path selection has a high mean time of 514s; presenting choice immediately gives context to the story sequence.",
+   "config": {
+    "choose_path": {
+     "layout": "grid",
+     "headline": "Choose Your Pet Journey",
+     "body": "Select how you would like to create your new companion."
+    },
+    "_order": [
+     "choose_path",
+     "story",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "existing screens must keep their order; only sign_in may move"
+   }
+  },
+  {
+   "title": "Multi-Step Photo Preview Verification Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Add an interactive preview and validation flow on the photo upload screen before custom pet generation starts.",
+   "why": "3 support tickets reported custom pet generation failures or wrong-looking visual outputs.",
+   "config": {
+    "upload_photos": {
+     "layout": "split",
+     "headline": "Upload & Verify Pet Photo",
+     "body": "Preview how your custom pet will look before completing adoption.",
+     "components": [
+      {
+       "type": "photo_picker",
+       "label": "Select Photo",
+       "action": "choose",
+       "style": "rounded"
+      },
+      {
+       "type": "preview",
+       "asset": "asset:pet_preview",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding preview components to the photo upload sub-flow inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.031,
+   "score": 7.93,
+   "score_note": "Interactive adoption flows have a strong track record of success (+3.1%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 155.8
+  },
+  {
+   "title": "Existing Account Pet Memory Sign-In Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add a direct hint under sign-in buttons explaining that logging into an existing account restores saved pets.",
+   "why": "8 support emails complained about pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in with your existing account automatically restores your saved pets and progress.",
+     "layout": "centered"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding helpful account restoration copy to the sign-in screen is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.028,
+   "score": 9.66,
+   "score_note": "Sign-in hints supported by strong evidence perform reliably well (+2.8%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 155.8
+  },
+  {
+   "title": "Desktop Pet Initialization Wait Stage Timer",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display explicit stage timers and rendering status on the waiting screen as the desktop pet initializes.",
+   "why": "Waiting step has a median time of 201s and mean of 2336s, indicating users idle during generation.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "headline": "Creating Your Desktop Pet",
+     "body": "Your companion is being built and prepared for desktop launch.",
+     "hint": "Estimated completion time: 2 minutes."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating waiting screen information and providing completion estimates for actual waiting periods is permitted."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.015,
+   "score": 4.65,
+   "score_note": "Wait info updates yield modest improvements (+1.5%) with limited confidence.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 155.8
+  },
+  {
+   "title": "Path Selection Trait Preview Callout",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Add personality and desktop interaction trait callouts directly on the path selection cards.",
+   "why": "3 support emails reported post-onboarding confusion regarding how to control or interact with the pet.",
+   "config": {
+    "choose_path": {
+     "hint": "Each path determines companion traits and how your pet interacts on your desktop.",
+     "layout": "card"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding trait preview hints to path selection options is allowed inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.008,
+   "score": 3.11,
+   "score_note": "Hints outside sign-in tend to be ineffective or slightly negative (-0.8%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 155.8
+  },
+  {
+   "title": "Home Intro Companion Desktop Action Card Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign the home intro screen into a split card layout highlighting system tray controls, keybindings, and hide commands.",
+   "why": "Support mail showed multiple tickets regarding confusion over controlling, hiding, or talking to the pet.",
+   "config": {
+    "home_intro": {
+     "layout": "split",
+     "headline": "Welcome Your Companion!",
+     "body": "Learn how to summon, control, and interact with your pet on your desktop.",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "checklist",
+        "text": "Tray Icon: Right-click to hide or summon\nShortcut: Cmd/Ctrl+Pet to talk\nSettings: Custom behaviors",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.replace.home_welcome[0].text' has characters outside the allowed set: ['\\n']"
+   }
+  },
+  {
+   "title": "Background Rendering Desktop Ready Alert",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Include a notification prompt on the waiting screen letting users opt into a desktop alert when their pet is ready.",
+   "why": "Waiting stage mean time is 2336s, showing that users switch away while waiting for rendering.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "headline": "Preparing Desktop Pet",
+     "body": "You can safely minimize this window while we finish rendering.",
+     "hint": "We will notify you on your desktop as soon as your pet is ready."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding desktop readiness notifications to the waiting screen is explicitly allowed under Rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.013,
+   "score": 4.65,
+   "score_note": "Addresses long wait times but push notification prompts have uncertain lift."
+  },
+  {
+   "title": "Centered Single-Tap Quick Sign-In Layout",
+   "target_step": "sign_in",
+   "type": "layout",
+   "change": "Reframe the sign-in screen into a centered layout highlighting fast social sign-in options.",
+   "why": "Sign-in drop-off is nearly 20% and mean time takes 567s, suggesting friction in standard authentication.",
+   "config": {
+    "sign_in": {
+     "layout": "centered",
+     "headline": "Quick Sign-In",
+     "body": "Sign in to save your companion across all your desktop devices."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the sign-in screen layout inside onboarding is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.0,
+   "score": 1.89,
+   "score_note": "Sign-in layout changes show no clear effect in previous tests (0.0%)."
+  }
+ ],
+ "picked": [
+  "Multi-Step Photo Preview Verification Flow",
+  "Desktop Launch Readiness Check Screen",
+  "Existing Account Pet Memory Sign-In Hint",
+  "Desktop Pet Initialization Wait Stage Timer",
+  "Path Selection Trait Preview Callout"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 724.8,
+ "decisions": [
+  {
+   "test": "sim-38",
+   "title": "Multi-Step Photo Preview Verification Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": 59,
+   "share": 1.0,
+   "planned_harm": 155.8,
+   "result": {
+    "step": {
+     "control": 0.6506,
+     "treatment": 0.5645,
+     "lift": -0.1323,
+     "lift_se": 0.0356,
+     "p": 0.000521
+    },
+    "finish": {
+     "control": 0.232,
+     "treatment": 0.2094,
+     "lift": -0.0976,
+     "lift_se": 0.0683,
+     "p": 0.174654
+    },
+    "users_per_group": 1237
+   },
+   "outcome": "stopped early: adoption worse",
+   "score": 7.93,
+   "predicted_lift": 0.031,
+   "true_lift_hidden": -0.1461,
+   "finishers_delta_hidden": -43.18
+  },
+  {
+   "test": "sim-39",
+   "title": "Desktop Launch Readiness Check Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 101.6,
+   "result": {
+    "step": {
+     "control": 0.6442,
+     "treatment": 0.6389,
+     "lift": -0.0082,
+     "lift_se": 0.0321,
+     "p": 0.799118
+    },
+    "finish": {
+     "control": 0.2293,
+     "treatment": 0.2277,
+     "lift": -0.0073,
+     "lift_se": 0.0471,
+     "p": 0.877816
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 1.74,
+   "predicted_lift": -0.144,
+   "true_lift_hidden": -0.0463,
+   "finishers_delta_hidden": -32.26
+  },
+  {
+   "test": "sim-40",
+   "title": "Existing Account Pet Memory Sign-In Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 155.8,
+   "result": {
+    "step": {
+     "control": 0.795,
+     "treatment": 0.8284,
+     "lift": 0.0419,
+     "lift_se": 0.0145,
+     "p": 0.003199
+    },
+    "finish": {
+     "control": 0.2333,
+     "treatment": 0.2433,
+     "lift": 0.0429,
+     "lift_se": 0.0481,
+     "p": 0.363343
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 9.66,
+   "predicted_lift": 0.028,
+   "true_lift_hidden": 0.0433,
+   "finishers_delta_hidden": 30.17
+  },
+  {
+   "test": "sim-41",
+   "title": "Desktop Pet Initialization Wait Stage Timer",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 155.8,
+   "result": {
+    "step": {
+     "control": 0.8823,
+     "treatment": 0.897,
+     "lift": 0.0167,
+     "lift_se": 0.0148,
+     "p": 0.254657
+    },
+    "finish": {
+     "control": 0.2237,
+     "treatment": 0.2313,
+     "lift": 0.0343,
+     "lift_se": 0.0492,
+     "p": 0.478764
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.65,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": 0.0155,
+   "finishers_delta_hidden": 10.8
+  },
+  {
+   "test": "sim-42",
+   "title": "Path Selection Trait Preview Callout",
+   "target_step": "choose_path",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 155.8,
+   "result": {
+    "step": {
+     "control": 0.779,
+     "treatment": 0.7697,
+     "lift": -0.012,
+     "lift_se": 0.0138,
+     "p": 0.387182
+    },
+    "finish": {
+     "control": 0.2303,
+     "treatment": 0.2217,
+     "lift": -0.0376,
+     "lift_se": 0.046,
+     "p": 0.422234
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.11,
+   "predicted_lift": -0.008,
+   "true_lift_hidden": -0.0147,
+   "finishers_delta_hidden": -10.24
+  }
+ ],
+ "shipped": [
+  "Existing Account Pet Memory Sign-In Hint"
+ ],
+ "ends_week": 10,
+ "weights_next": {
+  "impact": 0.28,
+  "evidence": 0.383,
+  "confidence": 2.606,
+  "cost": 0.731
+ },
+ "lessons_next": [
+  "Sign-in hints, a preset customization fallback flow, story screen sequence reordering, and interactive wait screen flows and tips were helpful.",
+  "Hints outside sign-in, sign-in step reordering, and most wait screen info updates showed no clear effect.",
+  "Layout changes, new screens, and copy updates showed no clear effect or significantly hurt performance.",
+  "Predictions were too high for failed, harmful, or no-effect changes, overestimating gains.",
+  "Predictions were too low for winning sequence reorderings and interactive waiting flows expected to perform poorly."
+ ]
+}

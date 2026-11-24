@@ -1,0 +1,524 @@
+{
+ "round": 6,
+ "starts_week": 6,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7537131,
+  "adoption": 0.6798876,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Custom Pet Generation Visual Preview Stage",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the custom pet photo upload screen into a split stage layout featuring a live preview card and interactive feature confirmation before generation.",
+   "why": "Adoption stage drops 32% of users and 3 support emails reported custom pet creation failing or looking wrong.",
+   "config": {
+    "upload_photos": {
+     "layout": "split",
+     "headline": "Preview & Customize Your Desktop Pet",
+     "body": "Check how your pet looks in desktop preview mode before rendering.",
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "preview",
+        "asset": "asset:pet_preview_stage",
+        "style": "playful",
+        "action": "choose"
+       },
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "label": "Upload Pet Photo",
+        "style": "emphasis",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[0]': a preview cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Overlay Health Check Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Insert a dedicated desktop visibility diagnostic screen before waiting to test desktop window permissions and rendering display engines.",
+   "why": "3 support emails reported pets not appearing on desktop or app failing to open, and waiting screen median time is 201s.",
+   "config": {
+    "new_desktop_health": {
+     "headline": "Desktop Display Diagnostic",
+     "body": "Verifying screen overlay permissions and multi-monitor desktop support.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Screen Overlay Permission Granted",
+       "style": "emphasis",
+       "action": "next"
+      },
+      {
+       "type": "button",
+       "label": "Test Desktop Pet Spawn",
+       "style": "playful",
+       "action": "next"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_desktop_health",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid diagnostic screen to onboarding without removing required steps."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.03,
+   "score": 3.75,
+   "score_note": "New diagnostic screen addresses desktop render failures (3 emails) but adds onboarding friction."
+  },
+  {
+   "title": "Interactive Desktop Pet Control Tutorial",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Embed an interactive desktop control playground into the finish screen showing users how to move, hide, summon, and speak to their pet.",
+   "why": "3 support emails asked how to control, hide, or talk to the pet after setup, and finish step conversion is 64.8%.",
+   "config": {
+    "home_intro": {
+     "layout": "centered",
+     "headline": "Meet Your Desktop Companion!",
+     "body": "Try out these essential shortcut controls to interact with your pet anywhere on your screen.",
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Drag to Move • Double Click to Talk • Right Click to Hide",
+       "style": "playful",
+       "action": "open_tip"
+      },
+      {
+       "type": "button",
+       "label": "Launch Pet On Desktop",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.components[0].text' has characters outside the allowed set: ['•']"
+   }
+  },
+  {
+   "title": "Move Sign-In Post Pet Adoption Certificate",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder the sign-in step to take place immediately after completing the pet adoption certificate.",
+   "why": "8 support emails reported pets missing or reset after re-signing in; moving sign-in right after certificate creation links the named pet profile securely.",
+   "config": {
+    "sign_in": {
+     "headline": "Save Your Adoption Certificate",
+     "body": "Sign in to save your pet's name, custom appearance, and progress to your cloud account.",
+     "hint": "Use your primary sign-in method to sync existing pets."
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in after adoption certificate, which is explicitly allowed by rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 5.42,
+   "score_note": "Reordering sign-in directly targets major reset issue (8 emails), but structural changes carry risk.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 151.4
+  },
+  {
+   "title": "Pet Path Decision Comparison Screen",
+   "target_step": "choose_path",
+   "type": "new_screen",
+   "change": "Add an interactive preview screen before path selection showcasing live comparisons between instant pre-made pets and custom photo-created pets.",
+   "why": "choose_path has a 23.8% drop-off rate and a high mean duration of 514s, indicating confusion about available choices.",
+   "config": {
+    "new_path_overview": {
+     "headline": "Choose How You Want to Create Your Companion",
+     "body": "Pick an instant ready-to-play companion or create a custom pet from your own photo.",
+     "layout": "two_column",
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Instant Adoption vs Custom Photo Pet",
+       "style": "playful",
+       "action": "choose"
+      },
+      {
+       "type": "button",
+       "label": "Continue to Selection",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "new_path_overview",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a path comparison screen inside onboarding while keeping all mandatory steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.03,
+   "score": 3.75,
+   "score_note": "Adding a comparison screen may resolve path confusion but adds extra step complexity."
+  },
+  {
+   "title": "Returning Account Pet Recovery Warning",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add a prominent account sync warning hint on the sign-in screen urging returning users to select the same provider to avoid pet resets.",
+   "why": "8 emails reported pets missing or reset after signing in again, making account confusion the largest single support issue.",
+   "config": {
+    "sign_in": {
+     "hint": "Already have a pet? Sign in with your original account method to automatically recover your existing pets.",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates sign-in hint text without violating any rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.06,
+   "score": 9.17,
+   "score_note": "High impact hint directly addressing the top support complaint (8 emails) with low effort."
+  },
+  {
+   "title": "Path Selection Outcome Clarity Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update headline and body on choose_path screen to explicitly detail setup time and photo requirements for both paths.",
+   "why": "23.8% of users drop off at choose_path with a 514s mean time, showing hesitation over what each path requires.",
+   "config": {
+    "choose_path": {
+     "headline": "Select Your Adoption Method",
+     "body": "Instant Adoption takes 10 seconds with pre-made pets. Custom Pet creation turns any pet photo into a 3D desktop companion in 1 minute."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Clarifies path selection options on choose_path screen while maintaining its required job."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.05,
+   "score": 8.33,
+   "score_note": "Clearer copy addresses the 514s mean time on choose_path with minimal effort.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 151.4
+  },
+  {
+   "title": "Real-time Photo Generation Diagnostic Checklist",
+   "target_step": "adoption",
+   "type": "wait_info",
+   "change": "Add photo status verification badges and an automated quality checklist component to the photo upload screen.",
+   "why": "3 support emails reported custom pet generation failing or rendering improperly.",
+   "config": {
+    "upload_photos": {
+     "hint": "Clear lighting and single pet photos produce the best desktop pet renders.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Face Visible • Good Lighting • Single Pet",
+       "style": "subtle",
+       "action": "open_tip"
+      },
+      {
+       "type": "badge",
+       "text": "Auto-Enhance Active",
+       "style": "emphasis",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'upload_photos.components[0].text' has characters outside the allowed set: ['•']"
+   }
+  },
+  {
+   "title": "Multi-Stage Asset Rendering Progress Tracker",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Upgrade waiting screen with live asset rendering step indicators and time estimates.",
+   "why": "The waiting step has an extreme mean duration of 2336s and median 201s, causing user frustration.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "headline": "Building Your Desktop Pet...",
+     "body": "Generating 3D mesh, desktop animations, and behavior routines.",
+     "components": [
+      {
+       "type": "progress",
+       "text": "Generating Desktop Animations...",
+       "style": "emphasis",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates waiting screen rendering information and progress indicators as allowed by rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 7.08,
+   "score_note": "Progress tracker directly alleviates frustration during the lengthy 201s/2336s waiting step.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 151.4
+  },
+  {
+   "title": "Desktop Shortcut Dashboard Home Intro",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Rebuild home_intro into a spotlight dashboard layout displaying desktop overlay shortcut guides.",
+   "why": "3 support emails cited confusion on how to interact with or hide pet after setup, causing dropoff at finish (64.8%).",
+   "config": {
+    "home_intro": {
+     "layout": "spotlight",
+     "headline": "Your Pet is Ready on Your Desktop!",
+     "body": "Use Ctrl+Pet to summon, right-click menu to configure settings, or drag anywhere.",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "choice_cards",
+        "text": "Desktop Shortcuts & Quick Controls",
+        "style": "playful",
+        "action": "open_tip"
+       },
+       {
+        "role": "home_welcome",
+        "type": "button",
+        "label": "Start Playing With Pet",
+        "style": "emphasis",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.replace.home_welcome[0]': a choice_cards cannot do the home_welcome job (use ['animation', 'button', 'checklist', 'image', 'mascot', 'text'])"
+   }
+  }
+ ],
+ "picked": [
+  "Move Sign-In Post Pet Adoption Certificate",
+  "Path Selection Outcome Clarity Copy",
+  "Multi-Stage Asset Rendering Progress Tracker"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 454.2,
+ "decisions": [
+  {
+   "test": "sim-19",
+   "title": "Move Sign-In Post Pet Adoption Certificate",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": 83,
+   "share": 1.0,
+   "planned_harm": 151.4,
+   "result": {
+    "step": {
+     "control": 0.7792,
+     "treatment": 0.7219,
+     "lift": -0.0735,
+     "lift_se": 0.0206,
+     "p": 0.000577
+    },
+    "finish": {
+     "control": 0.2175,
+     "treatment": 0.2056,
+     "lift": -0.055,
+     "lift_se": 0.0616,
+     "p": 0.38559
+    },
+    "users_per_group": 1756
+   },
+   "outcome": "stopped early: sign_in worse",
+   "score": 5.42,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": -0.0326,
+   "finishers_delta_hidden": -12.48
+  },
+  {
+   "test": "sim-20",
+   "title": "Path Selection Outcome Clarity Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": 114,
+   "share": 1.0,
+   "planned_harm": 151.4,
+   "result": {
+    "step": {
+     "control": 0.7605,
+     "treatment": 0.7138,
+     "lift": -0.0614,
+     "lift_se": 0.0164,
+     "p": 0.000271
+    },
+    "finish": {
+     "control": 0.1966,
+     "treatment": 0.1962,
+     "lift": -0.0022,
+     "lift_se": 0.0588,
+     "p": 0.970742
+    },
+    "users_per_group": 2355
+   },
+   "outcome": "stopped early: choose_path worse",
+   "score": 8.33,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": -0.068,
+   "finishers_delta_hidden": -34.36
+  },
+  {
+   "test": "sim-21",
+   "title": "Multi-Stage Asset Rendering Progress Tracker",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 151.4,
+   "result": {
+    "step": {
+     "control": 0.8264,
+     "treatment": 0.8668,
+     "lift": 0.0488,
+     "lift_se": 0.0182,
+     "p": 0.00597
+    },
+    "finish": {
+     "control": 0.2237,
+     "treatment": 0.228,
+     "lift": 0.0194,
+     "lift_se": 0.0487,
+     "p": 0.68814
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 7.08,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": 0.0583,
+   "finishers_delta_hidden": 38.16
+  }
+ ],
+ "shipped": [
+  "Multi-Stage Asset Rendering Progress Tracker"
+ ],
+ "ends_week": 6,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

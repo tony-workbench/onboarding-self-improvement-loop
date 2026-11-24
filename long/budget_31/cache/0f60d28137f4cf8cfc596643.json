@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [home, new_screen] Desktop Pet Launch Preflight Status Screen: Adds a preflight setup status screen before waiting that verifies desktop rendering permissions and display drivers.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_preflight_check\", \"waiting\", \"home_intro\"], \"new_preflight_check\": {\"headline\": \"Checking Desktop Compatibility\", \"body\": \"Verifying display permissions and graphics renderer for desktop companion overlay.\", \"layout\": \"checklist\", \"show_progress\": true, \"components\": [{\"type\": \"checklist\", \"text\": \"Display permissions checked\"}, {\"type\": \"progress\", \"text\": \"Initializing overlay engine\"}]}}\n1: [finish, redesign] Desktop Interaction and Controls Quick Reference Layout: Redesigns the home intro screen into a split view detailing pet interaction shortcuts, tray controls, and hide commands.\n   config: {\"home_intro\": {\"layout\": \"split\", \"headline\": \"Meet Your Desktop Companion\", \"body\": \"Your pet is now active! Right-click to open controls, drag to move, or double-click to chat.\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"text\", \"text\": \"Quick Controls: Right-click pet for menu | Drag pet anywhere on screen | Double-click to talk\"}]}}}\n2: [sign_in, notification] Sign In Diagnostic and Retry Toast Prompt: Displays an automatic visual prompt with connection tips and a retry button if sign-in authentication takes more than 10 seconds.\n   config: {\"sign_in\": {\"notify_when_ready\": true, \"tip_delay_seconds\": 10, \"hint\": \"Taking longer than usual? Check your network connection or try signing in again.\", \"components\": [{\"type\": \"button\", \"label\": \"Retry Sign In\", \"action\": \"next\"}]}}\n3: [adoption, new_flow] Multi-Angle Photo Assistant and Generation Checklist Flow: Introduces a step-by-step photo validation sub-flow that guides users on optimal lighting and angles before submitting custom pet photos.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_photo_guide\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_photo_guide\": {\"headline\": \"Custom Pet Photo Guidance\", \"body\": \"Follow these quick recommendations for best 3D pet rendering results.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"text\": \"Use clear lighting and avoid blur\"}, {\"type\": \"checklist\", \"text\": \"Include single pet centered in frame\"}, {\"type\": \"button\", \"label\": \"Continue to Upload\", \"action\": \"next\"}]}}\n4: [choose_path, redesign] Interactive Companion Journey Card Layout: Redesigns path selection into a clean centered grid layout showcasing clear playstyle tags and expected activity levels.\n   config: {\"choose_path\": {\"layout\": \"grid\", \"headline\": \"Choose Your Pet Companion Journey\", \"body\": \"Select how active or quiet you want your desktop companion to be during your work day.\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"text\": \"Relaxed Companion | Interactive Playmate | Productive Assistant\"}]}}}\n5: [home, wait_info] Interactive Generation Status Progress Tracker: Replaces static waiting text with step-by-step progress indicators showing texture generation, animation rigging, and desktop placement stages.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"headline\": \"Bringing Your Pet to Life...\", \"body\": \"Building 3D model, generating behaviors, and preparing desktop overlay.\", \"replace\": {\"wait_status\": [{\"role\": \"wait_status\", \"type\": \"progress\", \"text\": \"Step 2 of 3: Rendering pet animations\"}]}}}\n6: [adoption, hint] Pet Certificate Naming Guidance Tip: Adds a contextual micro-copy tip under the pet naming field suggesting popular naming themes and character limits.\n   config: {\"adoption_certificate\": {\"hint\": \"Tip: You can change your pet's name anytime in settings later!\", \"components\": [{\"type\": \"text\", \"text\": \"Popular names: Barnaby, Pixel, Mocha, Ziggy\", \"style\": \"subtle\"}]}}\n7: [sign_in, layout] Simplified Social Auth Priority Grid Layout: Reorganizes the sign-in screen into a compact card layout placing quick social login options upfront.\n   config: {\"sign_in\": {\"layout\": \"compact\", \"headline\": \"Sign In to Save Your Pet\", \"body\": \"Create or access your account so your pet state and preferences stay synced.\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"button\", \"label\": \"Continue with Google\", \"action\": \"next\"}, {\"role\": \"sign_in_options\", \"type\": \"button\", \"label\": \"Continue with Apple\", \"action\": \"next\"}]}}}\n8: [finish, incentive] Onboarding Completion Pioneer Title Perk: Displays a badge celebrating successful onboarding completion and unlocks an exclusive 'Pioneer Pet Parent' desktop pet title.\n   config: {\"home_intro\": {\"components\": [{\"type\": \"badge\", \"text\": \"Unlocked Title: Pioneer Pet Parent\", \"style\": \"playful\"}]}}\n9: [choose_path, new_screen] Companion Style Preview and Selection Screen: Inserts a new preview screen before path selection demonstrating animated desktop pet behaviors for each companion style.\n   config: {\"_order\": [\"story\", \"new_path_preview\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_path_preview\": {\"headline\": \"Preview Pet Playstyles\", \"body\": \"See how different companions behave on your desktop before choosing your journey.\", \"layout\": \"carousel\", \"components\": [{\"type\": \"preview\", \"text\": \"Chill Pet: Sits calmly in your taskbar\"}, {\"type\": \"preview\", \"text\": \"Active Pet: Wanders across screen and plays\"}, {\"type\": \"button\", \"label\": \"Select My Path\", \"action\": \"next\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid preflight check screen within onboarding without skipping required steps."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the home intro screen while keeping it within onboarding boundaries."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a sign-in retry prompt component without altering core sign-in behavior."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a photo guidance screen into the onboarding flow before photo upload."
+   },
+   {
+    "index": 4,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replaces path options with activity levels, losing the required job of choosing between adopting or making a pet."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Replaces static wait text with progress details while preserving the screen's core job."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds subtle naming micro-copy to the certificate without removing any required elements."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorganizes the sign-in layout while preserving social authentication functionality."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a completion badge component on the home intro screen without violating pricing or fair design rules."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a playstyle preview screen before path selection within allowed onboarding modifications."
+   }
+  ]
+ }
+}

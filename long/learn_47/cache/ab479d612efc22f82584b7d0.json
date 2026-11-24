@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [choose_path, redesign] Split-View Companion Path Selector: Redesign the path selection screen with a split card layout that clearly contrasts picking a ready-made pet versus creating a custom pet side-by-side.\n   config: {\"choose_path\": {\"layout\": \"split\", \"headline\": \"Choose How to Meet Your Desktop Pet\", \"body\": \"Select a ready-to-play companion or create a custom pet from your own photos.\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"label\": \"Path Selection\", \"style\": \"emphasis\", \"action\": \"choose\"}]}}}\n1: [finish, new_screen] Interactive Desktop Controls Sandbox: Insert a interactive sandbox screen (new_controls_sandbox) before final home intro to demonstrate pet interaction controls and hotkeys.\n   config: {\"home_intro\": {\"headline\": \"Your Pet is Live on Your Desktop!\", \"body\": \"Your desktop companion is ready to hang out.\", \"button_label\": \"Start Playing\"}, \"new_controls_sandbox\": {\"headline\": \"Learn Desktop Commands\", \"body\": \"Try right-clicking or dragging your companion around the screen.\", \"layout\": \"centered\", \"components\": [{\"type\": \"animation\", \"asset\": \"asset:controls_demo\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Got It!\", \"style\": \"emphasis\", \"action\": \"next\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_controls_sandbox\", \"home_intro\"]}\n2: [sign_in, reorder] Post-Adoption Sign-In Shift: Move sign-in after pet adoption selection so users pick their pet before creating an account.\n   config: {\"sign_in\": {\"headline\": \"Save Your New Desktop Companion\", \"body\": \"Sign in to backup your pet settings and sync across devices.\", \"button_label\": \"Save & Continue\"}, \"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n3: [adoption, new_flow] Guided Pet Trait Customizer Flow: Replace photo upload layout with a step-by-step customizer carousel for selecting colors, personality, and visual traits.\n   config: {\"upload_photos\": {\"layout\": \"carousel\", \"headline\": \"Customize Pet Appearance\", \"body\": \"Tailor your pet's fur, colors, and accessories.\", \"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"choice_cards\", \"label\": \"Select Features\", \"style\": \"playful\", \"action\": \"choose\"}]}}}\n4: [home, wait_info] Live Pet Fact Feed During Generation: Display an estimated wait timer and rotating fun pet trivia feed during the pet generation waiting screen.\n   config: {\"waiting\": {\"headline\": \"Hatching Your Pet...\", \"body\": \"We are assembling your pet's unique personality.\", \"show_time_estimate\": true, \"show_progress\": true, \"tip_delay_seconds\": 8, \"components\": [{\"type\": \"tip_carousel\", \"text\": \"Did you know desktop pets gain happiness when you move your mouse near them?\", \"style\": \"calm\"}]}}\n5: [sign_in, copy] Account Cloud Sync Security Copy: Update sign-in screen text to emphasize that signing in protects pets from being lost or reset during app updates.\n   config: {\"sign_in\": {\"headline\": \"Secure Your Pet Cloud Backup\", \"body\": \"Link an account now so your pet companion is safe and never reset.\", \"hint\": \"Your account keeps your pet saved even if you reinstall.\"}}\n6: [adoption, hint] Photo Quality Assistant Hint: Add photo lighting and formatting guidance tips directly on the upload photo screen.\n   config: {\"upload_photos\": {\"hint\": \"Use clear, well-lit photos facing forward for best rendering results.\", \"components\": [{\"type\": \"tip_carousel\", \"text\": \"Tip: Bright natural lighting produces the best custom pet model!\", \"style\": \"subtle\"}]}}\n7: [finish, layout] Spotlight Desktop Launch Focus: Reframe the home_intro screen using a spotlight layout with a bold call to action to launch the desktop companion.\n   config: {\"home_intro\": {\"layout\": \"spotlight\", \"headline\": \"Meet Your Desktop Companion!\", \"body\": \"Your pet is ready to live on your screen.\", \"button_label\": \"Spawn Pet Now\"}}\n8: [choose_path, incentive] Starter Pet Bonus Badge: Display a free starter gift badge on the path selection screen for completing onboarding.\n   config: {\"choose_path\": {\"components\": [{\"type\": \"badge\", \"label\": \"Free Starter Toy Included\", \"style\": \"playful\"}]}}\n9: [home, notification] Background Notification Ready Switch: Add an option on the waiting screen to notify users on their desktop background when pet setup finishes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"show_progress\": true, \"hint\": \"You can minimize the window; we will notify you when your pet is ready!\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns path selection screen layout while maintaining both path options."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new controls sandbox screen inside onboarding is allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to occur after adoption selection is explicitly allowed."
+   },
+   {
+    "index": 3,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replacing photo upload with trait selection removes the photo upload functionality."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress and trivia tips to the waiting screen is permitted."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating sign-in copy to emphasize backup functionality is allowed."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding guidance hints to the photo upload screen is permitted."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro screen layout is allowed within onboarding."
+   },
+   {
+    "index": 8,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy cannot mention free extras, gifts, or prices."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding notification controls to the waiting screen is allowed."
+   }
+  ]
+ }
+}

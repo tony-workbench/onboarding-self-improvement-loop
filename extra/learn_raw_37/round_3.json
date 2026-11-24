@@ -1,0 +1,553 @@
+{
+ "round": 3,
+ "starts_week": 3,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.8312058000000001,
+  "adoption": 0.609,
+  "home": 0.842268,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.321,
+  "evidence": 0.354,
+  "confidence": 1.051,
+  "cost": 1.274
+ },
+ "lessons_used": [
+  "Reordering onboarding steps (moving sign-in after adoption) was helpful and exceeded predictions (+16.8% measured vs +12.0% predicted).",
+  "Live progress visualizers on the waiting screen were helpful and far exceeded predictions (+9.3% measured vs +2.0% predicted), whereas static time estimates and error safeguards on the same screen showed no clear effect.",
+  "Finish screen additions (control guides and notification prompts) showed no clear effect, and predictions were set too high.",
+  "Adoption grid layout changes showed no clear effect, with predictions (+15.0%) being overly optimistic.",
+  "Copy adjustments for path selection showed no clear effect, over-predicting impact (+8.0%).",
+  "Account sync safeguard warnings showed no clear effect, with predictions (+3.0%) being too high."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Photo Upload Step Card Layout Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the photo upload screen into a structured card layout with custom photo picker controls to make pet photo submission smooth.",
+   "why": "Adoption has the lowest conversion rate in the funnel at 60.9% and a high mean time of 1017s, plus support received 3 tickets about custom pet generation failures.",
+   "config": {
+    "upload_photos": {
+     "layout": "card",
+     "headline": "Upload Your Pet Photo",
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "label": "Choose Photo",
+        "style": "rounded",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns photo upload screen into a card layout without removing required functionality."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.03,
+   "score": 3.89,
+   "score_note": "Target step has highest dropoff and support tickets, but layout redesigns historically showed low impact.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 109.7
+  },
+  {
+   "title": "Defer Account Sign-In To Onboarding Finish",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move the sign-in step to the very end of onboarding after the pet setup and home welcome screens are complete.",
+   "why": "Moving sign-in later previously increased conversion by +16.8%, and 8 support emails noted account sync issues during early sign-in.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "sign_in"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "home_intro must come after every existing screen, sign_in included"
+   }
+  },
+  {
+   "title": "Live Pet Generation Animation Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Add a dedicated pet hatching animation screen right before waiting to build excitement during setup.",
+   "why": "Home wait time is 201s median / 2336s mean, and previous live visualizer experiments significantly outperformed predictions (+9.3%).",
+   "config": {
+    "new_generation_stage": {
+     "headline": "Hatching Your Desktop Pet",
+     "layout": "stage",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:pet_hatching",
+       "style": "playful",
+       "action": "next"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_generation_stage",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order leaves out existing screens ['sign_in']: no step may be removed"
+   }
+  },
+  {
+   "title": "Split Path Selection Experience",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign path selection into a side-by-side split view comparing instant adoptable pets against custom photo pets.",
+   "why": "Choose path has a high mean duration of 514s and a 76.2% conversion rate, indicating decision friction early on.",
+   "config": {
+    "choose_path": {
+     "layout": "split",
+     "headline": "Choose Your Pet Path",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Instant vs Custom",
+        "style": "emphasis",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Interactive Mascot Progress Updates",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add an animated mascot helper and step counter to the waiting screen while pet generation finishes.",
+   "why": "Live progress visualizers on waiting screens previously boosted conversion by +9.3% and high waiting times (median 201s) need engagement.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_step_counter": true,
+     "components": [
+      {
+       "type": "mascot",
+       "text": "Your pet is coming to life on your desktop!",
+       "style": "playful",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds progress updates to the waiting screen while fulfilling its core function."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.09,
+   "score": 5.91,
+   "score_note": "Live progress visualizers on waiting screens consistently outperform predictions.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 109.7
+  },
+  {
+   "title": "Account Recovery & Sync Helper Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add a clear explanatory hint on the sign-in screen informing users that signing in preserves their pet across re-installs.",
+   "why": "8 support tickets were submitted regarding pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Sign in with your main account to ensure your pet progress is saved safely.",
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an explanatory hint to the sign-in screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.04,
+   "score": 6.19,
+   "score_note": "Strong support email signal; explanatory hints historically produce moderate positive lift.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 109.7
+  },
+  {
+   "title": "Adoption Certificate Confirmation Headline Redesign",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Update adoption certificate copy with celebratory text and a prominent button to complete adoption.",
+   "why": "Adoption drops off significantly with only 60.9% conversion and long completion times.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Official Pet Adoption Certificate",
+     "body": "Your new desktop friend is ready to move in. Click below to confirm adoption!",
+     "button_label": "Finalize Adoption"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates copy on the adoption certificate screen while preserving its core function."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 6.78,
+   "score_note": "High dropoff step, but simple copy adjustments have shown almost no effect in past tests."
+  },
+  {
+   "title": "First-Day Desktop Owner Badge Prompt",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Display a celebratory owner badge component on the home intro screen upon completing setup.",
+   "why": "Finish step dropoff is high at 64.8% conversion and median completion takes 395s.",
+   "config": {
+    "home_intro": {
+     "headline": "Welcome Your Pet Home!",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Official Desktop Pet Owner",
+       "style": "highlight",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an owner badge to the home intro screen within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.0,
+   "score": 4.09,
+   "score_note": "Finish screen additions and prompts have historically shown negative or flat results.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 71.7
+  },
+  {
+   "title": "Desktop Launch Arrival Celebration Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a dedicated celebration screen after home intro showing a preview video of the pet arriving live on the desktop.",
+   "why": "Finish step drops to 64.8% and 3 support emails reported confusion about pet not appearing on desktop.",
+   "config": {
+    "new_celebration": {
+     "headline": "Your Pet Has Arrived!",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "video",
+       "asset": "asset:desktop_arrival",
+       "style": "playful",
+       "action": "next"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_celebration"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order leaves out existing screens ['sign_in']: no step may be removed"
+   }
+  },
+  {
+   "title": "Story Scroll Layout for Welcome Story",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Change story screen layout to story_scroll with a calm descriptive text component.",
+   "why": "Choose path mean duration is 514s, showing users take a long time to navigate initial app context.",
+   "config": {
+    "story": {
+     "layout": "story_scroll",
+     "headline": "Meet Your Future Desktop Companion",
+     "components": [
+      {
+       "type": "text",
+       "text": "Discover cute pets that stay right on your desktop while you work.",
+       "style": "calm",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the story screen layout while continuing to introduce the pet."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 2.99,
+   "score_note": "Addresses high step duration, but path selection layout changes have shown minimal impact.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 109.7
+  }
+ ],
+ "picked": [
+  "Photo Upload Step Card Layout Redesign",
+  "Account Recovery & Sync Helper Hint",
+  "Interactive Mascot Progress Updates",
+  "First-Day Desktop Owner Badge Prompt",
+  "Story Scroll Layout for Welcome Story"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 510.5,
+ "decisions": [
+  {
+   "test": "sim-9",
+   "title": "Photo Upload Step Card Layout Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 109.7,
+   "result": {
+    "step": {
+     "control": 0.5791,
+     "treatment": 0.5647,
+     "lift": -0.0249,
+     "lift_se": 0.0385,
+     "p": 0.522638
+    },
+    "finish": {
+     "control": 0.2053,
+     "treatment": 0.2013,
+     "lift": -0.0195,
+     "lift_se": 0.0709,
+     "p": 0.785488
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.89,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": -0.0667,
+   "finishers_delta_hidden": -22.02
+  },
+  {
+   "test": "sim-10",
+   "title": "Account Recovery & Sync Helper Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 109.7,
+   "result": {
+    "step": {
+     "control": 0.847,
+     "treatment": 0.8201,
+     "lift": -0.0317,
+     "lift_se": 0.018,
+     "p": 0.083096
+    },
+    "finish": {
+     "control": 0.2067,
+     "treatment": 0.2027,
+     "lift": -0.0194,
+     "lift_se": 0.0706,
+     "p": 0.785996
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.19,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": 0.005,
+   "finishers_delta_hidden": 1.65
+  },
+  {
+   "test": "sim-11",
+   "title": "Interactive Mascot Progress Updates",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 109.7,
+   "result": {
+    "step": {
+     "control": 0.8263,
+     "treatment": 0.8576,
+     "lift": 0.0379,
+     "lift_se": 0.0261,
+     "p": 0.138637
+    },
+    "finish": {
+     "control": 0.2153,
+     "treatment": 0.22,
+     "lift": 0.0217,
+     "lift_se": 0.0707,
+     "p": 0.756787
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.91,
+   "predicted_lift": 0.09,
+   "true_lift_hidden": 0.0188,
+   "finishers_delta_hidden": 6.21
+  },
+  {
+   "test": "sim-12",
+   "title": "First-Day Desktop Owner Badge Prompt",
+   "target_step": "finish",
+   "type": "incentive",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 71.7,
+   "result": {
+    "step": {
+     "control": 0.6765,
+     "treatment": 0.6599,
+     "lift": -0.0245,
+     "lift_se": 0.0434,
+     "p": 0.577601
+    },
+    "finish": {
+     "control": 0.23,
+     "treatment": 0.2173,
+     "lift": -0.0551,
+     "lift_se": 0.0643,
+     "p": 0.405144
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.09,
+   "predicted_lift": 0.0,
+   "true_lift_hidden": -0.0047,
+   "finishers_delta_hidden": -1.55
+  },
+  {
+   "test": "sim-13",
+   "title": "Story Scroll Layout for Welcome Story",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 109.7,
+   "result": {
+    "step": {
+     "control": 0.784,
+     "treatment": 0.776,
+     "lift": -0.0102,
+     "lift_se": 0.0192,
+     "p": 0.596885
+    },
+    "finish": {
+     "control": 0.218,
+     "treatment": 0.2113,
+     "lift": -0.0306,
+     "lift_se": 0.0677,
+     "p": 0.656564
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 2.99,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": 0.0187,
+   "finishers_delta_hidden": 6.17
+  }
+ ],
+ "shipped": [],
+ "ends_week": 3,
+ "weights_next": {
+  "impact": 1.385,
+  "evidence": 0.301,
+  "confidence": 1.147,
+  "cost": 1.167
+ },
+ "lessons_next": [
+  "Reordering onboarding steps (moving sign-in after adoption) was helpful and exceeded predictions (+16.8% measured vs +12.0% predicted).",
+  "Live progress visualizers on the waiting screen were helpful and far exceeded predictions (+9.3% measured vs +2.0% predicted), whereas static time estimates, safeguards, and mascot updates showed no clear effect.",
+  "Finish screen additions (control guides, notification prompts, owner badges) showed no clear effect, and predictions were set too high.",
+  "Adoption step layout changes and redesigns showed no clear effect, with predictions (up to +15.0%) being overly optimistic.",
+  "Path selection copy and layout adjustments showed no clear effect, over-predicting impact.",
+  "Sign-in hints and safeguard warnings showed no clear effect, with predictions set too high."
+ ]
+}

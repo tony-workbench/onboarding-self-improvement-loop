@@ -1,0 +1,515 @@
+{
+ "round": 4,
+ "starts_week": 4,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.6270873,
+  "home": 0.850398,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.47,
+  "evidence": 0.407,
+  "confidence": 1.515,
+  "cost": 0.608
+ },
+ "lessons_used": [
+  "Fallback flows during adoption (new_flow) were helpful (+8.0%).",
+  "Interactive wait screen tips and status (wait_info) were helpful (+5.1%), but other wait screen updates like progress bars or notification alerts showed no clear effect.",
+  "Sign-in changes, including reassurance hints and reordering steps, showed no clear effect.",
+  "Finish step changes, including copy updates, new verification screens, and layout changes, showed no clear effect.",
+  "Redesigns during path selection and adoption steps showed no clear effect.",
+  "Predictions consistently overestimated measured impact across tests."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Multi-Preset Pet Selection Carousel Fallback",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Adds an automated fallback carousel of curated pet archetypes when custom photo processing or rendering hits potential errors during adoption.",
+   "why": "Adoption has the highest drop-off rate (62.7% conversion, 1017s mean time) and support reported issues where custom pet creation fails.",
+   "config": {
+    "pick_friend": {
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "label": "Select Fallback Pet Preset",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Allows selecting a pet preset upon fallback while retaining the job of the pick a friend step."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.075,
+   "score": 8.48,
+   "score_note": "Adoption step has the highest drop-off rate (37.3%) and support confirms creation errors; fallback flows are proven effective (+8.0%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 147.9
+  },
+  {
+   "title": "Compact Carousel Pet Selector with Breed Badges",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the pet picker screen into a compact carousel layout displaying breed badges and animated previews to speed up choices.",
+   "why": "Adoption conversion is low (62.7%) with a high median decision time of 89s.",
+   "config": {
+    "pick_friend": {
+     "layout": "compact",
+     "headline": "Meet Your Future Desktop Companion",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Popular Breed",
+       "style": "highlight",
+       "action": "choose"
+      },
+      {
+       "type": "preview",
+       "asset": "asset:pet_preview_compact",
+       "style": "playful",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns pick a friend layout while preserving pet selection functionality and base onboarding rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.035,
+   "score": 2.79,
+   "score_note": "Target step drops 37.3% of users, but redesigns in adoption previously showed negative impact (-3.8%) and lack support ticket evidence."
+  },
+  {
+   "title": "Interactive Desktop Launch Status Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Inserts a dedicated launch readiness screen after waiting that verifies desktop overlay permissions before completing setup.",
+   "why": "Support received 3 emails reporting pets not appearing on desktop or the app failing to open upon onboarding completion.",
+   "config": {
+    "new_desktop_launch_status": {
+     "headline": "Verifying Desktop Workspace",
+     "body": "Checking screen permissions so your pet can roam freely.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Screen Overlay Enabled",
+       "style": "plain",
+       "action": "next"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_launch_status",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid launch status verification screen within the allowed onboarding flow before home intro."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.02,
+   "score": 1.9,
+   "score_note": "Home drop-off is relatively low (15.0%); introducing new screens typically adds friction and lacks positive precedent.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 147.9
+  },
+  {
+   "title": "Reorder Certificate Naming Before Photo Upload",
+   "target_step": "adoption",
+   "type": "reorder",
+   "change": "Reorders the adoption sub-flow so users name their pet and customize adoption details before uploading custom photos.",
+   "why": "Nurturing emotional connection through naming early can reduce adoption abandonments (37.3% drop-off).",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "adoption_certificate",
+     "upload_photos",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "existing screens must keep their order; only sign_in may move"
+   }
+  },
+  {
+   "title": "Background Generation Minimization Hint",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays a clear hint on the waiting screen explaining that the app can be safely minimized while generating the pet.",
+   "why": "The median home wait time is 201s (mean 2336s), leading to user anxiety and drop-off while waiting for generation.",
+   "config": {
+    "waiting": {
+     "hint": "Feel free to minimize this window! We will notify you when your pet is ready on your desktop.",
+     "show_time_estimate": true,
+     "tip_delay_seconds": 15
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds useful background generation hints and timing information to the waiting screen as allowed by Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.03,
+   "score": 8.44,
+   "score_note": "Home step has extreme wait times; wait_info changes consistently improve conversion (+2.2% to +5.1%) and can be shipped via config."
+  },
+  {
+   "title": "Free Starter Perk Banner on Path Selection",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Adds an encouraging reward badge banner on the path choice screen highlighting a free accessory included with onboarding.",
+   "why": "23.8% of users drop off during path selection.",
+   "config": {
+    "choose_path": {
+     "hint": "Includes exclusive desktop pet starter toy badge upon completing setup!",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Free Starter Toy Included",
+       "style": "emphasis",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions 'Free Starter Toy Included', violating Rule 3 which forbids mentioning gifts or free extras."
+   }
+  },
+  {
+   "title": "Desktop Pet Control Callout Card",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Adds explicit instructions on the final screen explaining how to summon, hide, and interact with the desktop pet using hotkeys.",
+   "why": "Support received 3 emails post-onboarding asking how to control, hide, or talk to their pet on the desktop.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Pet is Live on Your Desktop!",
+     "body": "Press Option/Alt + Pet to open controls, right-click to hide, or drag anywhere across your screen.",
+     "hint": "Double-click your pet anytime to start a conversation!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates home intro copy with helpful desktop control instructions within onboarding scope."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.035,
+   "score": 5.78,
+   "score_note": "Finish step drops 35.2% of users and support reports post-onboarding confusion, though finish step copy changes show mixed overall evidence.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 95.3
+  },
+  {
+   "title": "Compact Single-Column Sign-In Layout",
+   "target_step": "sign_in",
+   "type": "layout",
+   "change": "Reorganizes the sign-in screen into a clean compact layout focusing on quick single-click account creation.",
+   "why": "Sign-in loses 27.1% of users and has high mean time (567s). Support reported 8 cases of account sign-in confusion.",
+   "config": {
+    "sign_in": {
+     "layout": "compact",
+     "headline": "Quick Sign-In to Save Your Pet",
+     "body": "Connect an account to preserve your pet's memory across desktop restarts.",
+     "hint": "Your pet progress is saved automatically."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns sign-in screen layout without skipping steps or changing authentication requirements."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.005,
+   "score": 4.23,
+   "score_note": "Sign-in drops 27.1% and has 8 support cases, but historical sign-in layout/step modifications showed no clear positive effect.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 147.9
+  },
+  {
+   "title": "Completion Sound Notification Toggle",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Adds a completion sound toggle button on the wait screen so users hear an audio chime when pet generation finishes.",
+   "why": "Mean wait time is 2336s, causing users to switch away from the app and forget onboarding status.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "button",
+       "label": "Play Chime When Ready",
+       "style": "rounded",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a completion chime toggle to the waiting screen, allowed under onboarding changes in Rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.005,
+   "score": 2.32,
+   "score_note": "Addresses long home wait times, but notification/sound alert wait screen updates previously showed no clear effect."
+  },
+  {
+   "title": "Interactive Companion Match Quiz Path",
+   "target_step": "choose_path",
+   "type": "new_flow",
+   "change": "Replaces standard path selection choices with an interactive companion match quiz that recommends a pet style.",
+   "why": "Path selection has a high mean completion time of 514s, indicating indecision during initial path selection.",
+   "config": {
+    "choose_path": {
+     "layout": "spotlight",
+     "headline": "Find Your Ideal Desktop Companion",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Take 15-Second Match Quiz",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  }
+ ],
+ "picked": [
+  "Multi-Preset Pet Selection Carousel Fallback",
+  "Interactive Desktop Launch Status Screen",
+  "Desktop Pet Control Callout Card",
+  "Compact Single-Column Sign-In Layout"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 539.0,
+ "decisions": [
+  {
+   "test": "sim-14",
+   "title": "Desktop Pet Control Callout Card",
+   "target_step": "finish",
+   "type": "copy",
+   "weeks": 1,
+   "hours": 72,
+   "share": 1.0,
+   "planned_harm": 95.3,
+   "result": {
+    "step": {
+     "control": 0.7037,
+     "treatment": 0.6057,
+     "lift": -0.1393,
+     "lift_se": 0.0411,
+     "p": 0.001519
+    },
+    "finish": {
+     "control": 0.2232,
+     "treatment": 0.1815,
+     "lift": -0.1871,
+     "lift_se": 0.0587,
+     "p": 0.004003
+    },
+    "users_per_group": 1532
+   },
+   "outcome": "stopped early: finish worse",
+   "score": 5.78,
+   "predicted_lift": 0.035,
+   "true_lift_hidden": -0.0592,
+   "finishers_delta_hidden": -17.91
+  },
+  {
+   "test": "sim-12",
+   "title": "Multi-Preset Pet Selection Carousel Fallback",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 147.9,
+   "result": {
+    "step": {
+     "control": 0.6407,
+     "treatment": 0.663,
+     "lift": 0.0348,
+     "lift_se": 0.0261,
+     "p": 0.174305
+    },
+    "finish": {
+     "control": 0.2023,
+     "treatment": 0.2163,
+     "lift": 0.0692,
+     "lift_se": 0.0537,
+     "p": 0.182605
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.48,
+   "predicted_lift": 0.075,
+   "true_lift_hidden": 0.0581,
+   "finishers_delta_hidden": 34.81
+  },
+  {
+   "test": "sim-13",
+   "title": "Interactive Desktop Launch Status Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 147.9,
+   "result": {
+    "step": {
+     "control": 0.8522,
+     "treatment": 0.878,
+     "lift": 0.0302,
+     "lift_se": 0.0177,
+     "p": 0.081559
+    },
+    "finish": {
+     "control": 0.1997,
+     "treatment": 0.209,
+     "lift": 0.0467,
+     "lift_se": 0.0533,
+     "p": 0.369989
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 1.9,
+   "predicted_lift": -0.02,
+   "true_lift_hidden": 0.0223,
+   "finishers_delta_hidden": 13.36
+  },
+  {
+   "test": "sim-15",
+   "title": "Compact Single-Column Sign-In Layout",
+   "target_step": "sign_in",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 147.9,
+   "result": {
+    "step": {
+     "control": 0.7308,
+     "treatment": 0.7306,
+     "lift": -0.0003,
+     "lift_se": 0.0178,
+     "p": 0.986799
+    },
+    "finish": {
+     "control": 0.2023,
+     "treatment": 0.2027,
+     "lift": 0.0016,
+     "lift_se": 0.0513,
+     "p": 0.974372
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.23,
+   "predicted_lift": -0.005,
+   "true_lift_hidden": -0.0101,
+   "finishers_delta_hidden": -6.05
+  }
+ ],
+ "shipped": [],
+ "ends_week": 4,
+ "weights_next": {
+  "impact": 1.418,
+  "evidence": 0.429,
+  "confidence": 1.577,
+  "cost": 0.576
+ },
+ "lessons_next": [
+  "Preset customization fallback flow during adoption was helpful (+8.0%), though a carousel fallback flow later showed no clear effect.",
+  "Interactive wait screen tips and status was helpful (+5.1%), but other wait screen updates (progress bars, notification alerts, status screens) showed no clear effect.",
+  "Desktop pet control callout card during the finish step significantly hurt performance (-13.9%), while other finish step changes (copy, verification screens, layout) showed no clear effect.",
+  "Sign-in changes (hints, step reordering, single-column layout) and redesigns during path selection or adoption showed no clear effect.",
+  "Predictions consistently overestimate measured impact, particularly for expected positive changes."
+ ]
+}

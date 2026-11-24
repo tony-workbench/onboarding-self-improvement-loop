@@ -1,0 +1,523 @@
+{
+ "round": 7,
+ "starts_week": 7,
+ "funnel": {
+  "choose_path": 0.7934706000000001,
+  "sign_in": 0.8110854,
+  "adoption": 0.6560147999999999,
+  "home": 0.8632434,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.94,
+  "evidence": 0.128,
+  "confidence": 1.347,
+  "cost": 0.586
+ },
+ "lessons_used": [
+  "Preset fallback choices, background render status indicators, and certain onboarding flow reorders were helpful.",
+  "Interactive screen redesigns, desktop hint notifications, and moving sign-in after photo upload hurt performance.",
+  "Copy changes, guidelines, layout tweaks, hints, incentives, and other flow additions showed no clear effect.",
+  "Predictions were underestimated for preset fallback choices and background render status indicators.",
+  "Predictions were consistently too high for redesigns, notifications, copy changes, guidelines, layout tweaks, incentives, and new flow additions."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Pick Friend Spotlight Showcase Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the pet selection screen into a spotlight card layout featuring animated pet previews and style badges.",
+   "why": "Adoption step has a high drop-off with 65.6% conversion and median time of 89s; showcasing pets prominently speeds up decision-making.",
+   "config": {
+    "pick_friend": {
+     "layout": "spotlight",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "style": "playful",
+        "text": "Select your companion archetype"
+       },
+       {
+        "role": "pet_choices",
+        "type": "preview",
+        "asset": "asset:spotlight_pet_preview",
+        "style": "large"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Pre-Render Desktop Environment Verification Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Inserts a new verification screen before pet rendering to test desktop display compatibility and screen bounds.",
+   "why": "Support received 3 reports of pets failing to show on desktop/app not opening and 4 reports of misbehaving desktop features.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_desktop_verify",
+     "waiting",
+     "home_intro"
+    ],
+    "new_desktop_verify": {
+     "headline": "Checking Desktop Compatibility",
+     "body": "Ensuring your desktop display settings support virtual companion overlays.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Display Overlay & Taskbar Compatibility",
+       "style": "calm"
+      },
+      {
+       "type": "button",
+       "label": "Continue to Generation",
+       "action": "next",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a desktop verification screen inside onboarding."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.03,
+   "score": 1.72,
+   "score_note": "Adding a new verification screen adds friction and redesigns/new flows historically perform poorly.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 113.4
+  },
+  {
+   "title": "Multi-Angle Photo Sample Selection Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Replaces the single upload box on photo upload screen with a multi-angle photo sample picker and visual guidance cards.",
+   "why": "3 support cases involved custom pet generation failing or rendering inaccurate results.",
+   "config": {
+    "upload_photos": {
+     "layout": "two_column",
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "style": "rounded"
+       },
+       {
+        "role": "photo_upload",
+        "type": "choice_cards",
+        "text": "Choose Reference Pose Angle",
+        "style": "plain"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[1]': a choice_cards cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Interaction Walkthrough Sequence",
+   "target_step": "finish",
+   "type": "reorder",
+   "change": "Inserts a dedicated control walkthrough screen right before home intro to teach desktop interaction before completion.",
+   "why": "Finish step conversion drops to 64.8% and multiple support mails reported confusion on controlling, hiding, or talking to pets.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_controls_walkthrough",
+     "home_intro"
+    ],
+    "new_controls_walkthrough": {
+     "headline": "How to Control Your Desktop Pet",
+     "body": "Quick key shortcuts and click actions to interact with your pet anytime.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Right-click pet for menu | Drag to move | Click tray icon to hide/show",
+       "style": "plain"
+      },
+      {
+       "type": "button",
+       "label": "Got It!",
+       "action": "next",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'new_controls_walkthrough.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Rendering Phase Audio Sound Cues",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Plays subtle ambient hatch sound effects as pet generation progresses on the waiting screen.",
+   "why": "Home wait step has a mean duration of 2336s, causing unengaged users to drift away while background generation occurs.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "sound",
+       "text": "Hatching Ambient Sound",
+       "action": "play",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid audio component addition to waiting screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.035,
+   "score": 7.54,
+   "score_note": "Wait time indicators and audio progress info consistently improve engagement on slow background steps."
+  },
+  {
+   "title": "Sync Safety Notice on Adoption Certificate",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Updates the adoption certificate headline and hint to explicitly confirm account cloud sync state.",
+   "why": "Support logged 8 emails regarding pets missing or reset after signing in again.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Official Adoption Certificate - Cloud Synced",
+     "hint": "Your pet digital identity is safely stored and linked to your sign-in account."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update on adoption certificate screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.0,
+   "score": 5.02,
+   "score_note": "Strong support evidence and low drop cost, but copy changes historically yield zero or negligible lift.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 113.4
+  },
+  {
+   "title": "Floating Desktop Tray Interaction Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Adds a floating hint box on the home intro screen detailing tray icon interaction and hotkeys.",
+   "why": "3 support tickets noted users were confused on how to hide, control, or converse with their companion post-setup.",
+   "config": {
+    "home_intro": {
+     "hint": "Right-click your pet on desktop or use the system tray icon to open controls and chat."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid interaction hint added to home intro."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.02,
+   "score": 5.86,
+   "score_note": "Addresses late-stage onboarding confusion with minor hint UI, showing mild historical success.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 74.8
+  },
+  {
+   "title": "Early Adopter Companion Accessory Badge",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Adds an exclusive starter item reward badge banner to the path selection screen.",
+   "why": "First step choose_path conversion is 79.3% with a long mean duration (514s), requiring an immediate completion pull.",
+   "config": {
+    "choose_path": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Includes Exclusive Starter Accessory Pack",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions free extras or accessory gifts."
+   }
+  },
+  {
+   "title": "Completion Sound Alarm Trigger",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enables completion audio chime and step progress counter when rendering finishes on waiting screen.",
+   "why": "Home step average duration is high (2336s mean), indicating users leave the app hidden in background without noticing completion.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid notification and progress indicators added to waiting screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.06,
+   "score": 2.46,
+   "score_note": "Notification additions have consistently hurt performance in past onboarding tests."
+  },
+  {
+   "title": "Full Bleed Story Carousel Experience",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Changes story screen layout to full bleed carousel mode accompanied by an animated mascot guide component.",
+   "why": "Choose path funnel stage suffers from long mean times (514s) and a 20.7% early user drop-off.",
+   "config": {
+    "story": {
+     "layout": "full_bleed",
+     "components": [
+      {
+       "type": "mascot",
+       "asset": "asset:mascot_welcomer",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout redesign of the story screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.015,
+   "score": 1.72,
+   "score_note": "Layout tweaks and carousel redesigns incur high implementation cost and negative target lift.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 113.4
+  }
+ ],
+ "picked": [
+  "Pre-Render Desktop Environment Verification Screen",
+  "Floating Desktop Tray Interaction Hint",
+  "Sync Safety Notice on Adoption Certificate",
+  "Full Bleed Story Carousel Experience"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 415.0,
+ "decisions": [
+  {
+   "test": "sim-25",
+   "title": "Full Bleed Story Carousel Experience",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": 84,
+   "share": 0.5,
+   "planned_harm": 113.4,
+   "result": {
+    "step": {
+     "control": 0.8142,
+     "treatment": 0.7455,
+     "lift": -0.0844,
+     "lift_se": 0.0232,
+     "p": 0.000477
+    },
+    "finish": {
+     "control": 0.2669,
+     "treatment": 0.2444,
+     "lift": -0.0844,
+     "lift_se": 0.0742,
+     "p": 0.276618
+    },
+    "users_per_group": 888
+   },
+   "outcome": "stopped early: choose_path worse",
+   "score": 1.72,
+   "predicted_lift": -0.015,
+   "true_lift_hidden": -0.0359,
+   "finishers_delta_hidden": -7.9
+  },
+  {
+   "test": "sim-22",
+   "title": "Pre-Render Desktop Environment Verification Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 113.4,
+   "result": {
+    "step": {
+     "control": 0.8658,
+     "treatment": 0.867,
+     "lift": 0.0013,
+     "lift_se": 0.0219,
+     "p": 0.952016
+    },
+    "finish": {
+     "control": 0.2527,
+     "treatment": 0.2493,
+     "lift": -0.0132,
+     "lift_se": 0.0622,
+     "p": 0.833247
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 1.72,
+   "predicted_lift": -0.03,
+   "true_lift_hidden": -0.0148,
+   "finishers_delta_hidden": -5.47
+  },
+  {
+   "test": "sim-23",
+   "title": "Floating Desktop Tray Interaction Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 74.8,
+   "result": {
+    "step": {
+     "control": 0.6279,
+     "treatment": 0.6118,
+     "lift": -0.0257,
+     "lift_se": 0.0453,
+     "p": 0.575759
+    },
+    "finish": {
+     "control": 0.234,
+     "treatment": 0.2353,
+     "lift": 0.0057,
+     "lift_se": 0.0663,
+     "p": 0.931337
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.86,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": -0.0438,
+   "finishers_delta_hidden": -16.18
+  },
+  {
+   "test": "sim-24",
+   "title": "Sync Safety Notice on Adoption Certificate",
+   "target_step": "adoption",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 113.4,
+   "result": {
+    "step": {
+     "control": 0.666,
+     "treatment": 0.6429,
+     "lift": -0.0347,
+     "lift_se": 0.032,
+     "p": 0.286037
+    },
+    "finish": {
+     "control": 0.232,
+     "treatment": 0.2273,
+     "lift": -0.0201,
+     "lift_se": 0.0655,
+     "p": 0.761248
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.02,
+   "predicted_lift": 0.0,
+   "true_lift_hidden": -0.0124,
+   "finishers_delta_hidden": -4.58
+  }
+ ],
+ "shipped": [],
+ "ends_week": 7,
+ "weights_next": {
+  "impact": 2.011,
+  "evidence": 0.1,
+  "confidence": 1.353,
+  "cost": 0.536
+ },
+ "lessons_next": [
+  "Preset fallback choices, background render status indicators, and specific onboarding flow reorders (moving sign-in after adoption selection and story teaser prioritization) were helpful.",
+  "Interactive waiting screen redesigns, desktop notifications, moving sign-in after photo upload, and full bleed carousel layouts hurt performance.",
+  "Copy changes, interaction hints, badges/incentives, new screens, and layout tweaks showed no clear effect.",
+  "Predictions were underestimated (too low) for preset fallback choices and background render status indicators.",
+  "Predictions were consistently too high for redesigns, notifications, copy changes, hints, incentives, layout changes, and most flow alterations."
+ ]
+}

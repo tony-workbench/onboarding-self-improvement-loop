@@ -1,0 +1,514 @@
+{
+ "round": 4,
+ "starts_week": 4,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7612218,
+  "adoption": 0.609,
+  "home": 0.8290974,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 2.204,
+  "evidence": 0.718,
+  "confidence": 0.744,
+  "cost": 0.333
+ },
+ "lessons_used": [
+  "Moving sign-in after adoption selection was helpful (+5.5%), but reordering sign-in after the adoption certificate severely hurt performance (-22.4%).",
+  "Desktop ready background notification prompts were helpful (+5.1%), but sound cue notifications showed no clear effect.",
+  "Copy updates, overlay hints, and headline changes showed no clear effect.",
+  "Waiting screen progress indicators and tip carousels showed no clear effect.",
+  "Layout tweaks and visual redesigns showed no clear effect and risk severe negative drops or guardrail rollbacks.",
+  "Predictions were mostly over-optimistic, though the background notification prompt was slightly under-predicted (+4.0% predicted vs +5.1% measured)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Post-Setup Desktop Quick Launch Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Adds a dedicated quick launch guide screen immediately after home intro showing how to summon, control, and dock the desktop pet.",
+   "why": "Support receives multiple complaints about users being confused on how to control or interact with their pet after completing onboarding.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_desktop_launch_guide"
+    ],
+    "home_intro": {
+     "button_label": "Continue to Desktop Guide"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_desktop_launch_guide']"
+   }
+  },
+  {
+   "title": "Photo Guidelines Screen Before Upload",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Inserts a photo requirements visual guide screen right before photo upload to ensure uploaded images process successfully.",
+   "why": "3 support tickets reported custom pet generation failures or distorted results during photo generation.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "new_photo_guidelines",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "upload_photos": {
+     "hint": "Follow photo criteria for optimal 3D pet rendering."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_photo_guidelines']"
+   }
+  },
+  {
+   "title": "Reorder Sign-In After Photo Upload",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves sign-in screen to occur right after photo upload, capturing high user investment before certificate creation.",
+   "why": "Adoption conversion drops to 60.9%, whereas moving sign-in after pet adoption choices previously boosted conversion (+5.5%).",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "sign_in",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Moving sign-in to occur after photo upload is explicitly permitted by onboarding reordering rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.08,
+   "score": 4.69,
+   "score_note": "Reordering sign-in has consistently caused severe negative drops in previous tests (-8.4% to -22.4%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 148.0
+  },
+  {
+   "title": "Redesign Upload Photos Screen with Structured Dropzone",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Replaces standard photo upload area with an explicit multi-angle photo dropzone component showing sample poses.",
+   "why": "Custom pet rendering issues caused multiple support complaints due to poor quality or missing angle uploads.",
+   "config": {
+    "upload_photos": {
+     "replace": {
+      "photo_upload": [
+       {
+        "type": "photo_picker",
+        "label": "Upload Front & Side Pet Photos",
+        "style": "rounded",
+        "action": "choose",
+        "role": "photo_upload"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the upload photos component preserves the photo upload job while improving UX."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.15,
+   "score": 7.31,
+   "score_note": "High issue alignment, but adoption UI redesigns previously resulted in severe conversion loss (-17.2%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 148.0
+  },
+  {
+   "title": "Cloud Save Account Sync Banner on Sign-In",
+   "target_step": "sign_in",
+   "type": "incentive",
+   "change": "Displays a prominent cloud save reassurance badge detailing that pet progress is linked permanently to the account.",
+   "why": "The top support theme (8 emails) reports pets missing or reset when users sign back in.",
+   "config": {
+    "sign_in": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Cloud Backup Enabled: Your pet data syncs to this account.",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a cloud save status banner to sign-in provides helpful context without violating any rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.005,
+   "score": 4.8,
+   "score_note": "Addresses top support complaint, but copy and banner tweaks historically yield near-neutral impact."
+  },
+  {
+   "title": "Estimated Generation Time Display on Waiting Screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Enables an explicit estimated time remaining display on the waiting screen while pet generation processes in background.",
+   "why": "The waiting step has high latency (mean 1017s during adoption, 2336s during home), leading to user drop-offs.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "body": "Your pet model is being built. Feel free to minimize this window."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying estimated generation time during a real wait on the waiting screen is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.035,
+   "score": 7.15,
+   "score_note": "Targets high latency waiting step and leverages a previously positive change pattern (+4.0% measured).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 148.0
+  },
+  {
+   "title": "Tray Icon Docking Copy on Home Intro",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Updates home intro copy with explicit instructions on how to summon and minimize the pet via system tray.",
+   "why": "Multiple users reported confusion on how to find, control, or hide the pet once setup completes.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Pet is Ready on Desktop!",
+     "body": "Look for your pet icon in the system tray to toggle visibility, open controls, or access settings anytime."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating home intro copy with desktop controls instructions is allowed within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.005,
+   "score": 5.7,
+   "score_note": "Low cost text update for support issues, but copy updates consistently show neutral or slightly negative lift."
+  },
+  {
+   "title": "Path Selection Helper Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Adds a clear hint on choose path explaining that pet styles can be changed later without losing progress.",
+   "why": "Choose path takes a long tail median (8s) / mean (514s), indicating user hesitance when picking a starting path.",
+   "config": {
+    "choose_path": {
+     "hint": "Don't worry—you can switch between pre-made and custom pets at any time later!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a helpful hint on path selection maintains screen functionality and rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.002,
+   "score": 3.27,
+   "score_note": "Targets step hesitation, but helper hints and copy additions have shown no clear positive effect.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 148.0
+  },
+  {
+   "title": "Sign-In Stalling Fallback Option",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Adds explicit sign-in help copy and recovery guidance if authentication window takes long to load.",
+   "why": "Support received reports of sign-in screens stalling or failing to open properly.",
+   "config": {
+    "sign_in": {
+     "hint": "Having trouble signing in? Ensure your browser permits popup windows or try signing in via email link."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Background Tray Notification Enable Toggle on Home Intro",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Enables ready notification toggle on the home intro screen to inform users when background initialization completes.",
+   "why": "Background notification prompt was shown to increase conversion (+5.1%) when users leave app during setup.",
+   "config": {
+    "home_intro": {
+     "notify_when_ready": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling notification settings on home intro is an allowed onboarding feature adjustment."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.045,
+   "score": 7.15,
+   "score_note": "Leverages background notification prompts which were proven effective (+5.1% measured lift) during latency.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 95.4
+  }
+ ],
+ "picked": [
+  "Redesign Upload Photos Screen with Structured Dropzone",
+  "Reorder Sign-In After Photo Upload",
+  "Estimated Generation Time Display on Waiting Screen",
+  "Background Tray Notification Enable Toggle on Home Intro",
+  "Path Selection Helper Hint"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 687.4,
+ "decisions": [
+  {
+   "test": "sim-13",
+   "title": "Redesign Upload Photos Screen with Structured Dropzone",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 148.0,
+   "result": {
+    "step": {
+     "control": 0.6132,
+     "treatment": 0.5857,
+     "lift": -0.0449,
+     "lift_se": 0.0261,
+     "p": 0.092402
+    },
+    "finish": {
+     "control": 0.2073,
+     "treatment": 0.1893,
+     "lift": -0.0868,
+     "lift_se": 0.0475,
+     "p": 0.080407
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.31,
+   "predicted_lift": -0.15,
+   "true_lift_hidden": -0.0353,
+   "finishers_delta_hidden": -21.67
+  },
+  {
+   "test": "sim-14",
+   "title": "Reorder Sign-In After Photo Upload",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 148.0,
+   "result": {
+    "step": {
+     "control": 0.7647,
+     "treatment": 0.7899,
+     "lift": 0.033,
+     "lift_se": 0.0163,
+     "p": 0.039166
+    },
+    "finish": {
+     "control": 0.2047,
+     "treatment": 0.213,
+     "lift": 0.0407,
+     "lift_se": 0.0523,
+     "p": 0.427185
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 4.69,
+   "predicted_lift": -0.08,
+   "true_lift_hidden": 0.0302,
+   "finishers_delta_hidden": 18.54
+  },
+  {
+   "test": "sim-15",
+   "title": "Estimated Generation Time Display on Waiting Screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 148.0,
+   "result": {
+    "step": {
+     "control": 0.8474,
+     "treatment": 0.8204,
+     "lift": -0.0319,
+     "lift_se": 0.0183,
+     "p": 0.087269
+    },
+    "finish": {
+     "control": 0.198,
+     "treatment": 0.1873,
+     "lift": -0.0539,
+     "lift_se": 0.05,
+     "p": 0.294879
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.15,
+   "predicted_lift": 0.035,
+   "true_lift_hidden": -0.003,
+   "finishers_delta_hidden": -1.84
+  },
+  {
+   "test": "sim-16",
+   "title": "Background Tray Notification Enable Toggle on Home Intro",
+   "target_step": "finish",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 95.4,
+   "result": {
+    "step": {
+     "control": 0.6835,
+     "treatment": 0.6723,
+     "lift": -0.0164,
+     "lift_se": 0.0314,
+     "p": 0.60515
+    },
+    "finish": {
+     "control": 0.208,
+     "treatment": 0.2133,
+     "lift": 0.0256,
+     "lift_se": 0.0513,
+     "p": 0.612476
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.15,
+   "predicted_lift": 0.045,
+   "true_lift_hidden": 0.0113,
+   "finishers_delta_hidden": 6.94
+  },
+  {
+   "test": "sim-17",
+   "title": "Path Selection Helper Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 148.0,
+   "result": {
+    "step": {
+     "control": 0.768,
+     "treatment": 0.7947,
+     "lift": 0.0347,
+     "lift_se": 0.0141,
+     "p": 0.012467
+    },
+    "finish": {
+     "control": 0.2107,
+     "treatment": 0.201,
+     "lift": -0.0459,
+     "lift_se": 0.0484,
+     "p": 0.354449
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 3.27,
+   "predicted_lift": 0.002,
+   "true_lift_hidden": 0.0297,
+   "finishers_delta_hidden": 18.23
+  }
+ ],
+ "shipped": [
+  "Reorder Sign-In After Photo Upload",
+  "Path Selection Helper Hint"
+ ],
+ "ends_week": 4,
+ "weights_next": {
+  "impact": 2.206,
+  "evidence": 0.631,
+  "confidence": 0.768,
+  "cost": 0.395
+ },
+ "lessons_next": [
+  "Reordering sign-in can be helpful (won after adoption selection at +5.5% and photo upload at +3.3%), but placing sign-in after the adoption certificate severely hurt performance (-22.4%).",
+  "Desktop background notification prompts (+5.1%) and path selection helper hints (+3.3%) were helpful, but sound cue notifications, notification toggles, and desktop overlay hints showed no clear effect.",
+  "Copy updates and waiting screen progress/time displays consistently showed no clear effect.",
+  "Visual redesigns and layout changes showed no clear effect or caused severe negative drops (-17.2%) and guardrail rollbacks.",
+  "Predictions were frequently over-optimistic for non-winning tests, predicting up to +12.0% where no clear effect was measured.",
+  "Predictions underestimated several wins, such as sign-in reordering after photo upload (-8.0% predicted vs +3.3% measured) and path helper hints (+0.2% predicted vs +3.5% measured)."
+ ]
+}

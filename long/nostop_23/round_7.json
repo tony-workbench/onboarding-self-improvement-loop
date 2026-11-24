@@ -1,0 +1,427 @@
+{
+ "round": 7,
+ "starts_week": 7,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.76903941375,
+  "adoption": 0.7445394723899998,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.968,
+  "evidence": 1.268,
+  "confidence": 0.68,
+  "cost": 0.084
+ },
+ "lessons_used": [
+  "Predictions generally overestimate noise-corrected results, though some winning tests (like adoption new_screen) exceeded expectations.",
+  "No clear effect was seen for home, wait_info changes across four tests.",
+  "No clear effect was seen for choose_path, hint changes across two tests.",
+  "No clear effect was seen for choose_path, layout changes across two tests.",
+  "Evidence for sign_in, copy, sign_in, reorder, and adoption, redesign changes remains thin because results contradict each other or lack consistent wins.",
+  "Evidence for single-test change kinds (adoption layout/new_screen, finish changes, home notification/new_flow) remains thin."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Full bleed adoption certificate screen redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen into a full-bleed stage layout with an official seal verification graphic.",
+   "why": "Adoption conversion drops to 74.5% with high mean duration (1017s); a full-bleed celebratory layout builds momentum before sign-in.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "full_bleed",
+     "headline": "Official Pet Adoption Certificate",
+     "body": "Review and approve your new desktop pet's official credentials before activation.",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "image",
+        "asset": "asset:certificate_full_seal",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'adoption_certificate.certificate' does not do the job: needs 1 of ['animation', 'image', 'preview'] with an asset:certificate/ asset"
+   }
+  },
+  {
+   "title": "Desktop pet sound test step on onboarding completion",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a new pet sound test screen after home intro to introduce voice interactions before desktop launch.",
+   "why": "Finish conversion drops to 64.8% and support received 3 emails from users confused about how to talk to or interact with their pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_pet_sound_test"
+    ],
+    "new_pet_sound_test": {
+     "headline": "Test Pet Voice & Sounds",
+     "body": "Click the sound buttons to hear how your desktop pet will respond when clicked or summoned.",
+     "button_label": "Launch to Desktop",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "sound",
+       "label": "Play Happy Meow",
+       "asset": "asset:pet_sound_happy",
+       "action": "play",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a new onboarding screen after home intro."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.045,
+   "score": 8.94,
+   "score_note": "Targets highest drop step with strong support mail evidence; requires new screen.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Account pet lookup and recovery option on sign in",
+   "target_step": "sign_in",
+   "type": "new_flow",
+   "change": "Add an explicit account lookup choice card on sign-in screen for users restoring existing pet data.",
+   "why": "Support received 8 emails regarding pets missing or reset after signing in with wrong accounts.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Connect Your Pet",
+     "body": "Sign in to save your adoption progress or restore pets previously saved to another account.",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Looking for a previously adopted pet?",
+       "style": "highlight",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.components[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Reorder sign in immediately after adoption certificate",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move sign-in to trigger immediately after signing the adoption certificate, right before background waiting initializes.",
+   "why": "Placing sign-in after adoption certificate secures the pet profile when emotional investment is highest before background waiting.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid reordering of sign in within onboarding."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.001,
+   "score": 2.8,
+   "score_note": "Sign-in reordering has shown flat results (-0.1%) across 3 prior tests."
+  },
+  {
+   "title": "Existing account pet safety note on sign in screen",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Update headline and body on the sign-in screen to emphasize that logging into an existing account recovers previously adopted pets.",
+   "why": "8 support emails were submitted about pets disappearing after users logged in under new credentials.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Save or Recover Your Pet",
+     "body": "Use your primary account email to ensure your pet progress and accessories remain restored and saved across devices."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.body' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Compact desktop launch checklist on home intro",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Switch home intro screen layout to compact checklist mode highlighting key desktop shortcuts.",
+   "why": "Finish screen conversion is low at 64.8% with 395s median time; a compact checklist streamlines desktop activation.",
+   "config": {
+    "home_intro": {
+     "layout": "compact",
+     "headline": "Ready for Desktop Launch",
+     "body": "Review the desktop shortcuts below to control, hide, or talk with your pet anytime."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout update to the home intro screen."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.015,
+   "score": 7.99,
+   "score_note": "Addresses major drop off step (64.8% conv) via layout streamlining."
+  },
+  {
+   "title": "Desktop companion badge on finish screen",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Display an active desktop companion badge on the home intro screen as a reward for completing setup.",
+   "why": "Overall onboarding completion is only 23.0%, with finish step showing high mean drop time (5815s).",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Desktop Companion Verified",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid component addition to the home intro screen."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.02,
+   "score": 7.99,
+   "score_note": "Focuses on biggest drop step with incentive, backed by funnel metrics."
+  },
+  {
+   "title": "Desktop taskbar render troubleshooting hint",
+   "target_step": "home",
+   "type": "hint",
+   "change": "Add a hint on the waiting screen explaining how pet rendering overlays above system taskbar windows.",
+   "why": "3 support tickets reported the pet not appearing on desktop or app failing to open during initialization.",
+   "config": {
+    "waiting": {
+     "hint": "Note: Your pet app initializes in the system tray / taskbar area. Check your taskbar if window is minimized."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid text hint added to the waiting screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.005,
+   "score": 5.02,
+   "score_note": "Strong support ticket alignment and cheap config, but hints rarely drive high lift.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Audio chime progress indicator on waiting screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add a subtle sound component and progress update to the waiting screen as desktop pet engine initializes.",
+   "why": "Home / waiting step has a long median time of 201s and mean of 2336s, causing user dropout.",
+   "config": {
+    "waiting": {
+     "headline": "Initializing Desktop Pet Engine",
+     "body": "Setting up graphics renderers and background system hooks. Audio chime will play when complete.",
+     "components": [
+      {
+       "type": "sound",
+       "label": "Engine Startup Tone",
+       "asset": "asset:startup_tone",
+       "action": "play",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid content and component update to the waiting screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.006,
+   "score": 2.8,
+   "score_note": "Home wait_info changes showed no clear effect across 4 previous tests."
+  },
+  {
+   "title": "Taskbar ready background notification prompt",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable notify_when_ready on the waiting screen so users get a native notification when the pet finishes rendering.",
+   "why": "Users take median 201s / mean 2336s on waiting screen and 3 users reported confusion over desktop visibility.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "body": "Feel free to switch windows. We will send a desktop alert as soon as your pet is active."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid notification setting and text update to the waiting screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.02,
+   "score": 4.92,
+   "score_note": "Has support mail backing, but home notifications tested -2.0% previously."
+  }
+ ],
+ "picked": [
+  "Desktop pet sound test step on onboarding completion",
+  "Desktop taskbar render troubleshooting hint"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-24",
+   "title": "Desktop pet sound test step on onboarding completion",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.6402,
+     "treatment": 0.6148,
+     "lift": -0.0397,
+     "lift_se": 0.0333,
+     "p": 0.242142
+    },
+    "finish": {
+     "control": 0.2147,
+     "treatment": 0.2,
+     "lift": -0.0683,
+     "lift_se": 0.0471,
+     "p": 0.161157
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.94,
+   "predicted_lift": 0.045,
+   "true_lift_hidden": -0.0307,
+   "finishers_delta_hidden": -19.36
+  },
+  {
+   "test": "sim-25",
+   "title": "Desktop taskbar render troubleshooting hint",
+   "target_step": "home",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7992,
+     "treatment": 0.7757,
+     "lift": -0.0294,
+     "lift_se": 0.0198,
+     "p": 0.143757
+    },
+    "finish": {
+     "control": 0.229,
+     "treatment": 0.2183,
+     "lift": -0.0466,
+     "lift_se": 0.0459,
+     "p": 0.32149
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.02,
+   "predicted_lift": 0.005,
+   "true_lift_hidden": -0.025,
+   "finishers_delta_hidden": -15.77
+  }
+ ],
+ "shipped": [],
+ "ends_week": 7,
+ "weights_next": {
+  "impact": 2.116,
+  "evidence": 1.141,
+  "confidence": 0.657,
+  "cost": 0.086
+ },
+ "lessons_next": [
+  "Predictions generally overestimate noise-corrected results, though some winning tests (like adoption new_screen) exceeded expectations.",
+  "No clear effect was seen for home, wait_info changes across four tests.",
+  "No clear effect was seen for choose_path, hint changes across two tests.",
+  "No clear effect was seen for choose_path, layout changes across two tests.",
+  "Evidence for sign_in, copy, sign_in, reorder, and adoption, redesign changes remains thin due to contradictory results or lack of consistent wins.",
+  "Evidence for single-test change kinds (adoption layout/new_screen, finish changes, home hint/new_flow/notification) remains thin."
+ ]
+}

@@ -1,0 +1,464 @@
+{
+ "round": 16,
+ "starts_week": 16,
+ "funnel": {
+  "choose_path": 0.8093964,
+  "sign_in": 0.7575038999999999,
+  "adoption": 0.8192509530861598,
+  "home": 0.8946667707184348,
+  "finish": 0.8313247265328002
+ },
+ "weights_used": {
+  "impact": 2.771,
+  "evidence": 1.062,
+  "confidence": 0.084,
+  "cost": 0.084
+ },
+ "lessons_used": [
+  "Adding new screens (new_screen) was helpful, winning 5 tests (up to +15.4%), though 1 hurt performance (-7.7%) and 6 showed no clear effect.",
+  "Waiting screen info updates (wait_info) were helpful, winning 3 tests (up to +5.7%), though 1 hurt performance (-6.0%) and 8 showed no clear effect.",
+  "Layout changes (layout) were helpful, winning 2 tests (+7.0% and +8.7%), though 2 hurt performance (-3.7% and -3.8%) and 3 showed no clear effect.",
+  "Redesigns (redesign) were helpful, winning 1 test (+9.0%), though 1 hurt performance (-7.5%) and 5 showed no clear effect.",
+  "Step reordering (reorder) hurt performance in 1 test (-3.8%) and showed no clear effect in 2 tests, while copy changes, hints, notifications, and new flows showed no clear effect across all tests.",
+  "Predictions underestimated large wins (e.g., predicting -2.0% vs +8.7% measured, -1.5% vs +9.0% measured) and overestimated changes that hurt performance or had no clear effect."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Companion Sound Effect Customization Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Add a new audio preview screen during pet adoption so users can test and choose default companion vocalizations.",
+   "why": "Enables early audio customization to boost adoption completion (currently 81.9%) and companion personalization.",
+   "config": {
+    "pick_friend": {
+     "hint": "Select visual companion style"
+    },
+    "new_pet_audio": {
+     "headline": "Choose Companion Sound Effects",
+     "body": "Select the vocalizations and sound cues your pet will make on your desktop.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "sound",
+       "label": "Playful Chimes",
+       "asset": "asset:chimes",
+       "action": "play"
+      },
+      {
+       "type": "button",
+       "label": "Continue",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Desktop Audio & Layering Diagnostics on Waiting Screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add real-time desktop overlay engine diagnostic checklists and sound pipeline checks to the waiting screen.",
+   "why": "Support receives 3 emails about pets not appearing on desktop and 4 about desktop features misbehaving.",
+   "config": {
+    "waiting": {
+     "hint": "Verifying desktop overlay integration and sound hardware status...",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Desktop Overlay Engine Initialized",
+       "style": "subtle"
+      },
+      {
+       "type": "checklist",
+       "text": "Audio Pipeline Ready",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "The waiting screen loses its required job of showing that the pet is being made, replacing it with system diagnostics."
+   }
+  },
+  {
+   "title": "List Layout Redesign for Path Options",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Switch the choose path screen layout to a list view highlighting immediate companion choices.",
+   "why": "choose_path has an 80.9% conversion and a high mean duration of 514s; list layout simplifies option evaluation.",
+   "config": {
+    "choose_path": {
+     "layout": "list",
+     "body": "Select how you would like to create your desktop companion."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the path selection layout while preserving creation options is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.011,
+   "score": 5.71,
+   "score_note": "Target step drops 19.1% with high time spent; layout changes show modest historical gains (+1.1%)."
+  },
+  {
+   "title": "Carousel Layout Redesign for Home Intro Screen",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign home intro screen into a step-by-step interactive carousel presenting desktop control shortcuts.",
+   "why": "Support mail highlights 3 complaints about confusion over how to control, hide, or talk to the pet post-onboarding.",
+   "config": {
+    "home_intro": {
+     "layout": "carousel",
+     "headline": "Master Your Desktop Companion Controls",
+     "body": "Swipe through cards to learn desktop interaction shortcuts.",
+     "replace": {
+      "home_welcome": [
+       {
+        "type": "tip_carousel",
+        "text": "Click pet to interact, right-click to hide or open settings",
+        "role": "home_welcome"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.replace.home_welcome[0]': a tip_carousel cannot do the home_welcome job (use ['animation', 'button', 'checklist', 'image', 'mascot', 'text'])"
+   }
+  },
+  {
+   "title": "Interactive Desktop Summon Test Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a dedicated test screen after home intro where users practice summoning and hiding their pet before completing setup.",
+   "why": "Directly resolves post-onboarding user confusion regarding desktop pet controls and visibility (6 total support emails).",
+   "config": {
+    "home_intro": {
+     "hint": "Ready to test your controls?"
+    },
+    "new_summon_test": {
+     "headline": "Test Desktop Pet Controls",
+     "body": "Try hiding and summoning your pet right now before finishing setup.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "button",
+       "label": "Test Summon Pet",
+       "action": "next",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Companion Initial Outfit Customization Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Introduce a starter outfit selection flow during adoption allowing users to pick companion accessories before finalizing.",
+   "why": "Increases user engagement and personal attachment to improve adoption step conversion (currently 81.9%).",
+   "config": {
+    "pick_friend": {
+     "hint": "Pick starter companion look"
+    },
+    "new_outfit_select": {
+     "headline": "Select Companion Starter Outfit",
+     "body": "Equip your new pet with a starter accessory before bringing them to your desktop.",
+     "layout": "grid",
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Classic Bow, Cozy Hat, Party Glasses",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Cloud Account Pet Preservation Assurance Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Add explicit copy explaining that existing pet profiles, items, and progress are preserved upon signing in.",
+   "why": "Top support theme (8 emails) reports pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In & Keep Your Pets Safe",
+     "body": "Signing in syncs your pet profiles, saved items, and desktop preferences safely to the cloud.",
+     "hint": "Existing pet data is automatically restored upon sign-in."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating sign-in assurance copy within onboarding is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.006,
+   "score": 7.59,
+   "score_note": "Strongly backed by top support theme (8 emails) and funnel drop-off; low cost copy update.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 181.9
+  },
+  {
+   "title": "Reorder Story Sequence Before Path Selection",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Reorder onboarding sequence to place story intro prior to path selection so users understand companion context.",
+   "why": "Establishing narrative context earlier can reduce path selection indecision (mean time 514s, 19.1% drop-off).",
+   "config": {
+    "choose_path": {
+     "hint": "Choose your creation path after story context"
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering onboarding screens while maintaining all required steps is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.038,
+   "score": 5.61,
+   "score_note": "Step reordering historically reduced conversion (-3.8%) and lacks direct support email evidence.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 181.9
+  },
+  {
+   "title": "Desktop Screen Resolution & Display Multi-Monitor Info on Waiting",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display multi-monitor positioning and display resolution support notes on the waiting screen.",
+   "why": "Addresses 3 support complaints regarding pets failing to display on desktop or app startup stalls.",
+   "config": {
+    "waiting": {
+     "hint": "Pet supports multi-monitor setups and auto-detects primary display boundary."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding multi-monitor information to the waiting screen is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.012,
+   "score": 4.5,
+   "score_note": "Wait screen updates consistently yield positive results (+1.2% over 12 tests) and resolve reported user bugs.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 181.9
+  },
+  {
+   "title": "Card Layout Redesign for Sign In Options",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in options area into elevated selection cards featuring cloud save security indicators.",
+   "why": "Sign in conversion is 75.8% (lowest step conversion in funnel) and account retention concerns are high.",
+   "config": {
+    "sign_in": {
+     "layout": "card",
+     "headline": "Secure Your Companion Account",
+     "replace": {
+      "sign_in_options": [
+       {
+        "type": "button",
+        "label": "Continue with Account",
+        "action": "next",
+        "role": "sign_in_options",
+        "style": "emphasis"
+       },
+       {
+        "type": "badge",
+        "text": "Cloud Backup Protected",
+        "role": "sign_in_options",
+        "style": "subtle"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  }
+ ],
+ "picked": [
+  "Reorder Story Sequence Before Path Selection",
+  "Cloud Account Pet Preservation Assurance Copy",
+  "Desktop Screen Resolution & Display Multi-Monitor Info on Waiting"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 545.7,
+ "decisions": [
+  {
+   "test": "sim-57",
+   "title": "Reorder Story Sequence Before Path Selection",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 181.9,
+   "result": {
+    "step": {
+     "control": 0.81,
+     "treatment": 0.8107,
+     "lift": 0.0008,
+     "lift_se": 0.0125,
+     "p": 0.947489
+    },
+    "finish": {
+     "control": 0.3787,
+     "treatment": 0.395,
+     "lift": 0.0431,
+     "lift_se": 0.0339,
+     "p": 0.193985
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.61,
+   "predicted_lift": -0.038,
+   "true_lift_hidden": 0.0013,
+   "finishers_delta_hidden": 1.48
+  },
+  {
+   "test": "sim-58",
+   "title": "Cloud Account Pet Preservation Assurance Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 181.9,
+   "result": {
+    "step": {
+     "control": 0.7641,
+     "treatment": 0.8075,
+     "lift": 0.0568,
+     "lift_se": 0.0159,
+     "p": 0.000232
+    },
+    "finish": {
+     "control": 0.3687,
+     "treatment": 0.3993,
+     "lift": 0.0832,
+     "lift_se": 0.0355,
+     "p": 0.014604
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 7.59,
+   "predicted_lift": 0.006,
+   "true_lift_hidden": 0.0446,
+   "finishers_delta_hidden": 50.61
+  },
+  {
+   "test": "sim-59",
+   "title": "Desktop Screen Resolution & Display Multi-Monitor Info on Waiting",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 181.9,
+   "result": {
+    "step": {
+     "control": 0.9149,
+     "treatment": 0.9092,
+     "lift": -0.0063,
+     "lift_se": 0.0112,
+     "p": 0.572203
+    },
+    "finish": {
+     "control": 0.3943,
+     "treatment": 0.3833,
+     "lift": -0.0279,
+     "lift_se": 0.0315,
+     "p": 0.382156
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.5,
+   "predicted_lift": 0.012,
+   "true_lift_hidden": 0.0209,
+   "finishers_delta_hidden": 23.72
+  }
+ ],
+ "shipped": [
+  "Cloud Account Pet Preservation Assurance Copy"
+ ],
+ "ends_week": 16,
+ "weights_next": {
+  "impact": 2.84,
+  "evidence": 0.994,
+  "confidence": 0.083,
+  "cost": 0.083
+ },
+ "lessons_next": [
+  "Adding new screens (new_screen) was helpful, winning 5 tests (up to +15.4%), though 1 hurt performance (-7.7%) and 6 showed no clear effect.",
+  "Waiting screen info updates (wait_info) were helpful, winning 3 tests (up to +5.7%), though 1 hurt performance (-6.0%) and 9 showed no clear effect.",
+  "Layout changes (layout) were helpful, winning 2 tests (+7.0% and +8.7%), though 2 hurt performance (-3.7% and -3.8%) and 3 showed no clear effect.",
+  "Redesigns (redesign) and copy updates (copy) were helpful in 1 test each (+9.0% and +5.7%), though 1 redesign hurt performance (-7.5%) and most showed no clear effect.",
+  "Step reordering (reorder) hurt performance in 1 test (-3.8%) and showed no clear effect in 3 tests, while hints, notifications, and new flows showed no clear effect across all tests.",
+  "Predictions underestimated several large wins (e.g., predicting -2.0% vs +8.7% measured, +0.6% vs +5.7% measured) and overestimated changes that hurt performance or had no clear effect."
+ ]
+}

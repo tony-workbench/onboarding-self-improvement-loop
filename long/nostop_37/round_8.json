@@ -1,0 +1,460 @@
+{
+ "round": 8,
+ "starts_week": 8,
+ "funnel": {
+  "choose_path": 0.81680588226,
+  "sign_in": 0.807952696719336,
+  "adoption": 0.70300242642,
+  "home": 0.813,
+  "finish": 0.7695000000000001
+ },
+ "weights_used": {
+  "impact": 0.328,
+  "evidence": 1.452,
+  "confidence": 1.504,
+  "cost": 0.716
+ },
+ "lessons_used": [
+  "sign_in, copy changes were consistently helpful, winning 3 out of 4 tests (+2.2% average after noise correction).",
+  "adoption, redesign changes were helpful in 2 out of 4 tests (+2.3% average after noise correction), while the remaining 2 showed no clear effect.",
+  "home, wait_info, home, notification, and sign_in, hint changes consistently showed no clear effect across 2 tests each.",
+  "home, new_flow changes consistently failed to show positive impact across 2 tests, resulting in no clear effect or worse performance.",
+  "finish, new_screen changes generally failed after an initial win, with recent tests performing worse.",
+  "Predictions remained generally too high compared to noise-corrected results, and evidence remains thin for categories with only 1 test."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Deferred Account Creation Sequence Reorder",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder the onboarding flow so account sign-in occurs after pet adoption and certificate creation.",
+   "why": "Sign-in conversion is 80.8% with a 567s mean duration; allowing users to create their pet first builds ownership before account creation.",
+   "config": {
+    "sign_in": {
+     "_order": [
+      "story",
+      "choose_path",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "sign_in",
+      "waiting",
+      "home_intro"
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "field 'sign_in._order' is not adjustable"
+   }
+  },
+  {
+   "title": "Grid Companion Selection Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Transform the pet choice view into a grid layout with visual preview cards and animated mascots.",
+   "why": "Adoption has the lowest funnel conversion at 70.3% and a 1017s mean time. Previous adoption redesigns showed a +2.3% lift.",
+   "config": {
+    "pick_friend": {
+     "layout": "grid",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "style": "playful",
+        "label": "Select Pet Character"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Pre-Adoption Companion Preference Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Add a dedicated preference screening step prior to selecting a companion.",
+   "why": "High median (89s) and mean (1017s) time in adoption indicates users need clearer structured guidance before committing to a pet.",
+   "config": {
+    "new_companion_quiz": {
+     "headline": "Find Your Ideal Companion",
+     "body": "Select the personality and activity level that matches your daily desktop routine.",
+     "layout": "card",
+     "button_label": "Show Matching Pets"
+    },
+    "pick_friend": {
+     "_order": [
+      "story",
+      "choose_path",
+      "sign_in",
+      "new_companion_quiz",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "waiting",
+      "home_intro"
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Interactive Home Welcome Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign the home introduction screen into a stage layout featuring an interactive pet mascot and control guide.",
+   "why": "Support receives multiple tickets reporting confusion on how to control, hide, or talk to the pet after onboarding.",
+   "config": {
+    "home_intro": {
+     "layout": "stage",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "mascot",
+        "style": "highlight",
+        "asset": "asset:pet_welcome"
+       },
+       {
+        "role": "home_welcome",
+        "type": "text",
+        "style": "plain",
+        "text": "Right-click your pet anytime to summon desktop controls, hide, or interact."
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro screen preserves its essential functions."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.02,
+   "score": 1.48,
+   "score_note": "Finish step redesigns have performed poorly in past tests (-4.4%), and building an interactive layout requires high development effort.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Story Scroll Path Selection Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign path selection into a full story scroll layout with interactive animated path previews.",
+   "why": "Choose path step takes a mean time of 514s, showing that users hesitate when choosing their initial onboarding route.",
+   "config": {
+    "choose_path": {
+     "layout": "story_scroll",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "style": "rounded",
+        "label": "Choose Your Pet Path"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Stage Layout Adoption Certificate View",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Rebuild the adoption certificate summary into a stage layout with centered pet animations.",
+   "why": "Improving visual feedback during adoption completion boosts user investment right before the waiting screen phase.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "preview",
+        "style": "large",
+        "asset": "asset:pet_preview"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'adoption_certificate.certificate' does not do the job: needs 1 of ['animation', 'image', 'preview'] with an asset:certificate/ asset"
+   }
+  },
+  {
+   "title": "Multi-Device Pet Sync Account Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Update sign-in headline and body to highlight safe cloud synchronization and pet retrieval across devices.",
+   "why": "8 support emails cited missing or reset pets after signing in again, making account sync messaging critical.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Keep Your Pet Safe Across Devices",
+     "body": "Your pet customization and progress are saved to your cloud account so you never lose your companion."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Copy update for sign-in is accurate and contains no prohibited references."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.022,
+   "score": 9.73,
+   "score_note": "Directly addresses 8 support emails with a sign_in copy change, a pattern that consistently yielded +2.2% lift across 4 previous tests.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Account Data Retention Sign-In Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Clarify sign-in subtext to state that re-authenticating restores existing pets rather than starting fresh.",
+   "why": "Addresses the top support complaint (8 emails regarding pets missing or reset after re-login). Sign-in copy tests average +2.2% gain.",
+   "config": {
+    "sign_in": {
+     "headline": "Restore & Secure Your Pet Account",
+     "body": "Logging in connects your active desktop pet to your permanent account. Re-sign in anytime to restore lost pets."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Sign-in copy revision clearly explains data retention without dark patterns."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.022,
+   "score": 9.73,
+   "score_note": "Targets top support issue (8 emails) via a low-cost sign_in copy update, matching historical +2.2% average lift."
+  },
+  {
+   "title": "Two Column Photo Upload Layout",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Reframe the custom photo upload step into a two-column layout with photo quality previews and tips.",
+   "why": "Support received 3 emails reporting custom pet generation failures or unexpected visual results.",
+   "config": {
+    "upload_photos": {
+     "layout": "two_column",
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "style": "rounded",
+        "label": "Upload Pet Photo"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Two-column redesign of photo upload retains the photo selection functionality."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.014,
+   "score": 6.02,
+   "score_note": "Focuses on adoption, the step with the highest drop-off (29.7%), though adoption layout changes have limited historical data (+1.4%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Desktop Controls Quick Guidance Copy",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Revise the final completion screen headline and body to explain basic mouse shortcuts and hiding controls.",
+   "why": "3 support tickets highlighted post-onboarding confusion regarding how to control, hide, or talk to the pet.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Pet is Ready on Your Desktop!",
+     "body": "Click and drag to move your companion. Right-click to open actions, switch modes, or hide your pet anytime."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Home intro copy update provides desktop control guidance without violating rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 5.15,
+   "score_note": "Low-cost copy update on the finish step to reduce confusion, aligned with past non-redesign finish improvements (~+1.5%)."
+  }
+ ],
+ "picked": [
+  "Interactive Home Welcome Redesign",
+  "Multi-Device Pet Sync Account Copy",
+  "Two Column Photo Upload Layout"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-32",
+   "title": "Interactive Home Welcome Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7681,
+     "treatment": 0.7324,
+     "lift": -0.0464,
+     "lift_se": 0.0232,
+     "p": 0.051151
+    },
+    "finish": {
+     "control": 0.2837,
+     "treatment": 0.2773,
+     "lift": -0.0223,
+     "lift_se": 0.0404,
+     "p": 0.585063
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 1.48,
+   "predicted_lift": -0.02,
+   "true_lift_hidden": -0.0356,
+   "finishers_delta_hidden": -29.75
+  },
+  {
+   "test": "sim-33",
+   "title": "Multi-Device Pet Sync Account Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.796,
+     "treatment": 0.8528,
+     "lift": 0.0713,
+     "lift_se": 0.0142,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.265,
+     "treatment": 0.313,
+     "lift": 0.1811,
+     "lift_se": 0.0481,
+     "p": 4.1e-05
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 9.73,
+   "predicted_lift": 0.022,
+   "true_lift_hidden": 0.07,
+   "finishers_delta_hidden": 58.5
+  },
+  {
+   "test": "sim-34",
+   "title": "Two Column Photo Upload Layout",
+   "target_step": "adoption",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.6906,
+     "treatment": 0.664,
+     "lift": -0.0386,
+     "lift_se": 0.0213,
+     "p": 0.075479
+    },
+    "finish": {
+     "control": 0.266,
+     "treatment": 0.278,
+     "lift": 0.0451,
+     "lift_se": 0.0442,
+     "p": 0.296289
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.02,
+   "predicted_lift": 0.014,
+   "true_lift_hidden": -0.0483,
+   "finishers_delta_hidden": -40.36
+  }
+ ],
+ "shipped": [
+  "Multi-Device Pet Sync Account Copy"
+ ],
+ "ends_week": 8,
+ "weights_next": {
+  "impact": 0.298,
+  "evidence": 1.502,
+  "confidence": 1.521,
+  "cost": 0.678
+ },
+ "lessons_next": [
+  "sign_in, copy changes were consistently helpful, winning 4 out of 5 tests (+3.0% average after noise correction).",
+  "adoption, redesign changes were helpful in 2 out of 4 tests (+2.3% average after noise correction), while the remaining 2 showed no clear effect.",
+  "finish, new_screen changes generally failed after an initial win, with recent tests showing no clear effect or performing worse (-1.3% average).",
+  "home, wait_info, home, notification, sign_in, hint, and adoption, layout changes consistently showed no clear effect across 2 tests each.",
+  "home, new_flow and finish, redesign changes failed across 2 tests each, resulting in no clear effect or worse performance.",
+  "Predictions remained generally too optimistic compared to noise-corrected results, and evidence remains thin for categories with only 1 test."
+ ]
+}

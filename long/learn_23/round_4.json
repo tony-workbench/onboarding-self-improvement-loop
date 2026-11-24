@@ -1,0 +1,597 @@
+{
+ "round": 4,
+ "starts_week": 4,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7595451,
+  "adoption": 0.6978530999999999,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.384,
+  "evidence": 1.401,
+  "confidence": 1.005,
+  "cost": 0.21
+ },
+ "lessons_used": [
+  "Evidence is still thin for most specific change types because only choose_path copy and home wait_info have at least two tests.",
+  "Copy changes in choose_path (choose_path, copy) consistently made performance worse across multiple tests.",
+  "Waiting step info (home, wait_info) showed no clear effect across multiple tests.",
+  "Redesigning friend selection (adoption, redesign) and reordering sign-in (sign_in, reorder) were helpful, winning their tests.",
+  "Layout changes, notification toggles, and new visual tip screens had no clear effect.",
+  "Predictions were consistently too high compared to noise-corrected measured outcomes."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Split layout sign-in screen redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in screen into a split layout to clearly separate authentication options from pet progress context.",
+   "why": "Sign-in step has 76.0% conversion, and 2 support emails reported app stalling or sign-in screens failing to load properly.",
+   "config": {
+    "sign_in": {
+     "layout": "split",
+     "headline": "Sign In to Access Your Pet",
+     "body": "Connect your account to finish setting up your desktop companion."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout redesign of the sign-in screen within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 6.16,
+   "score_note": "Sign-in drops 24% of users with 2 support mails; redesigning sign-in layout has moderate potential.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 153.2
+  },
+  {
+   "title": "Pet naming screen before account setup",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Add a new screen after adoption certificate where users enter and confirm their pet's name before proceeding to sign-in.",
+   "why": "Adoption step drops 30.2% of users with an 89s median time; introducing a quick naming step boosts ownership before account creation.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_pet_name",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ],
+    "new_pet_name": {
+     "headline": "Name Your Pet",
+     "body": "Choose a name for your new desktop companion.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "name_input",
+       "label": "Pet Name",
+       "style": "rounded"
+      },
+      {
+       "type": "button",
+       "label": "Save Name",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a pet naming screen inside the onboarding flow."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.01,
+   "score": 3.47,
+   "score_note": "Adding new screens tends to increase friction; past new_screen test reduced conversion by -2.6%."
+  },
+  {
+   "title": "Photo quality guideline hint on photo upload screen",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add an explicit hint and quality badge to the photo upload screen explaining best photo lighting and angles.",
+   "why": "3 support emails mentioned custom pet creation failing or looking wrong after photo upload.",
+   "config": {
+    "upload_photos": {
+     "hint": "Use clear, well-lit frontal photos for accurate pet generation results.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Photo Quality Checklist",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of quality guidelines to the photo upload screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 7.59,
+   "score_note": "High evidence from 3 support emails on custom pet failures; cheap config/hint change."
+  },
+  {
+   "title": "Interactive wait screen animation replace",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Replace the standard wait status with a custom progress and live companion preview component.",
+   "why": "Waiting step takes a median of 201s (mean 2336s) with an 18.7% dropoff rate before entering home.",
+   "config": {
+    "waiting": {
+     "headline": "Generating Your Pet...",
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "progress",
+        "text": "Creating 3D desktop model...",
+        "style": "playful"
+       },
+       {
+        "role": "wait_status",
+        "type": "preview",
+        "asset": "asset:pet_generating",
+        "style": "large"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid replacement of wait status components while maintaining the waiting screen's core job."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 3.58,
+   "score_note": "Home step has lowest dropoff (18.7%) and wait_info showed little effect (+0.6%); high build cost."
+  },
+  {
+   "title": "Desktop control hint on finish screen",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Add a hint to the final home intro screen explaining basic mouse controls and right-click actions for the pet.",
+   "why": "3 support emails reported confusion about how to control, hide, or talk to the pet after onboarding, and finish step drops 35.2% of remaining users.",
+   "config": {
+    "home_intro": {
+     "hint": "Right-click your desktop pet anytime to open control options, speak, or send it to sleep."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a control hint to the home intro screen."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.04,
+   "score": 8.74,
+   "score_note": "Finish screen has the highest dropoff (35.2%) and 3 support emails; cheap hint fix."
+  },
+  {
+   "title": "Story scroll layout for story screen",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the onboarding story screen to a story_scroll layout to improve narrative engagement.",
+   "why": "Choose path drops 23.8% of users, and layout redesigns have proven more effective than pure copy edits in earlier tests.",
+   "config": {
+    "story": {
+     "layout": "story_scroll",
+     "headline": "Welcome to Your Desktop Pet Companion"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout redesign of the story screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 4.99,
+   "score_note": "Choose_path step drops 23.8%; copy edits failed previously (-4.1%), layout redesign is unproven.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 153.2
+  },
+  {
+   "title": "Desktop companion placement guide screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a new screen before home intro showing users where the pet sits on screen and how desktop launch works.",
+   "why": "3 support emails reported pets not showing up on desktop or app not opening, while 4 emails reported desktop feature misbehavior.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "new_desktop_guide",
+     "home_intro"
+    ],
+    "new_desktop_guide": {
+     "headline": "Where Your Pet Lives",
+     "body": "Your pet will walk around your taskbar and desktop windows.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "image",
+       "asset": "asset:desktop_placement_demo",
+       "style": "large"
+      },
+      {
+       "type": "button",
+       "label": "Got It",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a desktop guide screen inside the onboarding flow."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.01,
+   "score": 6.96,
+   "score_note": "Strong support mail evidence, but inserting a new screen previously decreased finish conversion.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 101.4
+  },
+  {
+   "title": "Sound notification toggle on waiting screen",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Add a sound notification trigger component to the waiting screen so users get an audio cue when setup finishes.",
+   "why": "Waiting screen mean duration is 2336s (median 201s), causing users to switch away and forget the desktop app.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "label": "Play chime when pet is ready",
+       "action": "play",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a sound notification toggle component to the waiting screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.025,
+   "score": 4.1,
+   "score_note": "Home notification test had positive trend (+2.7%) and low cost, though home dropoff is lower.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 153.2
+  },
+  {
+   "title": "Split layout redesign for adoption certificate",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign adoption certificate to a split layout featuring pet preview on one side and official details on the other.",
+   "why": "Adoption step drops 30.2% of users with an average time of 1017s; visual redesigns in adoption previously improved conversion.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "split",
+     "headline": "Official Pet Adoption Certificate"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid split layout redesign of the adoption certificate screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 7.42,
+   "score_note": "Adoption redesign was the strongest historical winner (+6.8% lift) on a high dropoff step (30.2%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 153.2
+  },
+  {
+   "title": "Sign-in troubleshooting screen before sign-in",
+   "target_step": "sign_in",
+   "type": "new_screen",
+   "change": "Add a sign-in preparation screen before authentication explaining connection requirements.",
+   "why": "2 support emails reported sign-in screen not appearing or app stalling before sign-in.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_signin_prep",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ],
+    "new_signin_prep": {
+     "headline": "Connecting to Account Services",
+     "body": "Preparing your sign-in session to securely save pet settings.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "progress",
+       "text": "Checking connection...",
+       "style": "plain"
+      },
+      {
+       "type": "button",
+       "label": "Continue to Sign In",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "screen 'new_signin_prep' is not part of onboarding (new screens are named new_..., and may not look like payment, account, sign-up or settings screens)"
+   }
+  }
+ ],
+ "picked": [
+  "Split layout redesign for adoption certificate",
+  "Desktop companion placement guide screen",
+  "Split layout sign-in screen redesign",
+  "Story scroll layout for story screen",
+  "Sound notification toggle on waiting screen"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 714.2,
+ "decisions": [
+  {
+   "test": "sim-13",
+   "title": "Split layout sign-in screen redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": 21,
+   "share": 1.0,
+   "planned_harm": 153.2,
+   "result": {
+    "step": {
+     "control": 0.8018,
+     "treatment": 0.6809,
+     "lift": -0.1508,
+     "lift_se": 0.0394,
+     "p": 0.000358
+    },
+    "finish": {
+     "control": 0.24,
+     "treatment": 0.2071,
+     "lift": -0.1373,
+     "lift_se": 0.1107,
+     "p": 0.249064
+    },
+    "users_per_group": 425
+   },
+   "outcome": "stopped early: sign_in worse",
+   "score": 6.16,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": -0.1147,
+   "finishers_delta_hidden": -11.28
+  },
+  {
+   "test": "sim-12",
+   "title": "Desktop companion placement guide screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": 88,
+   "share": 1.0,
+   "planned_harm": 101.4,
+   "result": {
+    "step": {
+     "control": 0.6423,
+     "treatment": 0.5547,
+     "lift": -0.1364,
+     "lift_se": 0.0398,
+     "p": 0.001369
+    },
+    "finish": {
+     "control": 0.2223,
+     "treatment": 0.1911,
+     "lift": -0.1404,
+     "lift_se": 0.0555,
+     "p": 0.018786
+    },
+    "users_per_group": 1858
+   },
+   "outcome": "stopped early: finish worse",
+   "score": 6.96,
+   "predicted_lift": -0.01,
+   "true_lift_hidden": -0.1773,
+   "finishers_delta_hidden": -74.86
+  },
+  {
+   "test": "sim-11",
+   "title": "Split layout redesign for adoption certificate",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 153.2,
+   "result": {
+    "step": {
+     "control": 0.706,
+     "treatment": 0.747,
+     "lift": 0.0581,
+     "lift_se": 0.0221,
+     "p": 0.006827
+    },
+    "finish": {
+     "control": 0.2117,
+     "treatment": 0.2213,
+     "lift": 0.0457,
+     "lift_se": 0.0514,
+     "p": 0.363339
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 7.42,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.0581,
+   "finishers_delta_hidden": 38.22
+  },
+  {
+   "test": "sim-14",
+   "title": "Story scroll layout for story screen",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 153.2,
+   "result": {
+    "step": {
+     "control": 0.7637,
+     "treatment": 0.7757,
+     "lift": 0.0157,
+     "lift_se": 0.0143,
+     "p": 0.269672
+    },
+    "finish": {
+     "control": 0.2237,
+     "treatment": 0.2283,
+     "lift": 0.0209,
+     "lift_se": 0.0488,
+     "p": 0.665637
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.99,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": 0.0186,
+   "finishers_delta_hidden": 12.24
+  },
+  {
+   "test": "sim-15",
+   "title": "Sound notification toggle on waiting screen",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 153.2,
+   "result": {
+    "step": {
+     "control": 0.8102,
+     "treatment": 0.819,
+     "lift": 0.0108,
+     "lift_se": 0.0195,
+     "p": 0.576731
+    },
+    "finish": {
+     "control": 0.224,
+     "treatment": 0.2277,
+     "lift": 0.0164,
+     "lift_se": 0.0486,
+     "p": 0.734135
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.1,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": 0.0172,
+   "finishers_delta_hidden": 11.32
+  }
+ ],
+ "shipped": [
+  "Split layout redesign for adoption certificate"
+ ],
+ "ends_week": 4,
+ "weights_next": {
+  "impact": 1.235,
+  "evidence": 1.334,
+  "confidence": 1.279,
+  "cost": 0.153
+ },
+ "lessons_next": [
+  "Evidence is still thin for single-test kinds of changes (adoption layout, choose_path redesign, finish layout, sign_in redesign, sign_in reorder).",
+  "Redesigning adoption screens (adoption, redesign) consistently worked well and proved helpful.",
+  "Copy changes in choose_path (choose_path, copy) consistently made performance worse.",
+  "Notification toggles (home, notification) and waiting step info (home, wait_info) showed no clear effect.",
+  "Adding new screens at the finish step (finish, new_screen) showed no clear positive effect and hurt performance.",
+  "Predictions were consistently too high compared to noise-corrected measured results."
+ ]
+}

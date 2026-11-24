@@ -1,0 +1,507 @@
+{
+ "round": 5,
+ "starts_week": 5,
+ "funnel": {
+  "choose_path": 0.7899653999999999,
+  "sign_in": 0.8532327537000001,
+  "adoption": 0.6300714,
+  "home": 0.8534061000000001,
+  "finish": 0.7014600000000001
+ },
+ "weights_used": {
+  "impact": 1.587,
+  "evidence": 0.612,
+  "confidence": 1.172,
+  "cost": 0.629
+ },
+ "lessons_used": [
+  "Moving sign-in after pet adoption was helpful and underpredicted (+13.3% vs +12.0%), but moving it to hand-off showed no clear effect and moving it after the waiting room made results worse (-3.9%). Account sync sign-in banners were also helpful (+2.7%).",
+  "Path clarity headline copy updates were helpful and underpredicted (+5.9% vs +1.0%), whereas general path copy simplification and time expectation banners showed no clear effect.",
+  "Interactive waiting rooms (+5.6%) and photo quality incentives (+7.6%) were helpful, though their predicted impacts (+8.0% and +10.0%) were too high.",
+  "Compact grid layouts for friend selection in pet adoption performed worse (-7.7%).",
+  "Progress trackers, sound notifications, split photo upload assistants, mascot welcome stages, and desktop spawn alerts showed no clear effect."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Custom Pet Style Selection Showcase",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the photo upload screen into a split layout that pairs custom image uploads with style preset selection cards to clarify fallback options.",
+   "why": "Adoption is the largest bottleneck converting at only 63.0%, and support received 3 tickets regarding custom pet creation failing or looking wrong.",
+   "config": {
+    "upload_photos": {
+     "layout": "split",
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "choice_cards",
+        "label": "Choose photo style preset",
+        "style": "emphasis"
+       },
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "label": "Upload reference image",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[0]': a choice_cards cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Pet Controls Orientation Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a dedicated post-onboarding orientation screen showing how to summon, right-click, and control the desktop pet.",
+   "why": "3 support emails specifically asked how to control, hide, or talk to their pet after finishing setup.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro",
+     "new_pet_controls"
+    ],
+    "new_pet_controls": {
+     "headline": "How to Interact with Your Companion",
+     "body": "Right-click your desktop pet to access settings, minimize to system tray, or start a chat anytime.",
+     "layout": "card",
+     "components": [
+      {
+       "type": "image",
+       "asset": "asset:controls_diagram",
+       "style": "large"
+      },
+      {
+       "type": "button",
+       "label": "Got It!",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a post-onboarding orientation screen after home_intro, which is permitted under Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.035,
+   "score": 5.13,
+   "score_note": "Addresses 30% drop-off at finish and support queries, but requires a new orientation screen."
+  },
+  {
+   "title": "Post-Adoption Certificate Sign-In Sequence",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Place the sign-in step right after the adoption certificate stage so users attach their newly customized pet directly to their account.",
+   "why": "8 support messages reported pets missing or reset after signing in again, making early account attachment critical.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign_in to follow adoption_certificate, explicitly allowed by Rule 4."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.115,
+   "score": 9.21,
+   "score_note": "Strong match with top support issue (8 emails) and historical success moving sign-in post-adoption.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 162.7
+  },
+  {
+   "title": "Interactive Companion Trait Onboarding Flow",
+   "target_step": "choose_path",
+   "type": "new_flow",
+   "change": "Rebuild path selection into a multi-card interactive trait selection stage where users define companion behavior before choosing adoption type.",
+   "why": "21.0% of users drop off at choose_path with a very high mean time of 514s.",
+   "config": {
+    "choose_path": {
+     "layout": "stage",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Select Companion Vibe & Path",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Adoption Naming Bonus Perk",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Display an exclusive welcome perk badge on the adoption certificate screen to encourage users to complete pet naming.",
+   "why": "Adoption step has the lowest conversion rate across onboarding at 63.0% and takes a median of 89s.",
+   "config": {
+    "adoption_certificate": {
+     "hint": "Complete your adoption certificate now to unlock an exclusive founder collar badge!",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Unlocked: Founder Ribbon",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions gifts/free extras (unlocking an exclusive badge/ribbon)."
+   }
+  },
+  {
+   "title": "Existing Account Pet Recovery Callout",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit informational callout banner on the sign-in screen reassuring returning users that their existing pets auto-sync upon login.",
+   "why": "The top support theme with 8 emails concerns missing or reset pets after signing back in.",
+   "config": {
+    "sign_in": {
+     "hint": "Already adopted a pet? Sign in to your original account to automatically restore your pet state."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an informational account recovery hint to the sign_in screen without violating rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.027,
+   "score": 8.68,
+   "score_note": "Directly targets top support theme with proven account sync banner approach (+2.7% measured)."
+  },
+  {
+   "title": "Background Hatching Desktop Readiness Status",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Provide real-time desktop shader readiness messaging and progress indicators while waiting for pet assets to build.",
+   "why": "3 support tickets reported pets failing to spawn on desktop or app stall during setup; median wait time is 201s.",
+   "config": {
+    "waiting": {
+     "headline": "Preparing Companion for Your Desktop",
+     "body": "Building desktop graphics and animations. You may minimize this window while we finish setup.",
+     "show_progress": true,
+     "notify_when_ready": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enhances the waiting screen with real-time status messaging and progress indicators for a real wait."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.017,
+   "score": 5.92,
+   "score_note": "Addresses high 201s median wait time, though status/time banners historically show modest effects.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 162.7
+  },
+  {
+   "title": "Story Intro Value Proposition Refresh",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update the story intro headline and body text to immediately emphasize quick setup and interactive desktop companionship.",
+   "why": "First step drop-off is 21.0%, indicating users need clearer upfront motivation before committing to path choice.",
+   "config": {
+    "story": {
+     "headline": "Bring Your Desktop to Life with an Interactive Companion",
+     "body": "Adopt a pre-designed pet in seconds or transform your favorite photo into a custom virtual friend."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates story copy while retaining the core function of introducing the pet."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.045,
+   "score": 9.49,
+   "score_note": "Targets 21% initial funnel drop-off with headline copy updates proven effective in past iterations.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 162.7
+  },
+  {
+   "title": "First Interaction Desktop Notification Tip",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Trigger a subtle timed desktop notification hint on the home intro screen pointing out the pet spawn location.",
+   "why": "Support logs show 3 users experienced confusion over pets not showing up on desktop or where to click.",
+   "config": {
+    "home_intro": {
+     "hint": "Your pet is now active! Look near the bottom of your screen or system tray to begin.",
+     "tip_delay_seconds": 5
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a notification hint on the home_intro screen within onboarding boundaries."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.038,
+   "score": 4.59,
+   "score_note": "Solves spawn location confusion backed by support logs and consistent with notification test history.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 101.1
+  },
+  {
+   "title": "Pick Friend Two Column Showcase",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch the friend selection layout to a clean two-column format showing pet previews on one side and traits on the other.",
+   "why": "Compact grid layout failed previously (-7.7%), showing that users require spacious visual detail when picking their pet.",
+   "config": {
+    "pick_friend": {
+     "layout": "two_column",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "preview",
+        "asset": "asset:pet_preview_main",
+        "style": "large"
+       },
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "label": "Select Companion",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  }
+ ],
+ "picked": [
+  "Post-Adoption Certificate Sign-In Sequence",
+  "Story Intro Value Proposition Refresh",
+  "Background Hatching Desktop Readiness Status",
+  "First Interaction Desktop Notification Tip"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 589.2,
+ "decisions": [
+  {
+   "test": "sim-17",
+   "title": "Post-Adoption Certificate Sign-In Sequence",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 162.7,
+   "result": {
+    "step": {
+     "control": 0.8514,
+     "treatment": 0.9007,
+     "lift": 0.0578,
+     "lift_se": 0.0116,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.2647,
+     "treatment": 0.2653,
+     "lift": 0.0025,
+     "lift_se": 0.0431,
+     "p": 0.953347
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 9.21,
+   "predicted_lift": 0.115,
+   "true_lift_hidden": 0.0655,
+   "finishers_delta_hidden": 50.32
+  },
+  {
+   "test": "sim-18",
+   "title": "Story Intro Value Proposition Refresh",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 162.7,
+   "result": {
+    "step": {
+     "control": 0.781,
+     "treatment": 0.784,
+     "lift": 0.0038,
+     "lift_se": 0.0137,
+     "p": 0.778219
+    },
+    "finish": {
+     "control": 0.2587,
+     "treatment": 0.2573,
+     "lift": -0.0052,
+     "lift_se": 0.0436,
+     "p": 0.906048
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 9.49,
+   "predicted_lift": 0.045,
+   "true_lift_hidden": -0.0054,
+   "finishers_delta_hidden": -4.15
+  },
+  {
+   "test": "sim-19",
+   "title": "Background Hatching Desktop Readiness Status",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 162.7,
+   "result": {
+    "step": {
+     "control": 0.8616,
+     "treatment": 0.8897,
+     "lift": 0.0326,
+     "lift_se": 0.0155,
+     "p": 0.032028
+    },
+    "finish": {
+     "control": 0.2507,
+     "treatment": 0.2647,
+     "lift": 0.0559,
+     "lift_se": 0.0463,
+     "p": 0.215056
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 5.92,
+   "predicted_lift": 0.017,
+   "true_lift_hidden": 0.0354,
+   "finishers_delta_hidden": 27.2
+  },
+  {
+   "test": "sim-20",
+   "title": "First Interaction Desktop Notification Tip",
+   "target_step": "finish",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 101.1,
+   "result": {
+    "step": {
+     "control": 0.706,
+     "treatment": 0.6604,
+     "lift": -0.0647,
+     "lift_se": 0.0274,
+     "p": 0.022334
+    },
+    "finish": {
+     "control": 0.249,
+     "treatment": 0.2443,
+     "lift": -0.0187,
+     "lift_se": 0.0443,
+     "p": 0.675012
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 4.59,
+   "predicted_lift": 0.038,
+   "true_lift_hidden": -0.0514,
+   "finishers_delta_hidden": -39.49
+  }
+ ],
+ "shipped": [
+  "Post-Adoption Certificate Sign-In Sequence",
+  "Background Hatching Desktop Readiness Status"
+ ],
+ "ends_week": 5,
+ "weights_next": {
+  "impact": 1.807,
+  "evidence": 0.541,
+  "confidence": 1.159,
+  "cost": 0.493
+ },
+ "lessons_next": [
+  "Moving sign-in post-adoption or post-certificate sequence was helpful (underpredicted in round 1 at +13.3% vs +12.0%), and account sync banners were helpful (+2.7%), but moving sign-in after the waiting room made results worse (-3.9%) and hand-off timing showed no clear effect.",
+  "Path clarity headline updates were helpful and underpredicted (+5.9% vs +1.0%), whereas general path copy simplification, value proposition refreshes, and time expectation banners showed no clear effect.",
+  "Interactive waiting rooms (+5.6%) and background hatching readiness status (+3.3%, underpredicted) were helpful, though interactive waiting room impact was overpredicted (+8.0% vs +5.6%); 3D progress trackers showed no clear effect.",
+  "Photo quality guides and companion previews were helpful (+7.6%, overpredicted at +10.0%), while compact friend selection grid layouts made results worse (-7.7%) and split photo upload assistants showed no clear effect.",
+  "System tray location notification tips were helpful (+3.8%), but first interaction notification tips made results worse (-6.5%), and sound notifications, spawn alerts, and mascot welcome stages showed no clear effect."
+ ]
+}

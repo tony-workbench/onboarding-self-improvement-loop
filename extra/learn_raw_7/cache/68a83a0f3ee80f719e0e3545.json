@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, new_flow] Pre-Built Pet Archetype Flow: Introduce a streamlined sub-flow on the pick friend step with pre-configured pet archetypes to skip complex photo uploads.\n   config: {\"pick_friend\": {\"headline\": \"Select a Pre-Built Pet Archetype\", \"body\": \"Choose a ready-to-use pet archetype to ensure instant desktop setup and prevent generation issues.\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Pet Archetypes\", \"style\": \"rounded\", \"action\": \"choose\"}]}}\n1: [choose_path, new_screen] Desktop Compatibility Check Screen: Insert a system compatibility verification screen right after the story step to verify graphics rendering before onboarding choices.\n   config: {\"_order\": [\"story\", \"new_system_check\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_system_check\": {\"headline\": \"Checking System Compatibility\", \"body\": \"Verifying desktop display permissions and graphics driver readiness...\", \"layout\": \"centered\", \"components\": [{\"type\": \"progress\", \"label\": \"System Diagnostic\", \"style\": \"subtle\"}]}}\n2: [finish, redesign] Interactive Pet Behavior Showcase Redesign: Redesign the home intro step into a multi-step behavior showcase stage where users test pet movements and docking controls.\n   config: {\"home_intro\": {\"layout\": \"stage\", \"headline\": \"Test Pet Behaviors On Your Desktop\", \"body\": \"Try moving and docking your desktop pet before finishing setup.\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"mascot\", \"style\": \"playful\", \"action\": \"next\"}]}}}\n3: [sign_in, reorder] Post-Adoption Certificate Sign-In Shift: Move sign-in to occur right after the adoption certificate is generated, ensuring pet data is locked to the account prior to waiting.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n4: [home, new_screen] Desktop Pet Warmup Activity Screen: Add an engaging warmup screen before waiting that prepares desktop workspace boundaries.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_warmup_screen\", \"waiting\", \"home_intro\"], \"new_warmup_screen\": {\"headline\": \"Preparing Workspace Boundaries\", \"body\": \"Your pet is getting familiar with your screen layout.\", \"layout\": \"centered\", \"components\": [{\"type\": \"animation\", \"label\": \"Screen Warmup\", \"style\": \"calm\"}]}}\n5: [sign_in, hint] Existing Account Pet Restored Indicator: Add a prominent cloud save status badge and clear indicator on the sign-in screen explaining account recovery.\n   config: {\"sign_in\": {\"hint\": \"Signing in automatically restores previously adopted pets linked to your email.\", \"components\": [{\"type\": \"badge\", \"label\": \"Cloud Recovery Enabled\", \"style\": \"highlight\"}]}}\n6: [home, wait_info] Background Pet Render Status Indicators: Display explicit multi-phase progress step counters on the waiting screen during pet generation.\n   config: {\"waiting\": {\"headline\": \"Rendering Desktop Pet Assets\", \"body\": \"Building animations, interaction collision maps, and sound profiles.\", \"show_progress\": true, \"show_step_counter\": true}}\n7: [adoption, layout] Two-Column Photo Picker and Live Style Switcher: Switch upload_photos layout to a split view pairing photo selection directly alongside style options.\n   config: {\"upload_photos\": {\"layout\": \"split\", \"headline\": \"Upload Photo & Select Art Style\", \"body\": \"Choose a clear photo and select how your pet should render on desktop.\"}}\n8: [finish, hint] Desktop Taskbar Pinning Guidance Hint: Provide a helpful hint on home_intro explaining desktop taskbar access and pet control options.\n   config: {\"home_intro\": {\"hint\": \"Tip: Right-click your pet on the desktop or use the taskbar icon to manage settings anytime.\"}}\n9: [choose_path, incentive] Quick-Start Path Fast-Track Badge: Add a prominent fast-track badge to the pre-made path option to encourage faster path decision making.\n   config: {\"choose_path\": {\"components\": [{\"type\": \"badge\", \"label\": \"Fastest Setup (< 1 min)\", \"style\": \"emphasis\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid sub-flow addition inside onboarding on the pick_friend step that preserves the step's core function."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a new diagnostic screen inside onboarding without removing or skipping any required steps."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home_intro onboarding overlay into an interactive behavior showcase is allowed."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign_in to occur after adoption_certificate is explicitly allowed under Rule 4."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new warmup screen inside onboarding before waiting is allowed and retains all required steps."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding account restoration copy and a cloud recovery badge to the sign-in screen is compliant."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress and step counters to the waiting screen maintains its core job of showing pet generation."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the upload_photos layout to a split view preserves its functionality and complies with onboarding rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a desktop taskbar guidance hint to home_intro is allowed within onboarding."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an informational setup duration badge on choose_path is compliant and does not violate fair design rules."
+   }
+  ]
+ }
+}

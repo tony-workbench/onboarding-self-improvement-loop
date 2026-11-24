@@ -1,0 +1,401 @@
+{
+ "round": 7,
+ "starts_week": 7,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.523,
+  "evidence": 0.152,
+  "confidence": 1.459,
+  "cost": 1.866
+ },
+ "lessons_used": [
+  "Sign-in reordering (sign_in, reorder) tends to have a negative impact, as 2 tests agree after noise correction.",
+  "No kind of change has proven helpful yet, as no tests resulted in a statistically significant win.",
+  "Evidence is still thin for home flows (home, new_flow), path redesigns (choose_path, redesign), adoption redesigns (adoption, redesign), and finish screens (finish, new_screen), as each has only 1 test.",
+  "No clear effect was seen for new home flows, path selection redesigns, or photo upload split layout redesigns.",
+  "Predictions were consistently too high and overly optimistic across tests, such as predicting a +20.0% gain for sign-in reordering and +4.0% for a finish screen that performed significantly worse."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Pick Friend Companion Traits Layout",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch the friend picker screen to a two-column layout displaying pet personality traits alongside companion previews.",
+   "why": "Adoption conversion drops to 60.9% with a median time of 89s; displaying traits side-by-side helps users evaluate choices faster.",
+   "config": {
+    "pick_friend": {
+     "layout": "two_column",
+     "hint": "Compare pet traits and personalities side by side before picking your companion."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout update for pick_friend displaying personality traits while retaining friend selection."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 5.59,
+   "score_note": "Adoption has high drop-off (60.9%), but evidence relies only on funnel duration without support log confirmation.",
+   "slot": "best score"
+  },
+  {
+   "title": "Waiting Stage Interactive Tip Carousel",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add an interactive tip carousel component to the waiting screen explaining how to interact with the pet on desktop.",
+   "why": "The waiting step has a long mean duration of 2336s, and support logs show users are confused about how to control or talk to the pet later.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "tip_carousel",
+       "style": "calm",
+       "action": "open_tip",
+       "text": "Tips on moving, interacting with, and controlling your desktop pet"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of an interactive tip carousel component to the waiting screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.015,
+   "score": 5.41,
+   "score_note": "Both funnel wait time and support logs point to user confusion on home screen interactions.",
+   "slot": "best score"
+  },
+  {
+   "title": "Companion Desktop Quickstart Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a new quickstart introduction screen after home_intro demonstrating basic desktop mouse shortcuts and pet interactions.",
+   "why": "Support receives multiple inquiries regarding how to control, hide, or interact with pets post-onboarding.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_quickstart_guide"
+    ],
+    "new_quickstart_guide": {
+     "headline": "Interacting With Your Desktop Pet",
+     "body": "Drag your companion anywhere on screen or right-click them to open pet actions.",
+     "layout": "centered",
+     "button_label": "Got It!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a new quickstart guide screen following home_intro within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.03,
+   "score": 1.12,
+   "score_note": "New finish screens previously backfired (-5.1% lift); adding a screen increases friction and requires a full release.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 90.9
+  },
+  {
+   "title": "Home Intro Onboarding Checklist Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign the home intro welcome section into a checklist layout summarizing key final desktop setup tasks.",
+   "why": "The finish step conversion is 64.8% with high mean completion times (5815s); a structured checklist simplifies final steps.",
+   "config": {
+    "home_intro": {
+     "layout": "checklist",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "checklist",
+        "style": "rounded",
+        "text": "Setup steps: Desktop placement, Audio settings, Action shortcuts"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  },
+  {
+   "title": "Adoption Placement Preference Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Introduce a interactive placement selection card on the adoption certificate screen to specify initial desktop positioning.",
+   "why": "Support received reports of pets not showing up on desktop or app startup failures; setting placement expectations upfront prevents confusion.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "headline": "Configure Companion Placement",
+     "components": [
+      {
+       "type": "choice_cards",
+       "style": "playful",
+       "action": "choose",
+       "text": "Choose default desktop screen corner for your pet"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "The adoption certificate screen loses its required job of displaying the adoption with an official stamp."
+   }
+  },
+  {
+   "title": "Sign In Account Recovery Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Display explicit hint text on the sign-in screen explaining that signing into an existing account restores previously adopted pets.",
+   "why": "Support logged 8 emails about pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing into your existing account automatically restores your previously adopted pets.",
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid hint added to sign_in screen without altering required screen jobs or data collection."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 7.74,
+   "score_note": "Supported directly by 8 support emails and sign-in drop-offs; low cost text/hint update.",
+   "slot": "best score"
+  },
+  {
+   "title": "Choose Path Dual Column Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Update the choose_path screen layout to a two-column format contrasting preset companions against custom creation.",
+   "why": "Choose path takes a mean 514s, showing users hesitate when evaluating path options.",
+   "config": {
+    "choose_path": {
+     "layout": "two_column",
+     "headline": "Select Your Adoption Journey",
+     "hint": "Compare instant preset adoption with custom pet creation."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout update for choose_path screen that preserves both adoption options."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.008,
+   "score": 4.72,
+   "score_note": "Choose path redesign showed slight past improvement (+2.0%), but evidence is limited to funnel duration.",
+   "slot": "best score"
+  },
+  {
+   "title": "Waiting Screen Mascot Progress Redesign",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Replace the standard waiting status display with an animated companion mascot and active generation progress indicator.",
+   "why": "The waiting step has a 2336s mean time, and users experience drop-off or stall during pet generation.",
+   "config": {
+    "waiting": {
+     "layout": "centered",
+     "show_progress": true,
+     "show_time_estimate": true,
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "mascot",
+        "style": "playful",
+        "asset": "asset:pet_loading",
+        "text": "Your pet is being crafted and prepared for your desktop..."
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'waiting.wait_status' does not do the job: needs 1 of ['preview', 'progress', 'timer']"
+   }
+  },
+  {
+   "title": "Waiting Stage Background Notification Opt-In",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Add a desktop notification toggle switch to the waiting screen so users can be alerted when pet generation finishes.",
+   "why": "Mean time spent waiting is 2336s; allowing desktop alerts keeps users engaged without forcing them to stare at the screen.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "hint": "Enable desktop notifications to get alerted as soon as your pet is ready!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid opt-in notification toggle addition to the waiting screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.012,
+   "score": 5.15,
+   "score_note": "Addresses long waiting duration (2336s mean), though support logs do not explicitly request notifications."
+  },
+  {
+   "title": "Path Guidance Intro Screen",
+   "target_step": "choose_path",
+   "type": "new_screen",
+   "change": "Add an introductory guidance screen before choose_path detailing what each path offers.",
+   "why": "The choose_path step has a mean duration of 514s, indicating confusion early in the journey.",
+   "config": {
+    "_order": [
+     "story",
+     "new_path_guidance",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_path_guidance": {
+     "headline": "How Would You Like to Adopt?",
+     "body": "Choose between instant adoptable pets or crafting a customized pet from scratch.",
+     "layout": "card",
+     "button_label": "Explore Options"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a new path guidance screen before choose_path."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.01,
+   "score": 0.56,
+   "score_note": "Adding introductory screens creates extra friction and requires high effort with unproven benefit."
+  }
+ ],
+ "picked": [
+  "Companion Desktop Quickstart Guide Screen"
+ ],
+ "held_by_harm_budget": [
+  "Sign In Account Recovery Hint",
+  "Pick Friend Companion Traits Layout",
+  "Waiting Stage Interactive Tip Carousel",
+  "Choose Path Dual Column Layout"
+ ],
+ "harm_budget": 106.9,
+ "planned_harm": 90.9,
+ "decisions": [
+  {
+   "test": "sim-7",
+   "title": "Companion Desktop Quickstart Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 90.9,
+   "result": {
+    "step": {
+     "control": 0.672,
+     "treatment": 0.6717,
+     "lift": -0.0005,
+     "lift_se": 0.0348,
+     "p": 0.98808
+    },
+    "finish": {
+     "control": 0.1817,
+     "treatment": 0.1793,
+     "lift": -0.0128,
+     "lift_se": 0.0543,
+     "p": 0.814233
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 1.12,
+   "predicted_lift": -0.03,
+   "true_lift_hidden": 0.0333,
+   "finishers_delta_hidden": 17.61
+  }
+ ],
+ "shipped": [],
+ "ends_week": 7,
+ "weights_next": {
+  "impact": 0.489,
+  "evidence": 0.108,
+  "confidence": 1.299,
+  "cost": 2.104
+ },
+ "lessons_next": [
+  "No kind of change has proven helpful yet, as no test resulted in a statistically significant win.",
+  "Sign-in reordering (sign_in, reorder) tends to have a negative impact, as 2 tests agree after noise correction.",
+  "Adding new finish screens (finish, new_screen) tends to have a negative impact, as 2 tests agree after noise correction.",
+  "Evidence is still thin for home flows (home, new_flow), path redesigns (choose_path, redesign), and adoption redesigns (adoption, redesign), as each has only 1 test.",
+  "Predictions were consistently too high and overly optimistic across tests, such as predicting a +20.0% gain for sign-in reordering and +4.0% for a finish screen that performed significantly worse."
+ ]
+}

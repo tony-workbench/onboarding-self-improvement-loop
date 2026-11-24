@@ -1,0 +1,458 @@
+{
+ "round": 18,
+ "starts_week": 18,
+ "funnel": {
+  "choose_path": 0.7951980844800001,
+  "sign_in": 0.7513802999999999,
+  "adoption": 0.8701501562549575,
+  "home": 0.9426456375230181,
+  "finish": 0.7090416
+ },
+ "weights_used": {
+  "impact": 0.354,
+  "evidence": 0.091,
+  "confidence": 2.446,
+  "cost": 1.109
+ },
+ "lessons_used": [
+  "Predictions were generally too optimistic overall, but underestimated gains on several winning home wait_info and adoption redesign tests.",
+  "Adding new screens at adoption or finish stages consistently hurt performance and triggered early stops.",
+  "Redesigning the adoption stage (3 wins) and choose_path stage (2 wins) proved helpful.",
+  "Updating home wait_info frequently generated wins (5 wins), though many tests showed no clear effect.",
+  "Finish copy changes (4 tests), finish layout changes (2 tests), sign-in hints (2 tests), choose_path hints (2 tests), and home redesigns (2 tests) consistently showed no clear effect.",
+  "Evidence remains thin or mixed for change types with only one test or conflicting outcomes."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Two-Column Path Chooser Experience",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the path selection screen into a two-column layout featuring distinct comparison choice cards for quick companion creation versus full customization.",
+   "why": "The choose_path step has a median time of 8s but a mean time of 514s; presenting clean structured side-by-side choices helps undecided users pick faster.",
+   "config": {
+    "choose_path": {
+     "layout": "two_column",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Choose Companion Path",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Dynamic Render Milestone Indicator",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display a dynamic progress bar and estimated timer component on the generation waiting screen while rendering pet assets.",
+   "why": "The home waiting stage has a median of 201s and mean of 2336s; updating wait info has yielded 5 prior wins by reducing perceived wait frustration.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "progress",
+       "label": "Generating desktop assets...",
+       "style": "highlight"
+      },
+      {
+       "type": "timer",
+       "label": "Estimated time remaining",
+       "style": "small"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress indicator and real-time wait estimate is allowed on the waiting screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.013,
+   "score": 7.95,
+   "score_note": "Home step loses only 5.7% of users, but wait info updates have a strong track record of 5 historical wins (+1.3% mean lift).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 177.7
+  },
+  {
+   "title": "Spotlight Pet Choice Studio",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Rebuild the pet selection screen into a spotlight layout with focused preview assets and trait badges.",
+   "why": "Redesigning the adoption stage previously yielded multiple test wins, and enhancing visual clarity helps users finalize their adoption choice cleanly.",
+   "config": {
+    "pick_friend": {
+     "layout": "spotlight",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "preview",
+        "style": "large"
+       },
+       {
+        "role": "pet_choices",
+        "type": "badge",
+        "label": "Companion Trait Preview",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'pick_friend.replace.pet_choices[1]': a badge cannot do the pet_choices job (use ['animation', 'button', 'choice_cards', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Stage Visual Waiting Hub Redesign",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesign the waiting screen into a stage layout with centered mascot animation and real-time status updates.",
+   "why": "Long tail waiting times (mean 2336s) cause user drop-off; engaging centered visuals keep users entertained while background generation completes.",
+   "config": {
+    "waiting": {
+     "layout": "stage",
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "mascot",
+        "style": "playful"
+       },
+       {
+        "role": "wait_status",
+        "type": "text",
+        "text": "Preparing your pet's desktop environment...",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'waiting.wait_status' does not do the job: needs 1 of ['preview', 'progress', 'timer']"
+   }
+  },
+  {
+   "title": "Adoption-First Sign-In Sequence Shift",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move sign-in after pet adoption so users personalize their pet before creating an account.",
+   "why": "Sign-in currently drops 25% of users early; letting users select their companion first builds emotional investment prior to account creation.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in step after adoption certificate is explicitly allowed by Rule 4."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.004,
+   "score": 4.02,
+   "score_note": "Sign-in drops 25% of users, but structural reordering requires significant release effort and reorder tests show modest historical lift (+0.4%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 177.7
+  },
+  {
+   "title": "Desktop Ready Background Notification Alert",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable desktop notifications when rendering completes and display copy reassuring users they can minimize the app.",
+   "why": "Mean time on the waiting stage is over 38 minutes; users leave the window open without knowing they can safely minimize it.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "hint": "Feel free to minimize this window. We'll notify you on your desktop as soon as your pet arrives!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding background desktop notifications to the waiting screen is permitted."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.005,
+   "score": 1.83,
+   "score_note": "Addressing the 38-minute mean wait time is backed by funnel data, but notification changes historically show mixed to negative results."
+  },
+  {
+   "title": "Account Preservation Sign-In Clarification",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Update sign-in headline and hint to clarify that logging into an existing account restores saved pets and prevents reset issues.",
+   "why": "Support received 8 emails about missing or reset pets after signing back in with different credentials.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Keep & Sync Your Pets",
+     "hint": "Logging in ensures your existing pets are restored and saved safely to your account."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Clarifying copy on the sign-in screen is allowed and does not violate any rules."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.008,
+   "score": 3.88,
+   "score_note": "Strong evidence from 25% sign-in drop and 8 support emails, but copy changes consistently fail to generate positive lift."
+  },
+  {
+   "title": "Story Scroll Mascot Hero Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Rebuild the story intro screen using a story_scroll layout featuring animated pet previews and hero introduction text.",
+   "why": "Choose_path redesigns historically perform well; an engaging story introduction sets strong expectations before path selection.",
+   "config": {
+    "story": {
+     "layout": "story_scroll",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "animation",
+        "style": "large"
+       },
+       {
+        "role": "intro_story",
+        "type": "text",
+        "text": "Meet your interactive desktop companion, ready to keep you company and assist daily.",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'story.intro_story' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'video'] with an asset:story/ asset"
+   }
+  },
+  {
+   "title": "Custom Photo Upload Clarity Helper",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add photo lighting and background requirements hint to the photo upload screen.",
+   "why": "Support received 3 reports of custom pet generation failures or corrupted visual outputs.",
+   "config": {
+    "upload_photos": {
+     "hint": "For best generation results, upload a well-lit, front-facing photo with a clear subject and neutral background."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "asks for personal information (user photo)"
+   }
+  },
+  {
+   "title": "Split Desktop Controls Overview",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Switch home_intro to a split layout showcasing quick desktop pet interaction controls and tray visibility tips.",
+   "why": "Support received 3 emails about pets not appearing/opening and 3 about confusion over how to control or hide the pet after onboarding.",
+   "config": {
+    "home_intro": {
+     "layout": "split",
+     "components": [
+      {
+       "type": "text",
+       "text": "Your pet lives in your system tray! Click the pet to open controls or double-click to hide.",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro layout is allowed as home_intro is part of onboarding."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.004,
+   "score": 2.5,
+   "score_note": "Finish loses 29.1% and support emails confirm user confusion, but past finish layout changes consistently showed no clear effect.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 115.5
+  }
+ ],
+ "picked": [
+  "Adoption-First Sign-In Sequence Shift",
+  "Dynamic Render Milestone Indicator",
+  "Split Desktop Controls Overview"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 470.9,
+ "decisions": [
+  {
+   "test": "sim-67",
+   "title": "Adoption-First Sign-In Sequence Shift",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": 131,
+   "share": 1.0,
+   "planned_harm": 177.7,
+   "result": {
+    "step": {
+     "control": 0.7591,
+     "treatment": 0.7113,
+     "lift": -0.063,
+     "lift_se": 0.0175,
+     "p": 0.000491
+    },
+    "finish": {
+     "control": 0.3745,
+     "treatment": 0.3426,
+     "lift": -0.085,
+     "lift_se": 0.0341,
+     "p": 0.017234
+    },
+    "users_per_group": 2577
+   },
+   "outcome": "stopped early: sign_in worse",
+   "score": 4.02,
+   "predicted_lift": 0.004,
+   "true_lift_hidden": -0.0689,
+   "finishers_delta_hidden": -64.98
+  },
+  {
+   "test": "sim-68",
+   "title": "Dynamic Render Milestone Indicator",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 177.7,
+   "result": {
+    "step": {
+     "control": 0.9462,
+     "treatment": 0.9495,
+     "lift": 0.0034,
+     "lift_se": 0.0084,
+     "p": 0.681703
+    },
+    "finish": {
+     "control": 0.3463,
+     "treatment": 0.3483,
+     "lift": 0.0058,
+     "lift_se": 0.0356,
+     "p": 0.870764
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.95,
+   "predicted_lift": 0.013,
+   "true_lift_hidden": 0.0012,
+   "finishers_delta_hidden": 1.28
+  },
+  {
+   "test": "sim-69",
+   "title": "Split Desktop Controls Overview",
+   "target_step": "finish",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 115.5,
+   "result": {
+    "step": {
+     "control": 0.6882,
+     "treatment": 0.6908,
+     "lift": 0.0038,
+     "lift_se": 0.0249,
+     "p": 0.87962
+    },
+    "finish": {
+     "control": 0.3377,
+     "treatment": 0.3343,
+     "lift": -0.0099,
+     "lift_se": 0.0359,
+     "p": 0.784608
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 2.5,
+   "predicted_lift": 0.004,
+   "true_lift_hidden": -0.0437,
+   "finishers_delta_hidden": -46.6
+  }
+ ],
+ "shipped": [],
+ "ends_week": 18,
+ "weights_next": {
+  "impact": 0.307,
+  "evidence": 0.09,
+  "confidence": 2.599,
+  "cost": 1.005
+ },
+ "lessons_next": [
+  "Predictions were generally overly optimistic, though they underestimated top-performing wins in adoption redesign and home wait_info.",
+  "Adding new screens at the adoption or finish stages consistently reduced performance and triggered early stops.",
+  "Redesigning the adoption stage (3 wins) and choose_path stage (2 wins) proved helpful, while home redesigns (2 tests) showed no clear effect.",
+  "Updating home wait_info frequently generated wins (5 wins), though many tests showed no clear effect.",
+  "Finish copy (4 tests), finish layout (3 tests), sign-in hints (2 tests), choose_path hints (2 tests), and choose_path new screens (3 tests) consistently showed no clear effect.",
+  "Evidence remains thin or mixed for change types with only one test or conflicting outcomes (such as finish redesigns and sign-in reordering)."
+ ]
+}

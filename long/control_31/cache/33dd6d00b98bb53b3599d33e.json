@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Interactive Pet Trait Synthesis Wheel: Rebuild the photo customization step on upload_photos into a visual trait synthesizer layout where users configure companion personality traits and visual features alongside direct photo uploads.\n   config: {\"upload_photos\": {\"layout\": \"split\", \"headline\": \"Synthesize Your Custom Companion\", \"body\": \"Upload photos and tweak core visual traits to generate your perfect desktop companion.\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Select Trait Mix\", \"action\": \"choose\", \"style\": \"playful\"}, {\"type\": \"preview\", \"asset\": \"asset:trait_preview\", \"style\": \"rounded\"}]}}\n1: [finish, new_screen] Desktop Companion Quick Sandbox Screen: Add a new screen 'new_sandbox_practice' before home_intro where users practice moving, summoning, and minimizing their desktop companion inside a safe simulated desktop window.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_sandbox_practice\", \"home_intro\"], \"new_sandbox_practice\": {\"headline\": \"Practice Desktop Pet Controls\", \"body\": \"Try dragging, calling, and hiding your companion in this practice sandbox before placing it on your real desktop.\", \"layout\": \"spotlight\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:pet_sandbox\", \"style\": \"large\"}, {\"type\": \"button\", \"label\": \"Launch to Real Desktop\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n2: [sign_in, new_flow] Account Persistence & Integrity Check Flow: Introduce an explicit account save validation indicator and backup guarantee callout on the sign_in screen to reassure users their pet companion will not reset.\n   config: {\"sign_in\": {\"headline\": \"Secure Your Pet Save File\", \"body\": \"Link your account now to guarantee cloud save persistence so your companion is never lost or reset.\", \"hint\": \"Your companion progress syncs automatically with encrypted cloud backups.\", \"components\": [{\"type\": \"badge\", \"label\": \"Cloud Save Verification Active\", \"style\": \"highlight\"}]}}\n3: [choose_path, reorder] Experience Preview First Path Discovery: Reorder the initial flow sequence so choose_path appears directly first, allowing users to choose their path before watching the full story overview.\n   config: {\"_order\": [\"choose_path\", \"story\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n4: [home, wait_info] Live Desktop System Render Status Checklist: Add real-time hardware status verification steps on the waiting screen showing desktop layer compatibility checks and driver readiness.\n   config: {\"waiting\": {\"layout\": \"checklist\", \"headline\": \"Preparing Desktop Companion Overlay\", \"body\": \"Checking system display transparency and companion animation renderer.\", \"components\": [{\"type\": \"checklist\", \"label\": \"Desktop Overlay Supported\", \"style\": \"calm\"}, {\"type\": \"progress\", \"style\": \"highlight\"}]}}\n5: [adoption, hint] Photo Quality Guidance Callout Banner: Display explicit visual lighting and angle hints directly under photo slots on upload_photos screen to guide photo quality.\n   config: {\"upload_photos\": {\"hint\": \"Best results: Use evenly lit front-facing photos without strong shadows or filters.\", \"components\": [{\"type\": \"tip_carousel\", \"label\": \"Photo Recommendations\", \"style\": \"subtle\"}]}}\n6: [finish, redesign] Desktop Controls Quick Reference Card: Redesign home_intro into a two-column cheat sheet layout displaying hotkeys, tray controls, and chat shortcuts alongside a live companion preview.\n   config: {\"home_intro\": {\"layout\": \"two_column\", \"headline\": \"Your Desktop Pet is Ready!\", \"body\": \"Here is your essential companion control guide for hotkeys, tray toggles, and chat controls.\", \"components\": [{\"type\": \"checklist\", \"label\": \"Hotkey & Tray Shortcuts\", \"style\": \"plain\"}, {\"type\": \"preview\", \"asset\": \"asset:live_pet_demo\", \"style\": \"rounded\"}]}}\n7: [sign_in, copy] Data Loss Prevention Sign-In Copy: Update the sign-in headline and button microcopy to emphasize that signing in protects the pet from accidental deletion or re-login resets.\n   config: {\"sign_in\": {\"headline\": \"Link Account to Protect Companion Progress\", \"body\": \"Create or sign into your account to back up your companion's memory, items, and traits safely to the cloud.\", \"button_label\": \"Secure Companion Save File\"}}\n8: [choose_path, new_screen] Pet Path Match Finder Screen: Add a brief interactive assessment screen 'new_path_quiz' before choose_path that asks 2 quick questions to recommend instant preset vs custom companion paths.\n   config: {\"_order\": [\"story\", \"new_path_quiz\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_path_quiz\": {\"headline\": \"Find Your Companion Match\", \"body\": \"Answer two quick questions so we can suggest the best setup path for your desktop setup.\", \"layout\": \"card\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"How quickly do you want your pet on your desktop?\", \"action\": \"choose\", \"style\": \"playful\"}]}}\n9: [adoption, incentive] Adoption Seal Milestone Celebration: Add an interactive founder companion seal unlock animation and badge on adoption_certificate to elevate excitement before finalized setup.\n   config: {\"adoption_certificate\": {\"layout\": \"stage\", \"headline\": \"Official Adoption Certificate\", \"body\": \"You have unlocked the Founder Companion Badge! Name your pet to complete the adoption certificate.\", \"components\": [{\"type\": \"badge\", \"label\": \"Founder Companion Badge Unlocked\", \"style\": \"highlight\"}, {\"type\": \"name_input\", \"label\": \"Companion Name\", \"style\": \"large\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": false,
+    "rule": 2,
+    "reason": "The upload_photos screen configuration replaces photo upload controls with trait cards, losing the photo upload functionality."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a sandbox practice screen before home_intro is allowed within onboarding."
+   },
+   {
+    "index": 2,
+    "pass": false,
+    "rule": 2,
+    "reason": "The sign_in screen configuration removes sign-in controls, losing the screen's core job."
+   },
+   {
+    "index": 3,
+    "pass": false,
+    "rule": 2,
+    "reason": "Placing choose_path before story breaks the requirement that the story introduces the pet before path selection."
+   },
+   {
+    "index": 4,
+    "pass": false,
+    "rule": 2,
+    "reason": "The waiting screen displays hardware system checks instead of showing that the pet is being made."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding photo quality guidance callouts to upload_photos is allowed and keeps all core functionality."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro into a quick reference guide is allowed within onboarding."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating sign_in copy to explain account backup preserves the sign-in job without violating rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interactive path quiz screen before choose_path is a valid new screen within onboarding."
+   },
+   {
+    "index": 9,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replaces the official adoption stamp with a badge and adds free extra unlock copy."
+   }
+  ]
+ }
+}

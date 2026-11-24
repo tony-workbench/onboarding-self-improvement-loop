@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, hint] Account Pet Safeguard Sign-In Hint: Add a clear account security hint on the sign-in screen explaining that signing in links and preserves pets safely across sessions.\n   config: {\"sign_in\": {\"hint\": \"Signing in links your pet to your secure cloud account so your companion is never reset or lost.\"}}\n1: [adoption, redesign] Redesigned Pet Selection Workspace: Redesign the companion selection screen into a full-bleed workspace with full preview cards and interactive companion choices.\n   config: {\"pick_friend\": {\"layout\": \"full_bleed\", \"headline\": \"Choose Your Desktop Companion\", \"body\": \"Select a companion style to bring to life on your desktop.\", \"replace\": {\"pet_choices\": [{\"role\": \"pet_choices\", \"type\": \"choice_cards\", \"label\": \"Select Companion Style\", \"style\": \"large\"}]}}}\n2: [home, wait_info] Desktop Companion Generation Wait Status Info: Display explicit progress status and desktop tip carousel while waiting for pet companion desktop assets to generate.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"headline\": \"Bringing Your Pet to Your Desktop...\", \"tip_delay_seconds\": 5, \"components\": [{\"type\": \"tip_carousel\", \"label\": \"Desktop Pet Tips\", \"style\": \"calm\"}]}}\n3: [adoption, new_flow] Companion Personalization Naming Flow: Add interactive pet naming components and preview badge to the companion picking stage.\n   config: {\"pick_friend\": {\"components\": [{\"type\": \"name_input\", \"label\": \"Give your pet a name\", \"style\": \"playful\"}, {\"type\": \"badge\", \"label\": \"Companion Ready\", \"style\": \"highlight\"}]}}\n4: [finish, redesign] Complete Desktop Companion Arrival Redesign: Redesign the home intro finish screen into a stage layout explaining desktop interaction controls clearly before launch.\n   config: {\"home_intro\": {\"layout\": \"stage\", \"headline\": \"Your Companion Has Arrived!\", \"body\": \"Your pet is now active on your desktop. Click and drag to move, or right-click for controls.\", \"components\": [{\"type\": \"button\", \"label\": \"Start Desktop Interaction\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n5: [choose_path, layout] Grid Layout Companion Path Selector: Change the path selection screen layout to a grid format presenting path options visually.\n   config: {\"choose_path\": {\"layout\": \"grid\", \"headline\": \"Choose Your Pet Path\", \"body\": \"Pick how you would like to build your desktop pet.\"}}\n6: [home, new_flow] Desktop Spawning Mascot Waiting Flow: Add a animated pet mascot component and desktop ready progress bar to the waiting screen.\n   config: {\"waiting\": {\"layout\": \"centered\", \"components\": [{\"type\": \"mascot\", \"asset\": \"asset:pet_spawner\", \"style\": \"playful\"}, {\"type\": \"progress\", \"label\": \"Preparing Desktop Companion\", \"style\": \"highlight\"}]}}\n7: [sign_in, reorder] Deferred Sign-In Account Journey Reorder: Move sign-in to take place after companion pick and photo upload steps so users customize their pet before authenticating.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n8: [finish, hint] Desktop Companion Controls Guidance Hint: Add an explicit control hint on the home intro screen detailing tray icon navigation and right-click pet actions.\n   config: {\"home_intro\": {\"hint\": \"Tip: Access your companion's settings anytime from your system tray or by right-clicking your pet on desktop.\"}}\n9: [adoption, new_screen] Custom Photo Quality Prep Screen: Insert a dedicated photo preparation advice screen before upload_photos showing formatting and lighting guidance.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_photo_prep\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_photo_prep\": {\"headline\": \"Photo Preparation Tips\", \"body\": \"Upload a clear, front-facing photo for best 3D desktop companion generation results.\", \"layout\": \"centered\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:photo_guide\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Continue to Upload\", \"action\": \"next\", \"style\": \"emphasis\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a clear account security hint on sign-in without breaking any onboarding rules."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns companion selection while preserving the pick_friend job and functionality."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Enhances the waiting screen with progress info and calm tips, adhering to allowed onboarding changes."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds naming components to the companion picking stage without losing any required functionality."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the home intro onboarding screen layout with valid controls guidance."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates the layout of choose_path within allowed onboarding redesign scope."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds progress bar and mascot components to the waiting screen as permitted."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in to take place later in onboarding, which is explicitly permitted by Rule 4."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an onboarding hint to home_intro explaining companion desktop controls."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a valid photo prep advice screen into onboarding without removing existing required steps."
+   }
+  ]
+ }
+}

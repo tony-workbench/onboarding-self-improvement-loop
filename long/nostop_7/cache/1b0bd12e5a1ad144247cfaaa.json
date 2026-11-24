@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [choose_path, redesign] choose_path_split_hero_redesign: Redesign the path selection screen with a split hero layout clearly comparing pre-made pets versus custom created pets side by side.\n   config: {\"choose_path\": {\"layout\": \"split\", \"headline\": \"Choose Your Pet Journey\", \"body\": \"Select a ready-to-adopt companion or create your own custom pet from scratch.\"}}\n1: [finish, new_screen] desktop_pet_placement_guide: Add a new post-onboarding screen explaining how the pet sits on the desktop screen and where to find system tray controls.\n   config: {\"new_pet_placement_guide\": {\"headline\": \"Meet Your Desktop Companion\", \"body\": \"Your pet lives right on your desktop screen! Access settings and controls anytime from your taskbar tray icon.\", \"layout\": \"centered\"}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_pet_placement_guide\"]}\n2: [sign_in, reorder] reorder_sign_in_after_pick_friend: Move sign-in to immediately after selecting a pet in pick_friend so users bind account creation to their chosen companion.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"sign_in\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n3: [adoption, new_flow] preset_pet_quick_adoption_flow: Introduce a fast-track confirmation screen for users selecting pre-made pets to bypass heavy photo setup.\n   config: {\"pick_friend\": {\"layout\": \"compact\", \"headline\": \"Quick Adopt Your Companion\"}, \"new_quick_confirmation\": {\"headline\": \"Confirm Companion\", \"body\": \"Ready to adopt your selected companion instantly?\", \"layout\": \"centered\"}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_quick_confirmation\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n4: [home, wait_info] generation_progress_breakdown_waiting: Display explicit status stage descriptions and estimated timing on the waiting screen while background pet generation completes.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"tip_delay_seconds\": 5, \"headline\": \"Bringing Your Pet to Life...\", \"body\": \"We are generating your pet's 3D model, animations, and desktop behavior profile.\"}}\n5: [adoption, copy] adoption_certificate_clarity_copy: Update the adoption certificate copy to clarify that pet naming can be edited later and setup is almost complete.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Pet Adoption Certificate\", \"body\": \"Give your new desktop pet a name! You can customize its personality and desktop behavior anytime later.\", \"button_label\": \"Complete Adoption\"}}\n6: [home, notification] background_generation_desktop_notify: Turn on system notification triggers on the waiting screen so users are notified when pet preparation finishes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"body\": \"Feel free to use other apps. We'll send a desktop notification when your pet is ready!\"}}\n7: [sign_in, incentive] account_cloud_sync_sign_in_hint: Add cloud backup assurance text and a highlight badge on the sign-in screen.\n   config: {\"sign_in\": {\"hint\": \"Signing in saves your pet data to the cloud so your companion is never lost across devices.\", \"components\": [{\"type\": \"badge\", \"text\": \"Cloud Backup Enabled\", \"style\": \"highlight\"}]}}\n8: [finish, layout] home_intro_stage_layout: Switch the home intro screen layout to stage focus mode to give the newly generated pet maximum visibility.\n   config: {\"home_intro\": {\"layout\": \"stage\", \"headline\": \"Welcome Home!\", \"body\": \"Your pet is officially ready and residing on your desktop.\"}}\n9: [choose_path, hint] choose_path_time_estimate_hint: Add a time estimate hint to choose_path clarifying that preset adoption takes under one minute.\n   config: {\"choose_path\": {\"hint\": \"Pre-made pets take <1 min setup. Custom photo pets take 2-3 mins.\", \"show_time_estimate\": true}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesign retains both path options and complies with all base rules."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new guide screen after home_intro inside onboarding is allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign_in after pick_friend inside onboarding is explicitly permitted."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a quick confirmation screen inside onboarding preserves all required steps."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying progress breakdown and estimated time for a real generation wait is fair and allowed."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating adoption certificate copy maintains its official role and complies with base rules."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling desktop completion notifications on the waiting screen is permitted inside onboarding."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding cloud backup hint copy to sign-in screen complies with fair design and pricing rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Layout change to home_intro inside onboarding is allowed."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding setup time estimates to path selection provides helpful info without violating rules."
+   }
+  ]
+ }
+}

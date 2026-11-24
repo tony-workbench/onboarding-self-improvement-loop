@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, redesign] Split layout sign-in screen redesign: Redesign the sign-in screen into a split layout to clearly separate authentication options from pet progress context.\n   config: {\"sign_in\": {\"layout\": \"split\", \"headline\": \"Sign In to Access Your Pet\", \"body\": \"Connect your account to finish setting up your desktop companion.\"}}\n1: [adoption, new_screen] Pet naming screen before account setup: Add a new screen after adoption certificate where users enter and confirm their pet's name before proceeding to sign-in.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_pet_name\", \"sign_in\", \"waiting\", \"home_intro\"], \"new_pet_name\": {\"headline\": \"Name Your Pet\", \"body\": \"Choose a name for your new desktop companion.\", \"layout\": \"centered\", \"components\": [{\"type\": \"name_input\", \"label\": \"Pet Name\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Save Name\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n2: [adoption, hint] Photo quality guideline hint on photo upload screen: Add an explicit hint and quality badge to the photo upload screen explaining best photo lighting and angles.\n   config: {\"upload_photos\": {\"hint\": \"Use clear, well-lit frontal photos for accurate pet generation results.\", \"components\": [{\"type\": \"badge\", \"text\": \"Photo Quality Checklist\", \"style\": \"highlight\"}]}}\n3: [home, new_flow] Interactive wait screen animation replace: Replace the standard wait status with a custom progress and live companion preview component.\n   config: {\"waiting\": {\"headline\": \"Generating Your Pet...\", \"replace\": {\"wait_status\": [{\"role\": \"wait_status\", \"type\": \"progress\", \"text\": \"Creating 3D desktop model...\", \"style\": \"playful\"}, {\"role\": \"wait_status\", \"type\": \"preview\", \"asset\": \"asset:pet_generating\", \"style\": \"large\"}]}}}\n4: [finish, hint] Desktop control hint on finish screen: Add a hint to the final home intro screen explaining basic mouse controls and right-click actions for the pet.\n   config: {\"home_intro\": {\"hint\": \"Right-click your desktop pet anytime to open control options, speak, or send it to sleep.\"}}\n5: [choose_path, redesign] Story scroll layout for story screen: Redesign the onboarding story screen to a story_scroll layout to improve narrative engagement.\n   config: {\"story\": {\"layout\": \"story_scroll\", \"headline\": \"Welcome to Your Desktop Pet Companion\"}}\n6: [finish, new_screen] Desktop companion placement guide screen: Insert a new screen before home intro showing users where the pet sits on screen and how desktop launch works.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"new_desktop_guide\", \"home_intro\"], \"new_desktop_guide\": {\"headline\": \"Where Your Pet Lives\", \"body\": \"Your pet will walk around your taskbar and desktop windows.\", \"layout\": \"centered\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:desktop_placement_demo\", \"style\": \"large\"}, {\"type\": \"button\", \"label\": \"Got It\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n7: [home, notification] Sound notification toggle on waiting screen: Add a sound notification trigger component to the waiting screen so users get an audio cue when setup finishes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"sound\", \"label\": \"Play chime when pet is ready\", \"action\": \"play\", \"style\": \"plain\"}]}}\n8: [adoption, redesign] Split layout redesign for adoption certificate: Redesign adoption certificate to a split layout featuring pet preview on one side and official details on the other.\n   config: {\"adoption_certificate\": {\"layout\": \"split\", \"headline\": \"Official Pet Adoption Certificate\"}}\n9: [sign_in, new_screen] Sign-in troubleshooting screen before sign-in: Add a sign-in preparation screen before authentication explaining connection requirements.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_signin_prep\", \"sign_in\", \"waiting\", \"home_intro\"], \"new_signin_prep\": {\"headline\": \"Connecting to Account Services\", \"body\": \"Preparing your sign-in session to securely save pet settings.\", \"layout\": \"centered\", \"components\": [{\"type\": \"progress\", \"text\": \"Checking connection...\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Continue to Sign In\", \"action\": \"next\", \"style\": \"emphasis\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout redesign of the sign-in screen within onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a pet naming screen inside the onboarding flow."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of quality guidelines to the photo upload screen."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid replacement of wait status components while maintaining the waiting screen's core job."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a control hint to the home intro screen."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout redesign of the story screen."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a desktop guide screen inside the onboarding flow."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a sound notification toggle component to the waiting screen."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid split layout redesign of the adoption certificate screen."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a sign-in preparation screen inside the onboarding flow."
+   }
+  ]
+ }
+}

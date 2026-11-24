@@ -1,0 +1,498 @@
+{
+ "round": 7,
+ "starts_week": 7,
+ "funnel": {
+  "choose_path": 0.8316308208600002,
+  "sign_in": 0.7842106983599999,
+  "adoption": 0.6414597,
+  "home": 0.8290974,
+  "finish": 0.6958224000000001
+ },
+ "weights_used": {
+  "impact": 2.387,
+  "evidence": 0.513,
+  "confidence": 0.65,
+  "cost": 0.45
+ },
+ "lessons_used": [
+  "Reordering sign-in (after adoption selection or photo upload) can be helpful, but placing sign-in after the adoption certificate severely hurt performance (-22.4%).",
+  "Redesigns showed mixed results: while some caused severe negative drops (-17.2%, -8.6%) or no clear effect, specific redesigns like Stage Layout (+7.1% won) and Story Screen Scroll (+7.4% won) were helpful.",
+  "Desktop background notification prompts (+5.1% won), path helper hints (+3.5% won), and new screens like the desktop visibility check (+8.0% won) were helpful, but sound cues, notification toggles/banners, and overlay hints showed no clear effect.",
+  "Copy updates, incentives, and waiting screen progress or time displays consistently showed no clear effect.",
+  "Predictions were frequently over-optimistic for tests with no clear effect, predicting gains up to +12.0%.",
+  "Predictions underestimated multiple winning tests, predicting negative or zero impact (-8.0% to +0.2%) on changes that ultimately won (+3.3% to +8.0%)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "New Desktop Troubleshooter Screen Before Finish",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a new desktop rendering verification screen right before home intro to ensure the app window and mascot rendering engine work without system permission blocks.",
+   "why": "Support mails report 3 instances of pets not showing on the desktop or the app failing to open on home view.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_check",
+     "home_intro"
+    ],
+    "new_desktop_check": {
+     "headline": "Verify Desktop Display Compatibility",
+     "body": "Let us quickly check if desktop overlays and pet animations are permitted on your monitor.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Desktop Overlay Support Check",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a display verification screen before home intro, which is permitted under rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.035,
+   "score": 6.46,
+   "score_note": "New desktop visibility verification screens at finish previously won (+8.0% won, +2.9% avg).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 101.4
+  },
+  {
+   "title": "Adoption Certificate Stamp Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen layout into a stage layout featuring an official adoption certificate badge.",
+   "why": "Adoption step has the biggest drop-off (64.1% conversion) with long completion time (89s median), needing stronger visual payoff.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "badge",
+        "label": "Official Adoption Certificate",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'adoption_certificate.certificate' does not do the job: needs 1 of ['animation', 'image', 'preview'] with an asset:certificate/ asset"
+   }
+  },
+  {
+   "title": "Reorder Sign-In After Pick Friend",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move sign-in screen immediately after pick_friend so users establish their account context right after picking their pet companion.",
+   "why": "Sign-in conversion is 78.4% and placing sign-in directly after friend pick anchors account creation to pet selection.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "sign_in",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in after pick_friend, which is explicitly allowed by rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 5.78,
+   "score_note": "Sign-in after adoption/friend selection can be helpful, though overall reorders show mixed results."
+  },
+  {
+   "title": "Multi Pet Selection Flow on Pick Friend",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Transform the pick_friend screen into a carousel layout flow with interactive companion choice cards.",
+   "why": "Adoption drops down to 64.1% conversion; offering a structured choice flow makes picking a pet more interactive.",
+   "config": {
+    "pick_friend": {
+     "layout": "carousel",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "text": "Select your main desktop companion",
+        "style": "large"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Existing Account Sign-In Clarification",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an account hint on the sign-in screen reassuring users that signing in restores previous desktop pets.",
+   "why": "Support received 8 emails regarding pets missing or resetting after signing in again with existing accounts.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing into an existing account will automatically restore all your previously created desktop pets."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds account sign-in restoration hint without violating copy or fair design rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 7.2,
+   "score_note": "Strong evidence with 8 support emails on account reset confusion; low-cost hint fix.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 159.3
+  },
+  {
+   "title": "Compact Layout for Photo Upload Screen",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Change upload_photos screen to compact layout to streamline the photo submission process.",
+   "why": "3 support tickets reported custom pet generation failures or weird results during adoption.",
+   "config": {
+    "upload_photos": {
+     "layout": "compact",
+     "body": "Upload 1 to 3 clear photos of your pet or favorite character for AI mascot generation."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates photo upload screen to compact layout while maintaining photo upload job."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.025,
+   "score": 8.2,
+   "score_note": "Adoption stage has highest drop-off (35.9%); layout optimizations showed moderate positive results in other steps.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 159.3
+  },
+  {
+   "title": "Home Intro Control Action Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Add an explicit control hint on home_intro explaining how to click, drag, and open settings for the desktop mascot.",
+   "why": "3 support emails cited confusion after setup on how to control, hide, or talk to the pet on the desktop.",
+   "config": {
+    "home_intro": {
+     "hint": "Left-click your mascot on the desktop to interact, drag to move, and right-click to open pet settings anytime."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds control hint to home intro screen within allowed onboarding modifications."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.0,
+   "score": 5.96,
+   "score_note": "Support mail supports this, but overlay hints and finish hints historically show no clear effect (-0.4%)."
+  },
+  {
+   "title": "Full Bleed Layout Redesign for Story Screen",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the story screen using a full_bleed layout with prominent mascot visual graphics.",
+   "why": "Earlier story screen redesigns won (+7.4%), proving that stronger narrative presentation boosts early flow progression.",
+   "config": {
+    "story": {
+     "layout": "full_bleed",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "mascot",
+        "asset": "asset:mascot_welcome",
+        "style": "large"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'story.intro_story' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'video'] with an asset:story/ asset"
+   }
+  },
+  {
+   "title": "Tip Carousel Component on Waiting Screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add a calm tip carousel component to the waiting screen explaining background mascot behavior while generation finishes.",
+   "why": "Waiting step takes median 201s / mean 2336s, and completion drops to 69.6% at finish.",
+   "config": {
+    "waiting": {
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Your pet will live right on your desktop border once ready.",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a calm tip carousel component to the waiting screen as permitted in onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.004,
+   "score": 4.97,
+   "score_note": "High wait time exists, but wait screen displays consistently show no clear effect (+0.4% avg).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 159.3
+  },
+  {
+   "title": "New Account Verification Helper Screen in Sign-In",
+   "target_step": "sign_in",
+   "type": "new_screen",
+   "change": "Insert a new account helper screen right before sign-in to help returning users distinguish between restoring pets and fresh account creation.",
+   "why": "8 support tickets (highest volume theme) complained about missing or reset pets after signing in.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "new_account_help",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_account_help": {
+     "headline": "Welcome Back or New Friend?",
+     "body": "Select whether you are logging in to restore existing desktop pets or creating a brand new companion account.",
+     "layout": "card"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "screen 'new_account_help' is not part of onboarding (new screens are named new_..., and may not look like payment, account, sign-up or settings screens)"
+   }
+  }
+ ],
+ "picked": [
+  "New Desktop Troubleshooter Screen Before Finish",
+  "Compact Layout for Photo Upload Screen",
+  "Existing Account Sign-In Clarification",
+  "Tip Carousel Component on Waiting Screen"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 579.3,
+ "decisions": [
+  {
+   "test": "sim-28",
+   "title": "Compact Layout for Photo Upload Screen",
+   "target_step": "adoption",
+   "type": "layout",
+   "weeks": 1,
+   "hours": 8,
+   "share": 1.0,
+   "planned_harm": 159.3,
+   "result": {
+    "step": {
+     "control": 0.6786,
+     "treatment": 0.6371,
+     "lift": -0.0611,
+     "lift_se": 0.0882,
+     "p": 0.502784
+    },
+    "finish": {
+     "control": 0.3333,
+     "treatment": 0.2654,
+     "lift": -0.2037,
+     "lift_se": 0.1366,
+     "p": 0.182093
+    },
+    "users_per_group": 162
+   },
+   "outcome": "stopped early: home worse",
+   "score": 8.2,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": -0.0465,
+   "finishers_delta_hidden": -2.19
+  },
+  {
+   "test": "sim-27",
+   "title": "New Desktop Troubleshooter Screen Before Finish",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 101.4,
+   "result": {
+    "step": {
+     "control": 0.6979,
+     "treatment": 0.7083,
+     "lift": 0.0148,
+     "lift_se": 0.029,
+     "p": 0.606625
+    },
+    "finish": {
+     "control": 0.248,
+     "treatment": 0.2363,
+     "lift": -0.047,
+     "lift_se": 0.0435,
+     "p": 0.291541
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.46,
+   "predicted_lift": 0.035,
+   "true_lift_hidden": 0.0532,
+   "finishers_delta_hidden": 38.09
+  },
+  {
+   "test": "sim-29",
+   "title": "Existing Account Sign-In Clarification",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 159.3,
+   "result": {
+    "step": {
+     "control": 0.7809,
+     "treatment": 0.8585,
+     "lift": 0.0993,
+     "lift_se": 0.0147,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.2267,
+     "treatment": 0.256,
+     "lift": 0.1294,
+     "lift_se": 0.0518,
+     "p": 0.00793
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 7.2,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": 0.0793,
+   "finishers_delta_hidden": 56.78
+  },
+  {
+   "test": "sim-30",
+   "title": "Tip Carousel Component on Waiting Screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 159.3,
+   "result": {
+    "step": {
+     "control": 0.8185,
+     "treatment": 0.8221,
+     "lift": 0.0043,
+     "lift_se": 0.0188,
+     "p": 0.818619
+    },
+    "finish": {
+     "control": 0.2477,
+     "treatment": 0.2357,
+     "lift": -0.0485,
+     "lift_se": 0.0435,
+     "p": 0.277635
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.97,
+   "predicted_lift": 0.004,
+   "true_lift_hidden": -0.0038,
+   "finishers_delta_hidden": -2.72
+  }
+ ],
+ "shipped": [
+  "Existing Account Sign-In Clarification"
+ ],
+ "ends_week": 7,
+ "weights_next": {
+  "impact": 2.417,
+  "evidence": 0.524,
+  "confidence": 0.587,
+  "cost": 0.472
+ },
+ "lessons_next": [
+  "Reordering sign-in was helpful when placed after adoption selection (+5.5% won) or photo upload (+3.3% won), but placing it after the adoption certificate severely hurt performance (-22.4%).",
+  "Redesigns yielded mixed results: while several caused severe negative drops or no clear effect, specific redesigns like Stage Layout (+7.1% won) and Story Screen Scroll (+7.4% won) were helpful.",
+  "Desktop background notification prompts (+5.1% won), path helper hints (+3.5% won), sign-in clarifications (+9.9% won), and desktop visibility check screens (+8.0% won) were helpful, whereas sound cues, notification toggles/banners, overlay hints, and troubleshooter screens showed no clear effect.",
+  "Copy updates, incentives, and waiting screen progress or estimated time displays consistently showed no clear effect.",
+  "Predictions were frequently too high (over-optimistic) for tests that showed no clear effect, predicting gains up to +12.0%.",
+  "Predictions were too low for multiple winning tests, predicting negative or zero impact (-8.0% to +0.2%) on changes that ultimately won (+3.3% to +9.9%)."
+ ]
+}

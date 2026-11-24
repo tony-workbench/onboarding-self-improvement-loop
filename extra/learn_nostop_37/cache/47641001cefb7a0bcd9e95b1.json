@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_screen] Desktop pet visibility verification screen: Add a new step new_pet_visibility_check after home_intro asking users to confirm their pet rendered on their screen.\n   config: {\"new_pet_visibility_check\": {\"headline\": \"Can you see your pet?\", \"body\": \"Check your desktop screen right now. If your pet is visible, click continue to finish setup.\", \"components\": [{\"type\": \"button\", \"label\": \"Yes, I see my pet!\", \"action\": \"next\", \"style\": \"rounded\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_pet_visibility_check\"]}\n1: [home, redesign] Waiting screen checklist status redesign: Switch the waiting screen layout to checklist format to display pet generation stages clearly as they complete.\n   config: {\"waiting\": {\"layout\": \"checklist\", \"headline\": \"Assembling Your Desktop Pet\", \"body\": \"Generating pet animations and configuring desktop interactions.\", \"show_progress\": true}}\n2: [finish, new_flow] Desktop control interaction exercise flow: Add an interactive tip carousel component on home_intro explaining right-clicking, dragging, and controlling the pet.\n   config: {\"home_intro\": {\"headline\": \"Master Desktop Controls\", \"body\": \"Learn how to interact with your pet right on your desktop.\", \"components\": [{\"type\": \"tip_carousel\", \"text\": \"Right-click your pet for options; double-click to chat.\", \"style\": \"emphasis\"}]}}\n3: [choose_path, redesign] Choose path spotlight layout redesign: Redesign choose_path layout to spotlight format to focus attention on one companion path choice at a time.\n   config: {\"choose_path\": {\"layout\": \"spotlight\", \"show_progress\": true}}\n4: [adoption, new_flow] Adoption verification and review flow: Add a pet preview and confirmation flow on adoption_certificate so users can verify pet assets before waiting.\n   config: {\"adoption_certificate\": {\"headline\": \"Review Your Pet Companion\", \"body\": \"Confirm your pet appearance before desktop deployment.\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:pet_review\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Confirm Companion\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n5: [sign_in, layout] Sign-in simplified card layout: Change sign_in screen to a simple card layout with direct primary sign-in action to prevent app stalling.\n   config: {\"sign_in\": {\"layout\": \"card\", \"headline\": \"Sign In to Save Companion\", \"body\": \"Sign in to keep your pet safe across app updates.\"}}\n6: [adoption, notification] Pick friend choice notification hint: Enable notification prompt on pick_friend screen letting users know default pets are instantly ready without photo uploads.\n   config: {\"pick_friend\": {\"notify_when_ready\": true, \"hint\": \"Instant presets available if you want to skip photo upload.\"}}\n7: [home, wait_info] Waiting screen status estimation notice: Show dynamic completion time estimate and tip delay on waiting screen during pet rendering.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"show_progress\": true, \"tip_delay_seconds\": 15}}\n8: [finish, copy] Home intro controls guide copy: Update home_intro body copy with concise instructions on where to find the pet on the desktop and system tray.\n   config: {\"home_intro\": {\"headline\": \"Your Pet Is Now Active!\", \"body\": \"Look at the bottom right of your screen. Right-click your pet icon anytime to open options or chat.\"}}\n9: [choose_path, copy] Story screen quick setup callout copy: Update story screen headline and body copy to emphasize quick start choices and fast companion setup.\n   config: {\"story\": {\"headline\": \"Create Your Desktop Companion\", \"body\": \"Choose how you want to build your pet in just two simple steps.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid check screen after home_intro within onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns waiting screen while retaining pet creation status display."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds controls carousel component to home_intro within onboarding."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns choose_path layout while preserving path selection."
+   },
+   {
+    "index": 4,
+    "pass": false,
+    "rule": 2,
+    "reason": "Adoption certificate loses the official stamp and adoption certificate function."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns sign-in screen to card layout while preserving sign-in functionality."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds informative preset hint on pick_friend screen without skipping steps."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Displays real progress and time estimate during actual pet rendering wait."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates home_intro body copy with desktop pet controls guidance."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates story screen copy while continuing to introduce the desktop pet."
+   }
+  ]
+ }
+}

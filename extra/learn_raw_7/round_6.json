@@ -1,0 +1,409 @@
+{
+ "round": 6,
+ "starts_week": 6,
+ "funnel": {
+  "choose_path": 0.7934706000000001,
+  "sign_in": 0.8110854,
+  "adoption": 0.6560147999999999,
+  "home": 0.8632434,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.819,
+  "evidence": 0.165,
+  "confidence": 1.385,
+  "cost": 0.631
+ },
+ "lessons_used": [
+  "Reordering the onboarding flow, adding preset fallback choices, and adding background render status indicators were helpful.",
+  "Interactive screen redesigns and desktop hint notifications hurt performance.",
+  "Copy changes, guidelines, layout tweaks, hints, and incentives showed no clear effect.",
+  "Predictions were underestimated for preset fallback choices and background status indicators.",
+  "Predictions were consistently too high for redesigns, hint notifications, copy changes, guidelines, layout tweaks, and new flow additions."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Move Sign-In After Photo Upload",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder the onboarding sequence to place sign-in directly after photo upload and before adoption certificate creation.",
+   "why": "Sign-in has an 81.1% completion rate with low median time (3s), but asking users to sign in before choosing their pet disrupts pet selection momentum.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "sign_in",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in after photo upload is explicitly permitted under rule 4 and retains all required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.085,
+   "score": 7.56,
+   "score_note": "Reordering sign-in has strong historical lift (+8.8%) and addresses early momentum drop.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 113.4
+  },
+  {
+   "title": "Preset Photo Selector Component Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Replace the photo upload section with interactive sample photo choice cards alongside the upload option.",
+   "why": "Support receives emails about custom pet generation failing or looking wrong, and adoption step drop-off is high (65.6%). Preset fallbacks tested well previously.",
+   "config": {
+    "upload_photos": {
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "choice_cards",
+        "text": "Select a sample portrait or upload your own photo",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[0]': a choice_cards cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Dedicated Render Preparation Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Insert a dedicated pre-render status screen before the waiting screen showing asset preparation steps.",
+   "why": "The home stage waiting process has a long mean duration (2336s) and support emails report pets failing to display on desktop.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_render_prep",
+     "waiting",
+     "home_intro"
+    ],
+    "new_render_prep": {
+     "headline": "Preparing Desktop Pet Assets",
+     "body": "Verifying render engine readiness and unpacking companion files.",
+     "layout": "centered",
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new pre-render preparation screen inside onboarding is allowed under rule 4 and keeps all required steps."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.01,
+   "score": 1.93,
+   "score_note": "Adding new screens and redesigns consistently hurt conversion despite high support callout."
+  },
+  {
+   "title": "Prioritize Path Choice Over Intro Story",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Swap the initial story screen and path selection screen so users immediately pick their onboarding route.",
+   "why": "Choose path takes a mean time of 514s despite a fast median of 8s, showing users get delayed in intro story screens.",
+   "config": {
+    "_order": [
+     "choose_path",
+     "story",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "existing screens must keep their order; only sign_in may move"
+   }
+  },
+  {
+   "title": "Waiting Screen Background Status Toggle",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Enable background execution status indicators and step counters on the waiting screen.",
+   "why": "Background render indicators previously helped retention during generation delays.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_step_counter": true,
+     "notify_when_ready": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding status indicators and step counters to the waiting screen is permitted inside onboarding."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.052,
+   "score": 6.83,
+   "score_note": "Config toggle for background status indicator aligns with proven historical gains (+4.8%).",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 113.4
+  },
+  {
+   "title": "Home Intro Quick Control Checklist Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Replace the standard welcome area on home intro with an explicit desktop control checklist component.",
+   "why": "Support receives multiple inquiries after onboarding regarding how to control, hide, or talk to their desktop pet, and finish conversion drops to 64.8%.",
+   "config": {
+    "home_intro": {
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "checklist",
+        "text": "1. Left-click to pet. 2. Drag to reposition on screen. 3. Right-click for options menu.",
+        "style": "plain"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  },
+  {
+   "title": "Account Selection Choice Cards Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Replace standard sign-in options with distinct account choice cards separating new adoption from returning account login.",
+   "why": "The top support theme is existing users losing or resetting pets after signing in again (8 emails).",
+   "config": {
+    "sign_in": {
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "choice_cards",
+        "text": "Choose 'Returning Owner' to restore existing pets or 'New Owner' to create a new companion.",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'sign_in.sign_in_options' does not do the job (a sign-in button that says so): needs 1 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Pick Friend Visual Choice Cards Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Replace default friend choices with high-visibility playful choice cards on the pick_friend screen.",
+   "why": "Adoption step has the lowest conversion rate among early steps (65.6%) with a high median time (89s).",
+   "config": {
+    "pick_friend": {
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "text": "Select your starter companion archetype",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Mascot Guided Intro Story Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Replace the opening story intro block with a mascot component to welcome new users.",
+   "why": "The story screen is the first touchpoint in choose_path where long tail drop-offs occur (mean time 514s).",
+   "config": {
+    "story": {
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "mascot",
+        "text": "Hi! Pick how you would like to create your desktop companion today.",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'story.intro_story' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'video'] with an asset:story/ asset"
+   }
+  },
+  {
+   "title": "Waiting Screen Status Estimate Badge",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add an active generation status badge component to the waiting screen.",
+   "why": "Home stage has a median time of 201s and mean of 2336s; clear waiting indicators prevent app abandonment.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "badge",
+       "text": "Pet render engine initializing in background",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a status badge and time estimate for a real pet generation wait on the waiting screen is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.038,
+   "score": 4.31,
+   "score_note": "Status estimate component helps reduce wait dropoff but requires UI changes."
+  }
+ ],
+ "picked": [
+  "Move Sign-In After Photo Upload",
+  "Waiting Screen Background Status Toggle"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 226.8,
+ "decisions": [
+  {
+   "test": "sim-20",
+   "title": "Move Sign-In After Photo Upload",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 113.4,
+   "result": {
+    "step": {
+     "control": 0.798,
+     "treatment": 0.7472,
+     "lift": -0.0636,
+     "lift_se": 0.021,
+     "p": 0.003369
+    },
+    "finish": {
+     "control": 0.2173,
+     "treatment": 0.2,
+     "lift": -0.0798,
+     "lift_se": 0.0655,
+     "p": 0.242738
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: worse",
+   "score": 7.56,
+   "predicted_lift": 0.085,
+   "true_lift_hidden": -0.0854,
+   "finishers_delta_hidden": -28.94
+  },
+  {
+   "test": "sim-21",
+   "title": "Waiting Screen Background Status Toggle",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 113.4,
+   "result": {
+    "step": {
+     "control": 0.8681,
+     "treatment": 0.862,
+     "lift": -0.0071,
+     "lift_se": 0.0224,
+     "p": 0.75112
+    },
+    "finish": {
+     "control": 0.2327,
+     "treatment": 0.2207,
+     "lift": -0.0516,
+     "lift_se": 0.064,
+     "p": 0.432491
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.83,
+   "predicted_lift": 0.052,
+   "true_lift_hidden": 0.0236,
+   "finishers_delta_hidden": 8.0
+  }
+ ],
+ "shipped": [],
+ "ends_week": 6,
+ "weights_next": {
+  "impact": 1.94,
+  "evidence": 0.128,
+  "confidence": 1.347,
+  "cost": 0.586
+ },
+ "lessons_next": [
+  "Preset fallback choices, background render status indicators, and certain onboarding flow reorders were helpful.",
+  "Interactive screen redesigns, desktop hint notifications, and moving sign-in after photo upload hurt performance.",
+  "Copy changes, guidelines, layout tweaks, hints, incentives, and other flow additions showed no clear effect.",
+  "Predictions were underestimated for preset fallback choices and background render status indicators.",
+  "Predictions were consistently too high for redesigns, notifications, copy changes, guidelines, layout tweaks, incentives, and new flow additions."
+ ]
+}

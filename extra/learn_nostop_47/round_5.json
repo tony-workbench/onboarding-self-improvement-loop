@@ -1,0 +1,596 @@
+{
+ "round": 5,
+ "starts_week": 5,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7637004000000001,
+  "adoption": 0.6621657,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.547,
+  "evidence": 0.62,
+  "confidence": 1.541,
+  "cost": 1.292
+ },
+ "lessons_used": [
+  "Evidence remains thin for adoption new_flow, finish copy, finish hint, finish redesign, sign_in hint, sign_in notification, and sign_in reorder because each has only been tested once.",
+  "For choose_path copy changes (2 tests), no clear effect was seen in either test.",
+  "For choose_path redesign changes (2 tests), no clear effect was seen in either test.",
+  "For home wait_info changes (4 tests), no clear winning effect was demonstrated, with three tests showing no clear effect and one rolled back due to a guardrail.",
+  "For adoption redesign changes (2 tests), results disagree with one winning test and one showing no clear effect.",
+  "Predictions were consistently overly optimistic compared to noise-corrected measurements across most tests."
+ ],
+ "carried_retests": [
+  "Interactive Companion Controls Intro"
+ ],
+ "candidates": [
+  {
+   "title": "Interactive Desk Companion Mini Game",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Adds an interactive desk toy mini-game screen during the waiting stage while background pet creation completes.",
+   "why": "Home stage has high median (201s) and mean (2336s) duration, causing drop-offs; providing a mini-game keeps users engaged.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_waiting_minigame",
+     "home_intro"
+    ],
+    "waiting": {
+     "hint": "Play a quick mini-game while your pet prepares its room!"
+    },
+    "new_waiting_minigame": {
+     "headline": "Toy Workshop",
+     "body": "Tap items on the desk to build your pet's first favorite toy while setup finishes.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:toy_builder",
+       "style": "playful",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid interactive waiting minigame screen within onboarding while preserving all required onboarding steps and jobs."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 0.97,
+   "score_note": "Addresses high home waiting time but requires a full new mini-game screen; unproven strategy."
+  },
+  {
+   "title": "Desktop Pet Quick Action Carousel",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesigns the home intro welcome section into an interactive desktop controls carousel demonstrating how to move, hide, and summon the pet.",
+   "why": "Finish step drop-off is 35.2% and support received multiple tickets regarding confusion over controlling, hiding, or talking to the desktop pet.",
+   "config": {
+    "home_intro": {
+     "layout": "carousel",
+     "headline": "Meet Your New Desktop Companion!",
+     "body": "Swipe through quick tips to learn how to interact with your pet on screen.",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "tip_carousel",
+        "text": "Drag to move • Double click to talk • Right-click to send to tray",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.replace.home_welcome[0]': a tip_carousel cannot do the home_welcome job (use ['animation', 'button', 'checklist', 'image', 'mascot', 'text'])"
+   }
+  },
+  {
+   "title": "Pet Voice and Personality Setup Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Inserts a dedicated personality and voice selector screen right before the final adoption certificate is issued.",
+   "why": "Adoption stage experiences significant drop-off (66.2% conversion); adding high-value personalization deepens emotional investment before finalization.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "new_personality_selector",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_personality_selector": {
+     "headline": "Choose Personality & Voice",
+     "body": "Select how your pet talks and behaves on your desktop.",
+     "layout": "grid",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Playful, Curious, Calm",
+       "style": "playful",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new personality setup screen inside onboarding without removing required steps or violating base rules."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.005,
+   "score": 3.81,
+   "score_note": "Adoption stage has major drop-off (33.8%), but adding screens has high cost and adoption new_flow only gained +0.5% historically.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": null
+  },
+  {
+   "title": "Pet Archetype Carousel Selection",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Rebuilds the path selector into a carousel layout with rich visual cards highlighting distinct pet behavior archetypes.",
+   "why": "Choose path takes a long mean time (514s); a structured visual carousel simplifies comparison and accelerates choice.",
+   "config": {
+    "choose_path": {
+     "layout": "carousel",
+     "headline": "Pick Your Companion Archetype",
+     "body": "Explore different pet personalities designed for work and play.",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Select Archetype",
+        "style": "large",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Pet Hatching Animation Progress Info",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Adds an animated hatching pet graphic and background status explanation to the waiting screen.",
+   "why": "Support receives tickets about desktop pet apps stalling, and the home stage mean duration is 2336s.",
+   "config": {
+    "waiting": {
+     "headline": "Your Pet is Hatching...",
+     "body": "Setting up desktop graphics engine and companion AI response files.",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:pet_hatching",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds hatching visual progress and status information to the waiting screen within onboarding rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.009,
+   "score": 3.62,
+   "score_note": "Both support tickets and duration support this, but 4 previous wait_info tests showed minimal gain (+0.9%) and one rollback."
+  },
+  {
+   "title": "Account Recovery and Instant Reconnect Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Updates sign-in copy to explicitly highlight pet retrieval and existing account protection.",
+   "why": "Support received 8 emails regarding pets missing or account reset confusion after signing in.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Save & Restore Your Pets",
+     "body": "Log into your account so your desktop companion and saved accessories are safely backed up.",
+     "hint": "Signing in ensures your pet stays safe across device restarts or app updates."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates sign-in screen copy inside onboarding while retaining its required functionality."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 7.1,
+   "score_note": "Cheap copy change supported by 8 support tickets addressing sign-in confusion.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": null
+  },
+  {
+   "title": "Desktop Overlay Hotkey Helper Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Displays an explicit hotkey shortcut tip on the final screen explaining how to toggle desktop visibility.",
+   "why": "Support received multiple inquiries post-onboarding asking how to hide or reveal the desktop pet.",
+   "config": {
+    "home_intro": {
+     "hint": "Quick tip: Press Ctrl+Shift+P anytime to hide or bring your pet to the front!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a helpful shortcut hint to the home intro overlay screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": -0.01,
+   "score": 7.1,
+   "score_note": "High drop-off step with clear support evidence, but previous finish hint attempt measured -2.0% lift."
+  },
+  {
+   "title": "Starter Companion Accessory Reward",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Displays an exclusive welcome gift badge on the pet selection screen for completing adoption.",
+   "why": "Adoption conversion drops to 66.2%; granting a starter item boosts conversion motivation.",
+   "config": {
+    "pick_friend": {
+     "headline": "Adopt Your Companion & Claim Free Accessory",
+     "body": "Every adoption today comes with an exclusive founder's desktop toy badge!",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Includes Free Founder Toy",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy explicitly mentions gifts and free extras ('Claim Free Accessory' and 'Includes Free Founder Toy')."
+   }
+  },
+  {
+   "title": "Desktop Ready Sound Alert",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Adds a sound cue component and explicit notification message when waiting finishes.",
+   "why": "Home mean time is over 38 minutes as users switch windows; an audio chime alerts them when the pet is ready.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "asset": "asset:chime_ready",
+       "style": "calm",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a sound cue and notification option to the waiting screen within allowed onboarding changes."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.015,
+   "score": 4.51,
+   "score_note": "Low cost audio alert targeting long home stage delay; audio notifications are untested on home step.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": null
+  },
+  {
+   "title": "Path Switch Flexibility Guarantee Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Adds reassurance text stating paths and companion types can be switched anytime in settings.",
+   "why": "High mean decision time on choose_path (514s) points to user hesitation over making an irreversible choice.",
+   "config": {
+    "choose_path": {
+     "hint": "Don't worry! You can change your companion path or add more pets anytime in app settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a reassurance hint on the choose path screen while preserving its core function and design rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 4.66,
+   "score_note": "Config-only hint targeting choose_path delay, though past choose_path copy tests showed no clear effect.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": null
+  }
+ ],
+ "picked": [
+  "Pet Voice and Personality Setup Flow",
+  "Account Recovery and Instant Reconnect Copy",
+  "Path Switch Flexibility Guarantee Hint",
+  "Desktop Ready Sound Alert"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-19",
+   "title": "Pet Voice and Personality Setup Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.6605,
+     "treatment": 0.5071,
+     "lift": -0.2323,
+     "lift_se": 0.0333,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.1773,
+     "treatment": 0.1287,
+     "lift": -0.2744,
+     "lift_se": 0.0633,
+     "p": 0.000214
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "rolled back: guardrail",
+   "score": 3.81,
+   "predicted_lift": 0.005,
+   "true_lift_hidden": -0.1761,
+   "finishers_delta_hidden": -43.1
+  },
+  {
+   "test": "sim-20",
+   "title": "Account Recovery and Instant Reconnect Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7065,
+     "treatment": 0.7604,
+     "lift": 0.0764,
+     "lift_se": 0.0276,
+     "p": 0.004149
+    },
+    "finish": {
+     "control": 0.17,
+     "treatment": 0.164,
+     "lift": -0.0353,
+     "lift_se": 0.0787,
+     "p": 0.659534
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "won, shipped",
+   "score": 7.1,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": 0.0447,
+   "finishers_delta_hidden": 10.94
+  },
+  {
+   "test": "sim-21",
+   "title": "Path Switch Flexibility Guarantee Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.732,
+     "treatment": 0.7207,
+     "lift": -0.0155,
+     "lift_se": 0.0221,
+     "p": 0.486328
+    },
+    "finish": {
+     "control": 0.1573,
+     "treatment": 0.164,
+     "lift": 0.0424,
+     "lift_se": 0.087,
+     "p": 0.619066
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.66,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": -0.0196,
+   "finishers_delta_hidden": -4.8
+  },
+  {
+   "test": "sim-22",
+   "title": "Desktop Ready Sound Alert",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7786,
+     "treatment": 0.7384,
+     "lift": -0.0516,
+     "lift_se": 0.0326,
+     "p": 0.124001
+    },
+    "finish": {
+     "control": 0.166,
+     "treatment": 0.1707,
+     "lift": 0.0281,
+     "lift_se": 0.0835,
+     "p": 0.732676
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.51,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": -0.0347,
+   "finishers_delta_hidden": -8.49
+  },
+  {
+   "test": "sim-14",
+   "title": "Interactive Companion Controls Intro",
+   "target_step": "finish",
+   "type": "new_flow",
+   "weeks": 2,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.669,
+     "treatment": 0.7936,
+     "lift": 0.1863,
+     "lift_se": 0.0345,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.1947,
+     "treatment": 0.2473,
+     "lift": 0.2705,
+     "lift_se": 0.0622,
+     "p": 1e-06
+    },
+    "users_per_group": 3000,
+    "first_week": {
+     "step": {
+      "control": 0.6883,
+      "treatment": 0.8072,
+      "lift": 0.1727,
+      "lift_se": 0.0439,
+      "p": 1.3e-05
+     },
+     "finish": {
+      "control": 0.2193,
+      "treatment": 0.2847,
+      "lift": 0.2979,
+      "lift_se": 0.0826,
+      "p": 3.8e-05
+     },
+     "users_per_group": 1500
+    },
+    "retest": {
+     "step": {
+      "control": 0.6456,
+      "treatment": 0.7759,
+      "lift": 0.2018,
+      "lift_se": 0.0551,
+      "p": 4.7e-05
+     },
+     "finish": {
+      "control": 0.17,
+      "treatment": 0.21,
+      "lift": 0.2353,
+      "lift_se": 0.0938,
+      "p": 0.005233
+     },
+     "users_per_group": 1500
+    }
+   },
+   "outcome": "won after re-test, shipped",
+   "score": 5.47,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": 0.2074,
+   "finishers_delta_hidden": 114.97
+  }
+ ],
+ "shipped": [
+  "Account Recovery and Instant Reconnect Copy",
+  "Interactive Companion Controls Intro"
+ ],
+ "ends_week": 5,
+ "weights_next": {
+  "impact": 0.409,
+  "evidence": 0.698,
+  "confidence": 1.488,
+  "cost": 1.405
+ },
+ "lessons_next": [
+  "Evidence remains thin for choose_path hint, finish copy, finish hint, finish new_flow, finish redesign, home notification, sign_in copy, sign_in hint, sign_in notification, and sign_in reorder because each has only been tested once.",
+  "For choose_path copy changes (2 tests), no clear effect was seen in either test.",
+  "For choose_path redesign changes (2 tests), no clear effect was seen in either test.",
+  "For home wait_info changes (4 tests), no clear winning effect was demonstrated, with three tests showing no clear effect and one rolled back due to a guardrail.",
+  "For adoption redesign changes (2 tests), results disagree, with one winning test and one showing no clear effect.",
+  "Predictions were consistently overly optimistic compared to noise-corrected measurements across most tests."
+ ]
+}

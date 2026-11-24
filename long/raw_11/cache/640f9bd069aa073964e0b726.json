@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Adoption Custom Pet Style Preview Redesign: Rebuild the photo upload screen with interactive pet style card previews before final photo submission.\n   config: {\"upload_photos\": {\"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"preview\", \"style\": \"emphasis\"}, {\"role\": \"photo_upload\", \"type\": \"choice_cards\", \"style\": \"rounded\"}]}}}\n1: [finish, new_screen] Desktop Pet Placement Verification Screen: Add a new interactive verification screen after home intro where users click a button to test pet wave rendering on their screen.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\", \"new_placement_check\"], \"new_placement_check\": {\"headline\": \"Confirm Desktop Companion Location\", \"body\": \"Make sure your companion is visible on your primary desktop screen.\", \"components\": [{\"type\": \"button\", \"label\": \"Test Pet Wave\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n2: [sign_in, new_flow] Account Pet Sync Restore Flow: Introduce a dedicated multi-step cloud account verification layout on sign-in that explicitly checks and confirms existing pet data.\n   config: {\"sign_in\": {\"headline\": \"Sign In & Sync Companion\", \"body\": \"Sign in to link your pet safely or check for previously saved pets.\", \"components\": [{\"type\": \"badge\", \"text\": \"Cloud Save Protection Active\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Check Cloud Save\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n3: [sign_in, reorder] Sign-In Prior to Adoption Certificate Reorder: Move sign-in immediately before adoption certificate creation so user identity is bound before official companion naming.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n4: [home, hint] Waiting Screen Desktop Overlay System Hint: Add a prominent system permission hint on the waiting screen explaining what to check if the pet window is hidden.\n   config: {\"waiting\": {\"hint\": \"If your pet does not appear on your desktop, verify system overlay permissions in your taskbar.\", \"tip_delay_seconds\": 4}}\n5: [choose_path, layout] Full Bleed Path Selection Layout: Switch the choose path screen to a full bleed hero layout clearly highlighting custom creation versus preset adoption.\n   config: {\"choose_path\": {\"layout\": \"full_bleed\", \"headline\": \"Choose Your Pet Journey\", \"body\": \"Select a ready-to-adopt companion or create a custom pet from your photos.\"}}\n6: [home, wait_info] Waiting Screen Preparation Progress Bar: Display explicit progress status indicators and estimated wait time while desktop rendering initialises.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"headline\": \"Setting Up Companion Desktop Shell\"}}\n7: [finish, copy] Companion Quick Shortcut Hotkey Copy: Update the home intro text with explicit hotkey shortcuts for toggling, hiding, and talking to the desktop pet.\n   config: {\"home_intro\": {\"headline\": \"Your Companion is Ready!\", \"body\": \"Press Ctrl+Pet (Cmd+Pet on Mac) or right-click your taskbar pet icon anytime to hide, move, or talk to your desktop pet.\"}}\n8: [adoption, incentive] Adoption Certificate Verification Badge: Display a prominent official pet registration badge component on the adoption certificate screen.\n   config: {\"adoption_certificate\": {\"components\": [{\"type\": \"badge\", \"text\": \"Official Pet Registration Verified\", \"style\": \"highlight\"}]}}\n9: [finish, new_screen] Interactive Pet Control Practice Screen: Add an interactive practice screen at onboarding end where users test dragging, hiding, and talking to their desktop pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\", \"new_control_practice\"], \"new_control_practice\": {\"headline\": \"Try Your Desktop Pet Commands\", \"body\": \"Practice hiding, dragging, and opening chat with your desktop pet before finishing setup.\", \"components\": [{\"type\": \"button\", \"label\": \"Practice Hide & Seek\", \"action\": \"next\", \"style\": \"playful\"}, {\"type\": \"button\", \"label\": \"Practice Move Pet\", \"action\": \"next\", \"style\": \"rounded\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns photo upload screen while preserving functionality."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid placement verification screen after home intro within onboarding."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of sign-in flow."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Moving sign-in step before adoption certificate is explicitly allowed."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds system permission hint to waiting screen within onboarding limits."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Full bleed layout preserves both preset adoption and custom pet creation options."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Progress status and wait time estimate during real waiting step are permitted."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates home intro copy with valid hotkey usage instructions."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds official registration badge to adoption certificate maintaining the official stamp job."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an interactive practice screen after home intro within onboarding."
+   }
+  ]
+ }
+}

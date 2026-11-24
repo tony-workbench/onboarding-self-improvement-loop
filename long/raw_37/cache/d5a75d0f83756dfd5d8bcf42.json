@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Spotlight Pick Friend Selection View: Redesign the companion selection screen into a spotlight view highlighting personality traits and custom vs starter choices.\n   config: {\"pick_friend\": {\"layout\": \"spotlight\", \"headline\": \"Choose Your Ideal Desktop Companion\", \"body\": \"Select a starter friend or prepare photos for a custom companion tailored to your workspace.\"}}\n1: [adoption, new_screen] Pet Character Confirmation Stage: Insert a companion preview stage right after photo upload to confirm companion visual settings before certificate generation.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_pet_character_preview\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_pet_character_preview\": {\"headline\": \"Preview Your Companion\", \"body\": \"Check your companion look and traits before finalizing adoption.\", \"components\": [{\"type\": \"preview\", \"style\": \"emphasis\"}, {\"type\": \"button\", \"label\": \"Looks Great!\", \"action\": \"next\"}]}}\n2: [sign_in, reorder] Pre-Photo Sign-In Sequence: Move sign-in directly after companion picking and before photo upload so character choices are immediately attached to the account.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"sign_in\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n3: [home, new_flow] Desktop Launch Preparation Flow: Add a dedicated desktop launch verification step during waiting to prepare screen real estate before mascot spawn.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_launch_check\", \"home_intro\"], \"waiting\": {\"notify_when_ready\": true, \"show_time_estimate\": true}, \"new_launch_check\": {\"headline\": \"Preparing Desktop Canvas\", \"body\": \"Ensuring your companion has a safe screen position to spawn.\", \"components\": [{\"type\": \"progress\", \"style\": \"emphasis\"}, {\"type\": \"mascot\", \"style\": \"playful\", \"asset\": \"asset:mascot_launch\"}]}}\n4: [choose_path, hint] Path Choice Reassurance Note: Display a hint on path selection explaining that starter vs custom paths can be switched anytime later.\n   config: {\"choose_path\": {\"hint\": \"You can add custom pets or change companion modes anytime later in app settings.\"}}\n5: [finish, redesign] Desktop Control Overview Layout: Redesign the home intro screen layout to highlight system tray controls and companion interaction shortcuts.\n   config: {\"home_intro\": {\"layout\": \"spotlight\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"text\", \"text\": \"Your pet is active on your desktop!\", \"style\": \"emphasis\"}, {\"role\": \"home_welcome\", \"type\": \"tip_carousel\", \"text\": \"Use the system tray icon to hide, summon, or talk with your pet anytime.\", \"style\": \"rounded\"}]}}}\n6: [adoption, hint] Photo Generation Quality Advice Tip: Add clear image requirements hint on the photo upload screen explaining lighting and pose guidance.\n   config: {\"upload_photos\": {\"hint\": \"For best results, upload well-lit front-facing photos with clear background contrast.\"}}\n7: [sign_in, copy] Account Pet Link Guarantee Copy: Update sign-in screen hint to explicitly state that pets and items are bound to the cloud account.\n   config: {\"sign_in\": {\"hint\": \"Signing in automatically syncs your adoption progress and custom companion data to your account.\"}}\n8: [home, notification] Background Spawn Readiness Notification: Trigger a timely desktop notification when hatching completes while waiting in background.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"tip_delay_seconds\": 15, \"body\": \"Your companion is hatching in the background. We will alert you the moment it spawns!\"}}\n9: [finish, incentive] First Day Desktop Welcome Note: Add an inviting welcome headline and action button on the final screen prompting the user's first desktop click.\n   config: {\"home_intro\": {\"headline\": \"Welcome to Your New Workspace Buddy!\", \"body\": \"Your companion is ready on your screen. Double-click your pet to start your first chat!\", \"button_label\": \"Start Exploring\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of the companion selection screen within onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a character preview screen during onboarding."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid reordering of the sign-in step within onboarding."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a launch preparation screen during onboarding."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid hint added to the choose path screen."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout redesign of the home intro screen."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid photo upload guidance hint added."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid account sync hint added to sign-in screen."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid background readiness notification configuration added to waiting screen."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid welcome note added to the home intro screen."
+   }
+  ]
+ }
+}

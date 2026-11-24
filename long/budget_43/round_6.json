@@ -1,0 +1,403 @@
+{
+ "round": 6,
+ "starts_week": 6,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.536,
+  "evidence": 0.32,
+  "confidence": 1.563,
+  "cost": 1.58
+ },
+ "lessons_used": [
+  "Sign-in reordering (sign_in, reorder) tends to have a negative impact, as 2 tests agree after noise correction.",
+  "No kind of change has proven helpful yet, as no tests resulted in a statistically significant win.",
+  "Evidence is still thin for home flow changes (home, new_flow), path redesigns (choose_path, redesign), and adoption redesigns (adoption, redesign) because each has only 1 test so far.",
+  "No clear effect was seen for new home flows, path selection redesigns, or photo upload split layout redesigns.",
+  "Predictions were consistently too high and overly optimistic, particularly for sign-in reordering where a +20.0% gain was predicted but resulted in a loss."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Pick Friend Compact Grid Selection",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the pick_friend screen to use a compact grid layout with direct preview component selection for preset pets.",
+   "why": "Adoption has a low conversion rate (60.9%) and long mean completion time (1017s); a clear grid preview speeds up comparison.",
+   "config": {
+    "pick_friend": {
+     "layout": "grid",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "preview",
+        "style": "rounded",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Desktop Companion Orientation Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a new screen called new_desktop_orientation right after home_intro explaining desktop spawn location and basic interaction shortcuts.",
+   "why": "Finish conversion drops to 64.8% and support received multiple tickets regarding pets missing on desktop or confusion on how to talk to/control the pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_desktop_orientation"
+    ],
+    "new_desktop_orientation": {
+     "headline": "Meet Your Pet on Your Desktop",
+     "body": "Your companion lives directly on your screen. Drag to move, right-click for settings, or click to chat.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "image",
+       "asset": "asset:desktop_preview",
+       "style": "large"
+      },
+      {
+       "type": "button",
+       "label": "Launch Pet",
+       "style": "playful",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new orientation screen after home_intro without skipping any required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 3.65,
+   "score_note": "Strong support evidence for finish drop-off (35.2% loss), but requires creating a new screen.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 90.9
+  },
+  {
+   "title": "Choose Path Carousel Layout Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Rebuild the choose_path screen with a carousel layout featuring visual option cards for instant selection.",
+   "why": "23.8% of users drop off at choose_path with a high mean time of 514s; carousel card layout focuses attention.",
+   "config": {
+    "choose_path": {
+     "layout": "carousel",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "style": "emphasis",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Waiting Screen Interactive Mascot Mini Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Transform the waiting screen into an interactive companion preview flow with play actions while generation finishes.",
+   "why": "The waiting step has a very long mean duration (2336s), causing drop-off; engaging interactions keep users active during generation.",
+   "config": {
+    "waiting": {
+     "layout": "stage",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "mascot",
+       "style": "playful",
+       "action": "play"
+      },
+      {
+       "type": "tip_carousel",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enhances the waiting screen with interactive components while continuing to show progress."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.02,
+   "score": 1.16,
+   "score_note": "High development effort for interactive flow; home new_flow tests historically show minimal lift.",
+   "slot": "big move"
+  },
+  {
+   "title": "Sign In Account Recovery Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Display a helpful hint on the sign-in screen informing users how account login preserves and syncs pet data across installs.",
+   "why": "8 support emails complained about pets missing or reset after signing in again, while sign_in loses 27.1% of users.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in ensures your pets and customizations are automatically saved to your account across reinstalls."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a helpful sign-in hint regarding account syncing without introducing data privacy or pricing issues."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.03,
+   "score": 7.6,
+   "score_note": "Low cost text hint backed by 8 support tickets and 27.1% sign-in drop-off.",
+   "slot": "best score"
+  },
+  {
+   "title": "Upload Photos Progress Time Estimate",
+   "target_step": "adoption",
+   "type": "wait_info",
+   "change": "Enable estimated time display and helpful creation tips during photo processing on the upload_photos screen.",
+   "why": "Support receives tickets about custom pet generation stalling/failing, and adoption step drops 39.1% of users.",
+   "config": {
+    "upload_photos": {
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "progress",
+       "style": "highlight"
+      },
+      {
+       "type": "tip_carousel",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Displays progress and an estimated wait time during an actual processing wait on the upload_photos screen."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.05,
+   "score": 8.05,
+   "score_note": "Targets largest funnel drop-off step (39.1% loss) with support ticket backing via simple config toggle.",
+   "slot": "best score"
+  },
+  {
+   "title": "Story Screen Onboarding Expectation Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update the story screen headline and body text to set quick setup expectations before choosing a path.",
+   "why": "Initial entry drop-off is high (76.2% conversion on choose_path step); establishing low effort upfront boosts progression.",
+   "config": {
+    "story": {
+     "headline": "Adopt Your Desktop Companion in 2 Minutes",
+     "body": "Pick a quick preset pet or create a custom friend to keep you company on your screen."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates story copy to set setup expectations without mentioning pricing or introducing dark patterns."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 6.62,
+   "score_note": "Simple copy change to set expectations on entry; funnel evidence only without support tickets.",
+   "slot": "best score"
+  },
+  {
+   "title": "Waiting Screen System Notification Toggle",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable notify_when_ready on the waiting screen so users can minimize the app while their pet finishes generating.",
+   "why": "The median waiting time is 201s with a mean of 2336s, suggesting users walk away and abandon the window.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "hint": "We'll notify you when your pet is ready to join your desktop."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an optional notification toggle on the waiting screen while pet generation finishes."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.03,
+   "score": 7.33,
+   "score_note": "Config toggle addressing long home wait duration (mean 2336s) by allowing notification on completion."
+  },
+  {
+   "title": "Home Intro Split Screen Layout",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Change home_intro layout to split format with a live desktop pet visual preview alongside final completion steps.",
+   "why": "35.2% of users drop off at the final finish step; a split visual layout reinforces excitement right before onboarding completes.",
+   "config": {
+    "home_intro": {
+     "layout": "split",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "preview",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.replace.home_welcome[0]': a preview cannot do the home_welcome job (use ['animation', 'button', 'checklist', 'image', 'mascot', 'text'])"
+   }
+  },
+  {
+   "title": "Adoption Certificate Name Input Focus",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Enhance the adoption_certificate screen by featuring a prominent custom pet naming component with real-time preview styling.",
+   "why": "Creating personal connection during adoption reduces overall 39.1% step abandonment.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Name Your New Companion",
+     "components": [
+      {
+       "type": "name_input",
+       "style": "large"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.components[0]': inputs may only ask for the pet's name"
+   }
+  }
+ ],
+ "picked": [
+  "Desktop Companion Orientation Screen"
+ ],
+ "held_by_harm_budget": [
+  "Waiting Screen Interactive Mascot Mini Flow",
+  "Upload Photos Progress Time Estimate",
+  "Sign In Account Recovery Hint",
+  "Story Screen Onboarding Expectation Headline"
+ ],
+ "harm_budget": 106.9,
+ "planned_harm": 90.9,
+ "decisions": [
+  {
+   "test": "sim-6",
+   "title": "Desktop Companion Orientation Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": 91,
+   "share": 1.0,
+   "planned_harm": 90.9,
+   "result": {
+    "step": {
+     "control": 0.6983,
+     "treatment": 0.6067,
+     "lift": -0.1311,
+     "lift_se": 0.04,
+     "p": 0.002104
+    },
+    "finish": {
+     "control": 0.1881,
+     "treatment": 0.16,
+     "lift": -0.1496,
+     "lift_se": 0.06,
+     "p": 0.021508
+    },
+    "users_per_group": 1919
+   },
+   "outcome": "stopped early: finish worse",
+   "score": 3.65,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": -0.1104,
+   "finishers_delta_hidden": -35.93
+  }
+ ],
+ "shipped": [],
+ "ends_week": 6,
+ "weights_next": {
+  "impact": 0.523,
+  "evidence": 0.152,
+  "confidence": 1.459,
+  "cost": 1.866
+ },
+ "lessons_next": [
+  "Sign-in reordering (sign_in, reorder) tends to have a negative impact, as 2 tests agree after noise correction.",
+  "No kind of change has proven helpful yet, as no tests resulted in a statistically significant win.",
+  "Evidence is still thin for home flows (home, new_flow), path redesigns (choose_path, redesign), adoption redesigns (adoption, redesign), and finish screens (finish, new_screen), as each has only 1 test.",
+  "No clear effect was seen for new home flows, path selection redesigns, or photo upload split layout redesigns.",
+  "Predictions were consistently too high and overly optimistic across tests, such as predicting a +20.0% gain for sign-in reordering and +4.0% for a finish screen that performed significantly worse."
+ ]
+}

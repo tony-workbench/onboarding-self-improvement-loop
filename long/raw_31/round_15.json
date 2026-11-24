@@ -1,0 +1,471 @@
+{
+ "round": 15,
+ "starts_week": 15,
+ "funnel": {
+  "choose_path": 0.7908036,
+  "sign_in": 0.8654026818694531,
+  "adoption": 0.6270873,
+  "home": 0.8761650594,
+  "finish": 0.7629174345599999
+ },
+ "weights_used": {
+  "impact": 0.091,
+  "evidence": 0.266,
+  "confidence": 2.828,
+  "cost": 0.815
+ },
+ "lessons_used": [
+  "Sign-in hints, preset customization fallback flow, interactive wait tips/stage flow, pre-path story reordering, hotkey setup screen, and quick-action redesign were helpful.",
+  "Hints outside of sign-in, copy updates, layout changes, and sign-in reordering showed no clear effect or hurt performance.",
+  "Most new screens showed no clear effect or hurt performance, with the exception of the interactive desktop hotkey setup screen.",
+  "Predictions overestimated gains for changes that showed no clear effect or hurt performance.",
+  "Predictions underestimated gains for unexpected winning changes with low or negative predictions, such as the hotkey setup screen, quick-action redesign, story reordering, and waiting stage flow."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop Pet Visibility Initialization Stage Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Adds a dedicated desktop visibility initialization stage screen before the final wait stage to test pet display rendering on the user's primary screen.",
+   "why": "Support received multiple complaints about pets failing to show on desktop, and the home step wait stage suffers from a long 201s median / 2336s mean time.",
+   "config": {
+    "waiting": {
+     "headline": "Initializing Desktop Pet Rendering Stage"
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_visibility_stage",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_visibility_stage']"
+   }
+  },
+  {
+   "title": "Interactive Pet Trait Sound Calibration Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Rebuilds the companion selection flow on pick_friend with interactive audio preview controls for pet voices and traits.",
+   "why": "Adoption stage has the biggest dropoff in early funnel (62.7% conversion), and users report post-onboarding confusion regarding talking to and controlling pets.",
+   "config": {
+    "pick_friend": {
+     "layout": "stage",
+     "components": [
+      {
+       "type": "sound",
+       "label": "Preview Pet Voice Trait",
+       "action": "play",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding interactive audio voice preview components to the pick_friend selection flow maintains its core selection job."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.011,
+   "score": 0.45,
+   "score_note": "Adoption stage has the lowest conversion (62.7%), but new flows in adoption consistently underperform (-1.1% avg over 6 tests).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 172.1
+  },
+  {
+   "title": "Interactive Desktop Command Palette Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesigns the home intro screen into an interactive desktop command palette where users test summoning, hiding, and talking to their pet before completing onboarding.",
+   "why": "Multiple support emails reported post-onboarding confusion on how to control, hide, or talk to the pet, while the finish step has a high median time of 395s.",
+   "config": {
+    "home_intro": {
+     "layout": "checklist",
+     "headline": "Master Desktop Pet Controls",
+     "replace": {
+      "home_welcome": [
+       {
+        "type": "checklist",
+        "role": "home_welcome",
+        "text": "Test desktop pet hotkeys, hiding, and voice interaction controls"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  },
+  {
+   "title": "Custom Pet Generation Sound and Animation Preview Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Adds a dedicated pet sound and animation preview screen right after custom photo upload to confirm output before finalizing adoption.",
+   "why": "3 support tickets reported custom pet generation failures/visual errors, contributing to low 62.7% adoption conversion.",
+   "config": {
+    "adoption_certificate": {
+     "show_progress": true
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "new_generation_preview",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_generation_preview']"
+   }
+  },
+  {
+   "title": "Sign-In Existing Pet Data Recovery Notification Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Displays a clear sign-in hint explaining that logging in automatically restores all existing pets, customization data, and saved states.",
+   "why": "8 support emails (the single largest theme) reported pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing back in automatically restores all your previously adopted desktop pets and saved settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an informative sign-in hint about data recovery is an allowed copy/hint addition inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.024,
+   "score": 9.92,
+   "score_note": "Sign-in hints average +2.4% over 10 tests and directly address the #1 support mail theme (8 emails).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 172.1
+  },
+  {
+   "title": "Interactive Pet Trait Loading Stage Timer",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Adds an interactive stage timer and mascot progress indicator to the waiting screen while background rendering completes.",
+   "why": "The waiting step has a long median duration of 201s and mean of 2336s; interactive waiting stage features have proven effective in past iterations.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "components": [
+      {
+       "type": "timer",
+       "style": "highlight",
+       "text": "Estimated desktop initialization time: 2 minutes"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.components[0]': timer text must read like 'About 4 min left' (at most 30 min)"
+   }
+  },
+  {
+   "title": "Story Screen Interactive Sound & Animation Experience Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesigns the intro story screen with interactive mascot animation elements prior to path selection.",
+   "why": "Choose path has a high mean time (514s), and story sequence enhancements have previously driven solid conversion gains.",
+   "config": {
+    "story": {
+     "layout": "spotlight",
+     "replace": {
+      "intro_story": [
+       {
+        "type": "animation",
+        "role": "intro_story",
+        "asset": "asset:companion_intro",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'story.intro_story' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'video'] with an asset:story/ asset"
+   }
+  },
+  {
+   "title": "Adoption Certificate Mascot Trait Badge Reward",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Adds an interactive trait owner badge component to the adoption certificate screen celebrating pet adoption completion.",
+   "why": "Adoption step has the lowest conversion rate in the funnel at 62.7%. Adding visual ownership rewards boosts completion momentum.",
+   "config": {
+    "adoption_certificate": {
+     "components": [
+      {
+       "type": "badge",
+       "label": "Official Desktop Companion Owner Badge Unlocked",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.components[0].label' must be text up to 40 characters"
+   }
+  },
+  {
+   "title": "Desktop Pet Quick Practice Interaction Checklist Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Introduces a step-by-step practice interaction checklist on home_intro to verify desktop pet summoning and hotkeys.",
+   "why": "Finish stage median is 395s with 76.3% conversion, and interactive practice components have proven to beat simple copy/layout edits.",
+   "config": {
+    "home_intro": {
+     "layout": "stage",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Press Alt+P to summon or dismiss your desktop pet",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interactive practice checklist to home_intro is permitted inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.005,
+   "score": 3.91,
+   "score_note": "Finish step loses 23.7% of users; while practice/hotkey flows can work, new screens generally carry negative average lift.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 97.8
+  },
+  {
+   "title": "Desktop Generation Status System Tray Notification Alert",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enables a system notification option on the waiting screen to alert users on their desktop when pet rendering finishes.",
+   "why": "Waiting stage takes 201s median / 2336s mean, leading users to switch away and fail to see when the pet is ready on desktop.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "hint": "We will notify your desktop system tray the moment your pet is ready to play!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an optional system tray completion notification on the waiting screen is permitted inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.011,
+   "score": 8.68,
+   "score_note": "High wait time (201s median) causes dropoff; wait_info improvements reliably yield +1.1% lift over 7 tests.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 172.1
+  }
+ ],
+ "picked": [
+  "Desktop Pet Quick Practice Interaction Checklist Flow",
+  "Interactive Pet Trait Sound Calibration Flow",
+  "Sign-In Existing Pet Data Recovery Notification Hint",
+  "Desktop Generation Status System Tray Notification Alert"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 614.1,
+ "decisions": [
+  {
+   "test": "sim-61",
+   "title": "Desktop Pet Quick Practice Interaction Checklist Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 97.8,
+   "result": {
+    "step": {
+     "control": 0.7775,
+     "treatment": 0.7697,
+     "lift": -0.01,
+     "lift_se": 0.022,
+     "p": 0.648748
+    },
+    "finish": {
+     "control": 0.311,
+     "treatment": 0.303,
+     "lift": -0.0257,
+     "lift_se": 0.0378,
+     "p": 0.501751
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.91,
+   "predicted_lift": 0.005,
+   "true_lift_hidden": -0.0148,
+   "finishers_delta_hidden": -13.7
+  },
+  {
+   "test": "sim-62",
+   "title": "Interactive Pet Trait Sound Calibration Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 172.1,
+   "result": {
+    "step": {
+     "control": 0.6347,
+     "treatment": 0.6471,
+     "lift": 0.0195,
+     "lift_se": 0.0237,
+     "p": 0.405188
+    },
+    "finish": {
+     "control": 0.316,
+     "treatment": 0.304,
+     "lift": -0.038,
+     "lift_se": 0.0371,
+     "p": 0.314947
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 0.45,
+   "predicted_lift": -0.011,
+   "true_lift_hidden": 0.0234,
+   "finishers_delta_hidden": 21.67
+  },
+  {
+   "test": "sim-63",
+   "title": "Sign-In Existing Pet Data Recovery Notification Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 172.1,
+   "result": {
+    "step": {
+     "control": 0.8831,
+     "treatment": 0.8777,
+     "lift": -0.0062,
+     "lift_se": 0.0106,
+     "p": 0.562269
+    },
+    "finish": {
+     "control": 0.2983,
+     "treatment": 0.304,
+     "lift": 0.019,
+     "lift_se": 0.0401,
+     "p": 0.632372
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 9.92,
+   "predicted_lift": 0.024,
+   "true_lift_hidden": -0.0093,
+   "finishers_delta_hidden": -8.61
+  },
+  {
+   "test": "sim-64",
+   "title": "Desktop Generation Status System Tray Notification Alert",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 172.1,
+   "result": {
+    "step": {
+     "control": 0.8893,
+     "treatment": 0.9085,
+     "lift": 0.0216,
+     "lift_se": 0.0134,
+     "p": 0.103673
+    },
+    "finish": {
+     "control": 0.3013,
+     "treatment": 0.313,
+     "lift": 0.0387,
+     "lift_se": 0.0403,
+     "p": 0.327348
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.68,
+   "predicted_lift": 0.011,
+   "true_lift_hidden": 0.0234,
+   "finishers_delta_hidden": 21.67
+  }
+ ],
+ "shipped": [],
+ "ends_week": 15,
+ "weights_next": {
+  "impact": 0.091,
+  "evidence": 0.242,
+  "confidence": 2.836,
+  "cost": 0.832
+ },
+ "lessons_next": [
+  "Sign-in hints, preset customization fallback flow, interactive wait tips/stage flow, pre-path story reordering, hotkey setup screen, and quick-action redesign were helpful.",
+  "Copy updates, layout changes, and hints outside of sign-in showed no clear effect or hurt performance.",
+  "Most new screens and new flows showed no clear effect or hurt performance, with the exception of the hotkey setup screen and specific wait/fallback flows.",
+  "Predictions overestimated gains for changes that showed no clear effect or hurt performance.",
+  "Predictions underestimated gains for unexpected winning changes with negative or low predictions, such as the hotkey setup screen, quick-action redesign, story reordering, and waiting stage flow."
+ ]
+}

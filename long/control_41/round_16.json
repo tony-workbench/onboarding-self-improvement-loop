@@ -1,0 +1,511 @@
+{
+ "round": 16,
+ "starts_week": 16,
+ "funnel": {
+  "choose_path": 0.83005012270314,
+  "sign_in": 0.8720314410847562,
+  "adoption": 0.746607204,
+  "home": 0.8359266,
+  "finish": 0.7168176
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Mascot Guided Selection Redesign for Pick Friend Screen",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the friend selection screen into a spotlight layout featuring an animated mascot preview that showcases each pet's distinct idle behavior.",
+   "why": "Adoption conversion drops to 74.7% with a median time of 89s; interactive spotlight previews assist users in choosing faster.",
+   "config": {
+    "pick_friend": {
+     "layout": "spotlight",
+     "headline": "Meet Your New Desktop Companion",
+     "body": "Select a pet companion to watch their personality traits live on your screen.",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "mascot",
+        "label": "Interactive Mascot Preview",
+        "asset": "asset:mascot_preview",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'pick_friend.replace.pet_choices[0]': a mascot cannot do the pet_choices job (use ['animation', 'button', 'choice_cards', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Interactive Pet Trait Personality Quiz Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Adds a quick pet personality trait quiz screen right before photo customization to match users with pet companion behaviors.",
+   "why": "3 support tickets noted confusion or issues during pet customization, while adoption step mean duration is 1017s.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "new_trait_quiz",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_trait_quiz": {
+     "layout": "card",
+     "headline": "What behavior best fits your desktop?",
+     "body": "Answer 2 quick questions so your pet adapts to your work style.",
+     "show_step_counter": true,
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Playful vs Calm Behavior",
+       "style": "highlight",
+       "action": "choose"
+      },
+      {
+       "type": "button",
+       "label": "Continue to Customization",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new trait quiz screen inside onboarding without removing or skipping any required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 4.58,
+   "score_note": "Targeted step has long duration (1017s) and 25.3% drop, but adding a quiz screen requires a release.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 174.9
+  },
+  {
+   "title": "Instant Pet Mini Game Sub Flow While Spawning",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Introduces an interactive mini-game sub-flow directly on the waiting screen while the pet engine initializes in the background.",
+   "why": "The waiting step has a median duration of 201s and a mean of 2336s, causing drop-offs and desktop launch confusion.",
+   "config": {
+    "waiting": {
+     "layout": "split",
+     "headline": "Your Pet is Getting Ready!",
+     "body": "Play a quick reaction mini-game while we set up your pet's desktop home.",
+     "show_progress": true,
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "animation",
+        "label": "Desktop Pet Mini Game",
+        "asset": "asset:mini_game",
+        "style": "playful",
+        "action": "play"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'waiting.wait_status' does not do the job: needs 1 of ['preview', 'progress', 'timer']"
+   }
+  },
+  {
+   "title": "Reorder Sign In After Adoption Certificate Step",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves the sign-in requirement until after the user finalizes their pet adoption certificate and names their pet.",
+   "why": "Signing in before pet creation causes early drop-off; placing sign-in after certificate creation leverages psychological ownership.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in to take place after adoption certificate, which is explicitly allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.06,
+   "score": 4.58,
+   "score_note": "Delaying sign-in leverages ownership, but reordering steps requires structural release."
+  },
+  {
+   "title": "Existing Account Pet Restore & Sync Assurance Banner",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Adds an explicit account synchronization notice explaining how previously created pets are restored automatically.",
+   "why": "8 support emails complained about pets missing or account reset after signing in.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in with an existing account automatically restores all saved pets and adoption history.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Automatic Cloud Restoration Active",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds account restoration hint text on the sign-in screen without violating any onboarding limits."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 7.08,
+   "score_note": "Strong evidence from 8 support complaints regarding missing pet sync at sign-in.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 174.9
+  },
+  {
+   "title": "Desktop Safety Diagnostic & Progress Waiting Indicator",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays an active system verification checklist and estimated countdown on the waiting screen.",
+   "why": "3 support complaints mentioned the app failing to open or pet not showing on desktop, plus high waiting time.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "hint": "Verifying desktop display compatibility and screen layer permissions...",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Display Overlays Verified",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates waiting screen diagnostic information and progress feedback as permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 7.08,
+   "score_note": "High wait time (2336s) causes drop-off; clear progress indicators mitigate drop.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 174.9
+  },
+  {
+   "title": "Compact Checklist Layout for Adoption Certificate",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switches adoption certificate screen layout to a checklist format summarizing pet traits, name, and desktop permissions.",
+   "why": "Adoption step has a 74.7% conversion rate; a clear summary checklist reduces ambiguity before final spawn.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "checklist",
+     "headline": "Confirm Adoption Details",
+     "body": "Review your desktop pet summary and sign the official certificate.",
+     "hint": "Your pet will be saved to your account upon signing."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "Replaces the adoption certificate layout with a checklist that loses the required official stamp job."
+   }
+  },
+  {
+   "title": "Desktop Controls & Interaction Quick Reference Headline",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Updates the final intro screen copy to provide a quick guide on system tray controls, hiding, and talking to the pet.",
+   "why": "3 support emails reported post-onboarding confusion regarding how to control, hide, or interact with the pet.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Pet is Live! Here is How to Interact",
+     "body": "Right-click the system tray icon to hide or customize. Click your pet anytime to talk or play!",
+     "button_label": "Start Playing"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates copy on the home intro screen to guide desktop interactions within onboarding bounds."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.05,
+   "score": 7.92,
+   "score_note": "Finish step has the highest drop rate (28.3%); quick copy-only fix makes cost very low.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 112.6
+  },
+  {
+   "title": "Desktop Ready Audio Alert & System Notification Toggle",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Adds an optional sound notification and system alert toggle when rendering finishes on the desktop background.",
+   "why": "Mean waiting time is 2336s; users switch tasks while waiting and miss when the pet spawns.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "label": "Play Chime When Pet Appears",
+       "style": "rounded",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds notification settings and audio alerts to the waiting screen as allowed inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 4.58,
+   "score_note": "Addresses task-switching during 2336s wait time, but notification integration requires code release."
+  },
+  {
+   "title": "Starter Pet Accessory Unlock Completion Incentive",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Offers an exclusive free desktop accessory item upon completing the final onboarding tour step.",
+   "why": "Finish step drop-off is 71.7% with a mean duration of 5815s; rewarding completion reduces drop-off.",
+   "config": {
+    "home_intro": {
+     "headline": "Claim Your Free Welcome Gift!",
+     "body": "Finish this 30-second introduction to unlock an exclusive starter toy for your pet.",
+     "hint": "Gift item will automatically be added to your pet's desktop inventory.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Exclusive Welcome Toy Unlocked",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Mentions a free welcome gift and unlocked starter toy in onboarding copy, violating pricing copy rules."
+   }
+  }
+ ],
+ "picked": [
+  "Interactive Pet Trait Personality Quiz Screen",
+  "Desktop Controls & Interaction Quick Reference Headline",
+  "Existing Account Pet Restore & Sync Assurance Banner",
+  "Desktop Safety Diagnostic & Progress Waiting Indicator"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 637.3,
+ "decisions": [
+  {
+   "test": "sim-66",
+   "title": "Interactive Pet Trait Personality Quiz Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": 100,
+   "share": 1.0,
+   "planned_harm": 174.9,
+   "result": {
+    "step": {
+     "control": 0.7443,
+     "treatment": 0.6867,
+     "lift": -0.0774,
+     "lift_se": 0.0213,
+     "p": 0.000482
+    },
+    "finish": {
+     "control": 0.3098,
+     "treatment": 0.3045,
+     "lift": -0.0169,
+     "lift_se": 0.0456,
+     "p": 0.712596
+    },
+    "users_per_group": 2095
+   },
+   "outcome": "stopped early: adoption worse",
+   "score": 4.58,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": -0.0671,
+   "finishers_delta_hidden": -44.36
+  },
+  {
+   "test": "sim-67",
+   "title": "Desktop Controls & Interaction Quick Reference Headline",
+   "target_step": "finish",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 112.6,
+   "result": {
+    "step": {
+     "control": 0.7025,
+     "treatment": 0.7244,
+     "lift": 0.0311,
+     "lift_se": 0.0255,
+     "p": 0.214082
+    },
+    "finish": {
+     "control": 0.3093,
+     "treatment": 0.318,
+     "lift": 0.028,
+     "lift_se": 0.0393,
+     "p": 0.469416
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.92,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.0241,
+   "finishers_delta_hidden": 23.15
+  },
+  {
+   "test": "sim-68",
+   "title": "Existing Account Pet Restore & Sync Assurance Banner",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 174.9,
+   "result": {
+    "step": {
+     "control": 0.8756,
+     "treatment": 0.8544,
+     "lift": -0.0242,
+     "lift_se": 0.0109,
+     "p": 0.028521
+    },
+    "finish": {
+     "control": 0.329,
+     "treatment": 0.3037,
+     "lift": -0.077,
+     "lift_se": 0.0351,
+     "p": 0.034875
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 7.08,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": -0.0165,
+   "finishers_delta_hidden": -15.85
+  },
+  {
+   "test": "sim-69",
+   "title": "Desktop Safety Diagnostic & Progress Waiting Indicator",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 174.9,
+   "result": {
+    "step": {
+     "control": 0.8423,
+     "treatment": 0.8623,
+     "lift": 0.0237,
+     "lift_se": 0.015,
+     "p": 0.109587
+    },
+    "finish": {
+     "control": 0.315,
+     "treatment": 0.3327,
+     "lift": 0.0561,
+     "lift_se": 0.0394,
+     "p": 0.143681
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.08,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.0205,
+   "finishers_delta_hidden": 19.69
+  }
+ ],
+ "shipped": [],
+ "ends_week": 16,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

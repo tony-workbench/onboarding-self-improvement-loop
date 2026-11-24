@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Interactive Companion Sound Preview Component: Redesign the friend picker screen with interactive pet sound preview buttons and a playful layout so users hear sound effects while choosing their companion.\n   config: {\"pick_friend\": {\"headline\": \"Listen and Pick Your Desktop Companion\", \"body\": \"Tap each companion to hear their unique audio sounds and voice effects before adopting.\", \"layout\": \"grid\", \"components\": [{\"type\": \"sound\", \"text\": \"Preview Pet Sound\", \"style\": \"playful\", \"action\": \"play\", \"asset\": \"asset:pet_audio_preview\"}]}}\n1: [adoption, new_screen] Pet Voice Pitch Customizer Screen: Insert a new companion voice pitch customization screen before adoption confirmation, letting users test and set their pet audio tone.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_voice_customizer\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_voice_customizer\": {\"headline\": \"Choose Your Pet's Voice Pitch\", \"body\": \"Select a cheerful or calm sound profile for your new desktop companion.\", \"layout\": \"centered\", \"components\": [{\"type\": \"sound\", \"text\": \"Play High Pitch Sample\", \"style\": \"playful\", \"action\": \"play\", \"asset\": \"asset:voice_high\"}, {\"type\": \"sound\", \"text\": \"Play Low Pitch Sample\", \"style\": \"calm\", \"action\": \"play\", \"asset\": \"asset:voice_low\"}]}}\n2: [home, new_flow] Desktop Preparation Interactive Audio Activity: Add an interactive sound-and-visual background activity to the waiting screen where users tap ambient sound nodes while generation completes.\n   config: {\"waiting\": {\"headline\": \"Your Pet is Awakening\", \"body\": \"Tap the ambient sound nodes while we synthesize your companion's desktop engine.\", \"layout\": \"stage\", \"show_progress\": true, \"components\": [{\"type\": \"sound\", \"text\": \"Play Warm Ambiance\", \"style\": \"calm\", \"action\": \"play\", \"asset\": \"asset:waiting_ambiance\"}, {\"type\": \"progress\", \"style\": \"highlight\"}]}}\n3: [sign_in, reorder] Move Account Creation After Waiting Screen: Reorder the sign_in screen to happen after pet generation waiting completes, right before launching to the desktop intro.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"sign_in\", \"home_intro\"]}\n4: [sign_in, copy] Existing Account Pet Recovery Assurance Headline: Update headline and messaging on sign_in to explicitly guarantee existing pets and customized data will restore seamlessly.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Preserve & Restore Your Pets\", \"body\": \"Your companion data and past pets are safely bound to your account and will sync instantly upon sign in.\", \"hint\": \"Signing in ensures your pet never resets when switching devices.\"}}\n5: [home, wait_info] Live Pet Audio Generation Progress Indicator: Display a real-time audio waveform animation and hint on the waiting screen showing companion voice generation status.\n   config: {\"waiting\": {\"hint\": \"Synthesizing companion voice waveforms and sound effects...\", \"components\": [{\"type\": \"animation\", \"style\": \"highlight\", \"asset\": \"asset:waveform_anim\"}]}}\n6: [finish, hint] Desktop App Taskbar Pinning Hint: Add an explicit hint and badge component on the finish screen explaining where the pet app icon lives in the desktop system tray.\n   config: {\"home_intro\": {\"hint\": \"Your pet runs in your desktop system tray (near the clock). Click the tray icon anytime to bring your pet back!\", \"components\": [{\"type\": \"badge\", \"text\": \"System Tray Ready\", \"style\": \"rounded\"}]}}\n7: [adoption, incentive] Multi-Photo Audio Quality Incentive: Add a prominent incentive badge on upload_photos explaining that high-clarity photos unlock richer mascot vocal reactions.\n   config: {\"upload_photos\": {\"hint\": \"Clear, well-lit photos unlock realistic voice reactions and sound effects for your pet!\", \"components\": [{\"type\": \"badge\", \"text\": \"Bonus Vocal Expression Unlocked\", \"style\": \"playful\"}]}}\n8: [choose_path, layout] Centered Desktop Pet Path Overview: Reorganize choose_path into a centered layout with a welcoming mascot audio preview component.\n   config: {\"choose_path\": {\"layout\": \"centered\", \"headline\": \"How Would You Like to Create Your Pet?\", \"body\": \"Choose a pre-made pet companion or craft a custom friend from your own photos.\", \"components\": [{\"type\": \"mascot\", \"style\": \"playful\", \"asset\": \"asset:mascot_welcome\"}]}}\n9: [finish, redesign] Mascot Soundboard Finish Screen Redesign: Redesign home_intro into a mascot soundboard preview where users test different pet voice buttons before launching to desktop.\n   config: {\"home_intro\": {\"headline\": \"Meet Your New Desktop Mascot!\", \"body\": \"Test your mascot's audio soundboard below, then click finish to release them onto your screen.\", \"layout\": \"stage\", \"components\": [{\"type\": \"sound\", \"text\": \"Say Hello\", \"style\": \"playful\", \"action\": \"play\", \"asset\": \"asset:sound_hello\"}, {\"type\": \"sound\", \"text\": \"Happy Sound\", \"style\": \"highlight\", \"action\": \"play\", \"asset\": \"asset:sound_happy\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning pick_friend with sound preview buttons preserves its primary job of letting the user choose a pet companion."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new screen inside onboarding to customize pet voice pitch is permitted under Rule 4 and retains all required steps."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding ambient sound nodes to the waiting screen maintains the core function of showing that the pet is being generated."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign_in to occur after the waiting screen is explicitly allowed under Rule 4."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating sign_in messaging to reassure existing account users preserves the core sign_in functionality without violating any rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a real-time waveform animation to the waiting screen communicates generation progress without violating any rules."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding system tray usage guidance to home_intro is an allowed modification inside onboarding."
+   },
+   {
+    "index": 7,
+    "pass": false,
+    "rule": 3,
+    "reason": "Promising a 'Bonus Vocal Expression Unlocked' in onboarding copy violates Rule 3, which prohibits mentioning gifts, bonuses, or free extras."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorganizing choose_path retains both options (adopting a pre-made pet or making a custom one from photos)."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro to include soundboard previews before launching to the desktop is permitted under Rule 4."
+   }
+  ]
+ }
+}

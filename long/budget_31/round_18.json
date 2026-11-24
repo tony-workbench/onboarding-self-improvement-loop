@@ -1,0 +1,470 @@
+{
+ "round": 18,
+ "starts_week": 18,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.740378373310128,
+  "home": 0.813,
+  "finish": 0.8368590179093759
+ },
+ "weights_used": {
+  "impact": 3.777,
+  "evidence": 0.074,
+  "confidence": 0.074,
+  "cost": 0.074
+ },
+ "lessons_used": [
+  "Evidence is still thin for [choose_path, redesign], [finish, new_flow], [finish, new_screen], [sign_in, notification], and [sign_in, reorder] as each category has only one test.",
+  "Evidence for [adoption, new_flow] and [adoption, new_screen] remains mixed: for each category, one test won while the other showed no clear effect.",
+  "Evidence for [adoption, redesign] remains inconsistent across four tests: one won (+5.5% after noise correction), two were worse or stopped early (-8.3% and -4.0%), and one showed no clear effect.",
+  "[finish, redesign] changes can be helpful, as two of five tests won (+5.5% and +4.3% after noise correction), while three showed no clear effect.",
+  "Predictions were consistently too low for all winning tests.",
+  "Predictions were usually too high for tests that stopped early, lost, or showed no clear effect, with round 11 as a rare exception."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop Pet Launch Preflight Status Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Adds a preflight setup status screen before waiting that verifies desktop rendering permissions and display drivers.",
+   "why": "Support received 3 tickets reporting pets failing to display on desktop or app refusing to open.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_preflight_check",
+     "waiting",
+     "home_intro"
+    ],
+    "new_preflight_check": {
+     "headline": "Checking Desktop Compatibility",
+     "body": "Verifying display permissions and graphics renderer for desktop companion overlay.",
+     "layout": "checklist",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Display permissions checked"
+      },
+      {
+       "type": "progress",
+       "text": "Initializing overlay engine"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid preflight check screen within onboarding without skipping required steps."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.02,
+   "score": 3.36,
+   "score_note": "Addresses 3 support tickets regarding desktop rendering errors, but requires a new screen."
+  },
+  {
+   "title": "Desktop Interaction and Controls Quick Reference Layout",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesigns the home intro screen into a split view detailing pet interaction shortcuts, tray controls, and hide commands.",
+   "why": "3 support tickets highlighted confusion on controlling, hiding, or talking to the desktop pet.",
+   "config": {
+    "home_intro": {
+     "layout": "split",
+     "headline": "Meet Your Desktop Companion",
+     "body": "Your pet is now active! Right-click to open controls, drag to move, or double-click to chat.",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "text",
+        "text": "Quick Controls: Right-click pet for menu | Drag pet anywhere on screen | Double-click to talk"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.replace.home_welcome[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Sign In Diagnostic and Retry Toast Prompt",
+   "target_step": "sign_in",
+   "type": "notification",
+   "change": "Displays an automatic visual prompt with connection tips and a retry button if sign-in authentication takes more than 10 seconds.",
+   "why": "2 support emails reported sign-in screen stalling or failing to load; sign-in conversion rate is 72.9%.",
+   "config": {
+    "sign_in": {
+     "notify_when_ready": true,
+     "tip_delay_seconds": 10,
+     "hint": "Taking longer than usual? Check your network connection or try signing in again.",
+     "components": [
+      {
+       "type": "button",
+       "label": "Retry Sign In",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.components[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Multi-Angle Photo Assistant and Generation Checklist Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Introduces a step-by-step photo validation sub-flow that guides users on optimal lighting and angles before submitting custom pet photos.",
+   "why": "3 support tickets noted custom pet generation errors or distorted pet appearances; adoption step takes 1017s mean time.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "new_photo_guide",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_photo_guide": {
+     "headline": "Custom Pet Photo Guidance",
+     "body": "Follow these quick recommendations for best 3D pet rendering results.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Use clear lighting and avoid blur"
+      },
+      {
+       "type": "checklist",
+       "text": "Include single pet centered in frame"
+      },
+      {
+       "type": "button",
+       "label": "Continue to Upload",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a photo guidance screen into the onboarding flow before photo upload."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.025,
+   "score": 6.57,
+   "score_note": "Strong evidence from support tickets and high mean duration (1017s); prior adoption flow tests showed positive average lift.",
+   "slot": "big move",
+   "share": 0.7,
+   "planned_harm": 141.0
+  },
+  {
+   "title": "Interactive Companion Journey Card Layout",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesigns path selection into a clean centered grid layout showcasing clear playstyle tags and expected activity levels.",
+   "why": "Choose path drops 23.8% of onboarding users; median time is 8s but mean is 514s indicating hesitation.",
+   "config": {
+    "choose_path": {
+     "layout": "grid",
+     "headline": "Choose Your Pet Companion Journey",
+     "body": "Select how active or quiet you want your desktop companion to be during your work day.",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "text": "Relaxed Companion | Interactive Playmate | Productive Assistant"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'choose_path.replace.path_options[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Interactive Generation Status Progress Tracker",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Replaces static waiting text with step-by-step progress indicators showing texture generation, animation rigging, and desktop placement stages.",
+   "why": "Home waiting step has a high median duration of 201s and mean of 2336s; users need clear feedback while assets render.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "headline": "Bringing Your Pet to Life...",
+     "body": "Building 3D model, generating behaviors, and preparing desktop overlay.",
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "progress",
+        "text": "Step 2 of 3: Rendering pet animations"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Replaces static wait text with progress details while preserving the screen's core job."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 6.6,
+   "score_note": "Targets high waiting duration on home step (2336s mean), improving user feedback during processing.",
+   "slot": "best score"
+  },
+  {
+   "title": "Pet Certificate Naming Guidance Tip",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Adds a contextual micro-copy tip under the pet naming field suggesting popular naming themes and character limits.",
+   "why": "Adoption step has a median time of 89s; subtle naming tips reduce decision friction.",
+   "config": {
+    "adoption_certificate": {
+     "hint": "Tip: You can change your pet's name anytime in settings later!",
+     "components": [
+      {
+       "type": "text",
+       "text": "Popular names: Barnaby, Pixel, Mocha, Ziggy",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds subtle naming micro-copy to the certificate without removing any required elements."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 3.49,
+   "score_note": "Low cost micro-copy addition addressing decision friction at adoption step."
+  },
+  {
+   "title": "Simplified Social Auth Priority Grid Layout",
+   "target_step": "sign_in",
+   "type": "layout",
+   "change": "Reorganizes the sign-in screen into a compact card layout placing quick social login options upfront.",
+   "why": "Sign-in conversion is 72.9% with 27.1% drop-off; streamlined login layout speeds up authentication.",
+   "config": {
+    "sign_in": {
+     "layout": "compact",
+     "headline": "Sign In to Save Your Pet",
+     "body": "Create or access your account so your pet state and preferences stay synced.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Continue with Google",
+        "action": "next"
+       },
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Continue with Apple",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Onboarding Completion Pioneer Title Perk",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Displays a badge celebrating successful onboarding completion and unlocks an exclusive 'Pioneer Pet Parent' desktop pet title.",
+   "why": "Overall onboarding conversion is 28.0%; offering a clear reward upon completion motivates users to reach the end.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Unlocked Title: Pioneer Pet Parent",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a completion badge component on the home intro screen without violating pricing or fair design rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.035,
+   "score": 6.54,
+   "score_note": "Incentivizes completion targeting overall 28.0% completion rate.",
+   "slot": "best score"
+  },
+  {
+   "title": "Companion Style Preview and Selection Screen",
+   "target_step": "choose_path",
+   "type": "new_screen",
+   "change": "Inserts a new preview screen before path selection demonstrating animated desktop pet behaviors for each companion style.",
+   "why": "Choosing a path has mean time of 514s and 76.2% conversion; visual previews reduce uncertainty.",
+   "config": {
+    "_order": [
+     "story",
+     "new_path_preview",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_path_preview": {
+     "headline": "Preview Pet Playstyles",
+     "body": "See how different companions behave on your desktop before choosing your journey.",
+     "layout": "carousel",
+     "components": [
+      {
+       "type": "preview",
+       "text": "Chill Pet: Sits calmly in your taskbar"
+      },
+      {
+       "type": "preview",
+       "text": "Active Pet: Wanders across screen and plays"
+      },
+      {
+       "type": "button",
+       "label": "Select My Path",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a playstyle preview screen before path selection within allowed onboarding modifications."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.02,
+   "score": 6.45,
+   "score_note": "Addresses long mean time (514s) at choose_path step, but introduces a new screen."
+  }
+ ],
+ "picked": [
+  "Multi-Angle Photo Assistant and Generation Checklist Flow"
+ ],
+ "held_by_harm_budget": [
+  "Interactive Generation Status Progress Tracker",
+  "Onboarding Completion Pioneer Title Perk"
+ ],
+ "harm_budget": 167.9,
+ "planned_harm": 141.0,
+ "decisions": [
+  {
+   "test": "sim-19",
+   "title": "Multi-Angle Photo Assistant and Generation Checklist Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.7,
+   "planned_harm": 141.0,
+   "result": {
+    "step": {
+     "control": 0.7456,
+     "treatment": 0.7173,
+     "lift": -0.038,
+     "lift_se": 0.0239,
+     "p": 0.11876
+    },
+    "finish": {
+     "control": 0.2948,
+     "treatment": 0.29,
+     "lift": -0.0162,
+     "lift_se": 0.0472,
+     "p": 0.734432
+    },
+    "users_per_group": 2100
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.57,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": -0.0582,
+   "finishers_delta_hidden": -35.18
+  }
+ ],
+ "shipped": [],
+ "ends_week": 18,
+ "weights_next": {
+  "impact": 3.779,
+  "evidence": 0.074,
+  "confidence": 0.074,
+  "cost": 0.074
+ },
+ "lessons_next": [
+  "Evidence is still thin for [choose_path, redesign], [finish, new_flow], [finish, new_screen], [sign_in, notification], and [sign_in, reorder] as each category has only one test.",
+  "[finish, redesign] changes can be helpful, as two of five tests won (+5.5% and +4.3% after noise correction), while three showed no clear effect.",
+  "Evidence for [adoption, new_flow] and [adoption, new_screen] remains mixed: for each category, one test won while the others showed no clear effect.",
+  "Evidence for [adoption, redesign] remains inconsistent across four tests: one won (+5.5% after noise correction), two were worse or stopped early (-8.3% and -4.0%), and one showed no clear effect.",
+  "Predictions were consistently too low for all winning tests.",
+  "Predictions were usually too high for tests that stopped early, lost, or showed no clear effect."
+ ]
+}

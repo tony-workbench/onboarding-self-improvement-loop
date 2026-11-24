@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, hint] Account Pet Sync Guarantee Callout: Display a prominent reassurance banner explaining that signing in permanently links your pet to your account across reinstalls.\n   config: {\"sign_in\": {\"hint\": \"Signing in securely saves your desktop pet to your cloud account so your pet is never lost.\", \"components\": [{\"type\": \"badge\", \"label\": \"Cloud Save Protected\", \"style\": \"highlight\"}]}}\n1: [finish, new_screen] Desktop Control Quick Guide Screen: Add a dedicated post-onboarding desktop quick-guide screen showing how to talk to, summon, hide, and right-click your pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_desktop_controls\"], \"home_intro\": {\"headline\": \"Meet Your Desktop Companion!\", \"body\": \"Your pet is ready to join your desktop. Let us show you how to control and interact with it.\", \"button_label\": \"View Controls\"}, \"new_desktop_controls\": {\"headline\": \"How to Interact with Your Pet\", \"body\": \"Right-click your pet for actions, click and drag to move it, or press Ctrl+Pet to open voice chat.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"text\": \"Right-click pet to access settings & sleep mode\", \"style\": \"emphasis\"}, {\"type\": \"checklist\", \"text\": \"Drag and drop anywhere on your screens\", \"style\": \"emphasis\"}, {\"type\": \"checklist\", \"text\": \"Click pet to start talking\", \"style\": \"emphasis\"}], \"button_label\": \"Finish Setup\"}}\n2: [adoption, redesign] Adoption Pet Customizer & Repair Redesign: Redesign pick_friend with a split view showing immediate pet preview validation and custom photo upload safeguards.\n   config: {\"pick_friend\": {\"layout\": \"split\", \"headline\": \"Choose & Preview Your Companion\", \"body\": \"Select a starter pet or upload custom photos with automatic validation preview.\", \"replace\": {\"pet_choices\": [{\"role\": \"pet_choices\", \"type\": \"choice_cards\", \"text\": \"Select your starter desktop pet personality\", \"style\": \"playful\"}, {\"role\": \"pet_choices\", \"type\": \"preview\", \"asset\": \"asset:pet_preview_interactive\", \"style\": \"rounded\"}]}}}\n3: [home, new_flow] Waiting Screen Desktop Companion Mini-Game: Transform the waiting screen into an interactive play area where users can pet an animated companion mascot while generation finishes.\n   config: {\"waiting\": {\"layout\": \"stage\", \"headline\": \"Your Pet is Awakening!\", \"body\": \"Play with your temporary desktop mascot while we prepare your custom pet shaders and AI models.\", \"show_progress\": true, \"show_time_estimate\": true, \"components\": [{\"type\": \"mascot\", \"action\": \"play\", \"style\": \"playful\"}, {\"type\": \"tip_carousel\", \"text\": \"Pro-tip: You can minimize your pet to the system tray anytime.\", \"style\": \"calm\"}]}}\n4: [finish, redesign] Home Intro Desktop Controls Checklist Redesign: Redesign home_intro into a checklist layout with quick practice buttons for pet controls before completing setup.\n   config: {\"home_intro\": {\"layout\": \"checklist\", \"headline\": \"Master Desktop Pet Commands\", \"body\": \"Try these 3 quick actions so you know how to manage your pet on your desktop.\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"checklist\", \"text\": \"Try right-clicking the pet icon\", \"style\": \"emphasis\"}, {\"role\": \"home_welcome\", \"type\": \"checklist\", \"text\": \"Practice hiding your pet to the taskbar\", \"style\": \"plain\"}]}}}\n5: [choose_path, redesign] Story Screen Visual Split Showcase: Redesign the opening story screen into a split layout comparing interactive companion mode versus passive desktop assistant.\n   config: {\"story\": {\"layout\": \"split\", \"headline\": \"Welcome to Your Virtual Desktop Companion\", \"body\": \"Pick how you want your new pet to fit into your daily desktop workflow.\", \"replace\": {\"intro_story\": [{\"role\": \"intro_story\", \"type\": \"choice_cards\", \"text\": \"Interactive Friend vs Productivity Assistant\", \"style\": \"playful\"}]}}}\n6: [sign_in, hint] Sign-In Trouble Direct Support Hint: Add an instant fallback helper button and explicit status hint on the sign-in screen if loading stalls.\n   config: {\"sign_in\": {\"hint\": \"Having trouble signing in? Click here to check connection or retry authentication.\", \"components\": [{\"type\": \"button\", \"label\": \"Retry Sign-In Connection\", \"action\": \"replay\", \"style\": \"subtle\"}]}}\n7: [adoption, new_screen] Interactive Naming & Adoption Certificate Ceremony: Insert a dedicated interactive pet naming screen with sound effects before issuing the adoption certificate.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_name_pet\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_name_pet\": {\"headline\": \"Give Your New Companion a Name\", \"body\": \"What would you like to call your desktop pet?\", \"layout\": \"centered\", \"components\": [{\"type\": \"name_input\", \"text\": \"Enter pet name...\", \"style\": \"large\"}, {\"type\": \"sound\", \"asset\": \"asset:chime_success\", \"style\": \"playful\"}], \"button_label\": \"Confirm Name\"}}\n8: [finish, notification] Desktop Tray & Voice Controls Primer: Add an explicit system notification preference toggle and tray control guide component during final onboarding step.\n   config: {\"home_intro\": {\"notify_when_ready\": true, \"hint\": \"Your pet stays conveniently accessible in your system tray anytime you need to hide or recall it.\", \"components\": [{\"type\": \"badge\", \"label\": \"System Tray Enabled\", \"style\": \"calm\"}]}}\n9: [choose_path, layout] Path Selection Spotlight & Persona Preview: Switch choose_path layout to spotlight mode with clear persona badges for quick decision-making.\n   config: {\"choose_path\": {\"layout\": \"spotlight\", \"headline\": \"Select Your Ideal Companion Experience\", \"show_step_counter\": true, \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"text\": \"Playful Pal (Interactive) or Chill Co-Worker (Background)\", \"style\": \"emphasis\"}]}}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid account sync reassurance hint and component during sign in."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new controls screen after home_intro inside onboarding is permitted."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns pick_friend while retaining pet selection capability."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Waiting screen redesign retains progress feedback and showing that the pet is being created."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of home_intro layout and welcome checklist."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Story screen redesign retains pet introduction."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds sign-in fallback hint and button within onboarding limits."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new pet naming screen inside onboarding sequence is allowed."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds system tray tray preference and component to home_intro."
+   },
+   {
+    "index": 9,
+    "pass": false,
+    "rule": 2,
+    "reason": "choose_path no longer offers adopting and making your own pet."
+   }
+  ]
+ }
+}

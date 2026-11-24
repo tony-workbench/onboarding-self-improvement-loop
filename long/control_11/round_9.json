@@ -1,0 +1,556 @@
+{
+ "round": 9,
+ "starts_week": 9,
+ "funnel": {
+  "choose_path": 0.8068056,
+  "sign_in": 0.9457852717940836,
+  "adoption": 0.6727623,
+  "home": 0.8941230490532671,
+  "finish": 0.7352208
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Pick Friend Interactive Trait Archetype Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the pet selection screen into an interactive archetype picker where users choose personality traits to find their ideal pet match immediately.",
+   "why": "Adoption stage drops off to 67.3% with an extremely high mean time of 1017 seconds, indicating decision fatigue during selection.",
+   "config": {
+    "pick_friend": {
+     "headline": "Find Your Perfect Desktop Companion",
+     "body": "Select a personality archetype to reveal matching desktop pet companions.",
+     "layout": "stage",
+     "replace": {
+      "pet_choices": [
+       {
+        "type": "choice_cards",
+        "text": "Playful Explorer, Calm Study Buddy, Energetic Guardian",
+        "style": "playful",
+        "action": "choose",
+        "role": "pet_choices"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns pet selection into trait archetype selection while retaining pet choice functionality."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.12,
+   "score": 5.42,
+   "score_note": "Adoption has the highest drop-off (32.7%) and high mean duration; redesigning this step targets the biggest bottleneck but requires major new UI work.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 180.0
+  },
+  {
+   "title": "Custom Pet Photo Validation Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Adds a dedicated photo quality verification screen before rendering custom pets to catch formatting errors early.",
+   "why": "3 support tickets reported custom pet generation failures or distorted pet visuals, contributing to adoption step friction.",
+   "config": {
+    "upload_photos": {
+     "headline": "Upload Your Pet Photo",
+     "body": "Ensure high lighting and clear contrast for best rendering results.",
+     "button_label": "Verify Image Quality"
+    },
+    "new_photo_check": {
+     "headline": "Photo Quality & Outline Check",
+     "body": "We analyzed your photo. Confirm the pet border cutout looks accurate before generating.",
+     "layout": "card",
+     "components": [
+      {
+       "type": "preview",
+       "text": "Pet photo cutout preview",
+       "style": "highlight"
+      },
+      {
+       "type": "button",
+       "label": "Looks Great, Generate Pet",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "new_photo_check",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid quality check screen within the onboarding flow without removing any steps."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 4.58,
+   "score_note": "Both support emails and drop-off data confirm adoption friction, though custom photo validation targets a specific sub-flow."
+  },
+  {
+   "title": "Post-Onboarding Account Creation Shift",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves sign-in step to after the home desktop pet introduction so users experience their pet on desktop before creating an account.",
+   "why": "8 support emails cited pets resetting or disappearing upon sign-in during onboarding, while sign-in mean time is high (567s).",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "sign_in"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "home_intro must come after every existing screen, sign_in included"
+   }
+  },
+  {
+   "title": "Interactive Desktop Pet Sandbox Guided Practice",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Introduces a guided desktop interaction sandbox on the final screen teaching users how to summon, hide, and talk to their pet live on screen.",
+   "why": "3 support emails explicitly noted confusion on how to control, hide, or talk to the pet after completing setup.",
+   "config": {
+    "home_intro": {
+     "headline": "Try Controlling Your Desktop Pet Right Now!",
+     "body": "Practice clicking, dragging, and using tray shortcuts before completing onboarding.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "1. Click pet to interact | 2. Right-click for options | 3. Double-click tray icon to hide",
+       "style": "rounded"
+      },
+      {
+       "type": "button",
+       "label": "I'm Ready!",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Desktop Visibility Diagnostics Card",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays live system display diagnostics and overlay permissions status while waiting for pet rendering.",
+   "why": "3 support tickets reported pet not showing on desktop or app refusing to open, while home waiting step mean duration is 2336s.",
+   "config": {
+    "waiting": {
+     "headline": "Spawning Pet onto Your Desktop...",
+     "body": "Checking overlay permissions and graphics driver status to guarantee instant screen rendering.",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "badge",
+       "text": "Display Overlay: Active | System Tray: Docked",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'waiting.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Account Pet Conflict Guard Warning",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Displays a explicit warning banner clarifying whether existing cloud pets will overwrite or merge with current adoption data.",
+   "why": "8 users reported pets missing or reset after signing in again with existing accounts during setup.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Save Your Companion",
+     "hint": "Signing into an existing account will restore your cloud pets without deleting your new adoption.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Safe Sync Active: Existing pets will not be overwritten",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds sign-in sync clarification banner without breaking any rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.03,
+   "score": 7.5,
+   "score_note": "Sign-in already has a high 94.6% pass rate, but explicit warning banner is low cost and addresses specific user support reports.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 180.0
+  },
+  {
+   "title": "Choose Path Starter Accessory Incentive",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Highlights an exclusive starter cosmetic accessory bonus for completing path selection.",
+   "why": "19.3% of users drop off at choose_path with a 514s mean completion time.",
+   "config": {
+    "choose_path": {
+     "headline": "Choose Your Path & Claim Exclusive Starter Hat",
+     "body": "Select standard or custom path now to equip your pet with a free onboarding halo item.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Bonus Gift: Golden Collar unlocked on selection",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions gifts and free extras ('free onboarding halo item', 'Bonus Gift')."
+   }
+  },
+  {
+   "title": "Desktop Control Hotkey Reference Banner",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Adds a persistent reference card detailing keyboard hotkeys for toggling pet visibility and mute status.",
+   "why": "Multiple support emails show post-onboarding confusion regarding how to hide or talk to the pet.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Pet is Live on Your Screen!",
+     "hint": "Press Ctrl+Shift+P anytime to summon/hide your pet, or right-click system tray.",
+     "button_label": "Finish & Launch"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful hotkey guidance to home intro without breaking rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 5.83,
+   "score_note": "Finish step drops 26.5% of users and support emails highlight post-onboarding confusion around controls.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 111.4
+  },
+  {
+   "title": "Tray Docking Sound and Visual Flare Alert",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Plays a distinct chime and triggers system notification when pet desktop rendering completes.",
+   "why": "Users miss when pet renders onto desktop, causing high mean waiting time (2336s) and reports of pets not showing.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "text": "Pet ready spawn chime",
+       "action": "play",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds audio and system notification cues to the waiting screen while maintaining its functionality."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.08,
+   "score": 7.92,
+   "score_note": "Funnel mean wait time (2336s) and support feedback directly point to users missing when pet rendering completes.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 180.0
+  },
+  {
+   "title": "Story Intro Split Video Teaser Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Reconfigures the intro story screen into a split layout showcasing video previews of animated pets on live desktops.",
+   "why": "Path selection stage suffers high mean duration (514s) due to lack of immediate visual context.",
+   "config": {
+    "story": {
+     "headline": "Meet Your Future Desktop Buddy",
+     "layout": "split",
+     "components": [
+      {
+       "type": "video",
+       "text": "Desktop pet walking across real desktop background video",
+       "style": "large"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the story screen layout while still fulfilling its job of introducing the pet."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.06,
+   "score": 3.75,
+   "score_note": "Path selection loses 19.3% with high mean duration, but creating a split video layout requires dedicated video and layout work.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 180.0
+  }
+ ],
+ "picked": [
+  "Pick Friend Interactive Trait Archetype Redesign",
+  "Tray Docking Sound and Visual Flare Alert",
+  "Account Pet Conflict Guard Warning",
+  "Desktop Control Hotkey Reference Banner",
+  "Story Intro Split Video Teaser Layout"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 831.4,
+ "decisions": [
+  {
+   "test": "sim-35",
+   "title": "Pick Friend Interactive Trait Archetype Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 180.0,
+   "result": {
+    "step": {
+     "control": 0.6662,
+     "treatment": 0.7125,
+     "lift": 0.0695,
+     "lift_se": 0.0208,
+     "p": 0.000556
+    },
+    "finish": {
+     "control": 0.3497,
+     "treatment": 0.3753,
+     "lift": 0.0734,
+     "lift_se": 0.0368,
+     "p": 0.038653
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 5.42,
+   "predicted_lift": 0.12,
+   "true_lift_hidden": 0.0239,
+   "finishers_delta_hidden": 26.26
+  },
+  {
+   "test": "sim-36",
+   "title": "Tray Docking Sound and Visual Flare Alert",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 180.0,
+   "result": {
+    "step": {
+     "control": 0.9059,
+     "treatment": 0.9118,
+     "lift": 0.0065,
+     "lift_se": 0.0112,
+     "p": 0.559818
+    },
+    "finish": {
+     "control": 0.3693,
+     "treatment": 0.367,
+     "lift": -0.0063,
+     "lift_se": 0.0336,
+     "p": 0.851371
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.92,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": -0.0002,
+   "finishers_delta_hidden": -0.22
+  },
+  {
+   "test": "sim-37",
+   "title": "Account Pet Conflict Guard Warning",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 180.0,
+   "result": {
+    "step": {
+     "control": 0.9636,
+     "treatment": 0.9541,
+     "lift": -0.0098,
+     "lift_se": 0.0059,
+     "p": 0.096975
+    },
+    "finish": {
+     "control": 0.3617,
+     "treatment": 0.3723,
+     "lift": 0.0295,
+     "lift_se": 0.0349,
+     "p": 0.391381
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.5,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": -0.0114,
+   "finishers_delta_hidden": -12.53
+  },
+  {
+   "test": "sim-38",
+   "title": "Desktop Control Hotkey Reference Banner",
+   "target_step": "finish",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 111.4,
+   "result": {
+    "step": {
+     "control": 0.7424,
+     "treatment": 0.742,
+     "lift": -0.0005,
+     "lift_se": 0.0214,
+     "p": 0.982882
+    },
+    "finish": {
+     "control": 0.3737,
+     "treatment": 0.373,
+     "lift": -0.0018,
+     "lift_se": 0.0334,
+     "p": 0.957428
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.83,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": -0.001,
+   "finishers_delta_hidden": -1.1
+  },
+  {
+   "test": "sim-39",
+   "title": "Story Intro Split Video Teaser Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 180.0,
+   "result": {
+    "step": {
+     "control": 0.8167,
+     "treatment": 0.8123,
+     "lift": -0.0053,
+     "lift_se": 0.0123,
+     "p": 0.66591
+    },
+    "finish": {
+     "control": 0.3657,
+     "treatment": 0.3613,
+     "lift": -0.0119,
+     "lift_se": 0.0338,
+     "p": 0.727155
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.75,
+   "predicted_lift": 0.06,
+   "true_lift_hidden": -0.0084,
+   "finishers_delta_hidden": -9.23
+  }
+ ],
+ "shipped": [
+  "Pick Friend Interactive Trait Archetype Redesign"
+ ],
+ "ends_week": 9,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

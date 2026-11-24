@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [home, new_screen] Desktop pet status verification screen: Adds a post-generation verification step that confirms the companion successfully rendered on the desktop before completing setup.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_verify\", \"home_intro\"], \"new_desktop_verify\": {\"headline\": \"Desktop Pet Verification\", \"body\": \"Checking that your companion loaded properly on your desktop.\", \"layout\": \"centered\"}}\n1: [adoption, redesign] Split layout companion photo selection stage: Redesigns photo selection into a split layout combining interactive preview frame with photo picker controls.\n   config: {\"upload_photos\": {\"layout\": \"split\", \"replace\": {\"photo_upload\": [{\"type\": \"photo_picker\", \"label\": \"Select Photo\", \"role\": \"photo_upload\"}, {\"type\": \"preview\", \"style\": \"large\", \"role\": \"photo_upload\"}]}}}\n2: [choose_path, new_flow] Dual path choice split destination flow: Rebuilds path selection into a dual-column layout comparing instant preset adoption with custom photo creation.\n   config: {\"choose_path\": {\"layout\": \"two_column\", \"replace\": {\"path_options\": [{\"type\": \"choice_cards\", \"label\": \"Starter Companion Path\", \"action\": \"choose\", \"role\": \"path_options\"}, {\"type\": \"choice_cards\", \"label\": \"Custom AI Generation Path\", \"action\": \"choose\", \"role\": \"path_options\"}]}}}\n3: [finish, redesign] Spotlight stage finish welcome redesign: Rebuilds the final onboarding screen into a spotlight stage layout emphasizing active companion status.\n   config: {\"home_intro\": {\"layout\": \"spotlight\", \"replace\": {\"home_welcome\": [{\"type\": \"text\", \"text\": \"Your companion is active on your desktop screen\", \"style\": \"emphasis\", \"role\": \"home_welcome\"}, {\"type\": \"button\", \"label\": \"Get Started\", \"action\": \"next\", \"role\": \"home_welcome\"}]}}}\n4: [sign_in, hint] Existing pet sign-in safety hint: Displays an explicit hint on the sign-in screen reassuring users that logging in preserves existing pet data.\n   config: {\"sign_in\": {\"hint\": \"Sign in to securely sync your pets and keep your desktop companions saved.\"}}\n5: [home, wait_info] Generation system status progress info: Adds active background system status text alongside the live timer during pet generation.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"hint\": \"Generating companion graphics... your desktop pet will appear shortly.\"}}\n6: [choose_path, copy] Path selection journey headline update: Updates the story headline to highlight fast path selection clarity.\n   config: {\"story\": {\"headline\": \"Choose Your Desktop Companion Journey Path\"}}\n7: [adoption, hint] Photo processing optimization hint: Displays a hint during photo upload reassuring users that uploaded photos are automatically optimized.\n   config: {\"upload_photos\": {\"hint\": \"Uploaded photos are automatically optimized for desktop rendering.\"}}\n8: [home, notification] Background generation ready desktop alert: Enables a desktop notification option when companion generation completes on the waiting screen.\n   config: {\"waiting\": {\"notify_when_ready\": true}}\n9: [finish, new_screen] Tray navigation guide final screen: Adds a new end-of-flow screen showing users how to control and hide the desktop pet via the system tray.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_tray_guide\"], \"new_tray_guide\": {\"headline\": \"Desktop Tray Companion Controls\", \"body\": \"Use the menu bar icon to toggle visibility or interact with your companion anytime.\", \"layout\": \"card\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a verification screen inside onboarding is allowed and preserves all required steps."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the photo selection screen layout inside onboarding is allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning path selection into starter and custom paths maintains the screen's core job."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro welcome screen layout inside onboarding is allowed."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a sign-in data safety hint is allowed within onboarding."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding status progress info and timer to the waiting screen is allowed."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating story headline text within onboarding is allowed."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an optimization hint to photo upload within onboarding is allowed."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling desktop ready notifications on the waiting screen is allowed."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new guidance screen following home intro is explicitly allowed by rule 4."
+   }
+  ]
+ }
+}

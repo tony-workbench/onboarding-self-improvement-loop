@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_flow] Interactive Companion Task Assignment Practice Flow: Adds an interactive practice step right before completing onboarding where users practice sending their pet on a quick desktop task.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_task_practice\"], \"new_task_practice\": {\"headline\": \"Assign Your Pet's First Desktop Task\", \"body\": \"Try giving your companion a quick task to see how it moves around your workspace.\", \"layout\": \"centered\", \"components\": [{\"type\": \"animation\", \"asset\": \"asset:task_demo\", \"style\": \"playful\"}, {\"type\": \"button\", \"label\": \"Send Pet on Task\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n1: [home, wait_info] Desktop Visibility Diagnostic and Rendering Status Display: Displays real-time screen layer verification and render engine readiness status while the pet loads onto the desktop.\n   config: {\"waiting\": {\"show_progress\": true, \"components\": [{\"type\": \"text\", \"text\": \"Verifying desktop overlay compatibility and display rendering layer...\", \"style\": \"subtle\"}, {\"type\": \"progress\", \"style\": \"rounded\"}]}}\n2: [finish, new_flow] Interactive Pet Tray and Shortcut Mastery Flow: Guides users through a quick hands-on tutorial on summoning, hiding, and accessing pet settings from the system tray.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_tray_mastery\"], \"new_tray_mastery\": {\"headline\": \"Master Desktop Pet Tray Controls\", \"body\": \"Practice calling and minimizing your pet using your taskbar or menu tray.\", \"layout\": \"split\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:tray_icon_guide\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Practice Tray Toggle\", \"action\": \"next\", \"style\": \"highlight\"}]}}\n3: [sign_in, wait_info] Sign-In Sync Verification Status Info: Displays account data save status and cloud sync readiness indicators on the sign-in screen.\n   config: {\"sign_in\": {\"hint\": \"Secure cloud save verified. Your pet selection will be permanently attached to this account.\", \"components\": [{\"type\": \"badge\", \"text\": \"Cloud Pet Sync Enabled\", \"style\": \"rounded\"}]}}\n4: [adoption, hint] Custom Photo Render Diagnostic Hint: Adds a hint on the photo upload screen explaining image rendering compatibility checks.\n   config: {\"upload_photos\": {\"hint\": \"Render check active: Clear single-subject photos ensure optimal 3D desktop companion rendering.\"}}\n5: [choose_path, redesign] Full Bleed Interactive Path Discovery Screen: Redesigns the path choice screen into a full-bleed interactive visual layout previewing companion capabilities.\n   config: {\"choose_path\": {\"layout\": \"full_bleed\", \"headline\": \"Choose Your Desktop Companion Path\", \"body\": \"Select how your pet will inhabit and interact with your workspace.\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"style\": \"playful\", \"action\": \"choose\"}]}}}\n6: [sign_in, reorder] Adoption Certificate Before Sign-In Flow Shift: Moves the sign-in step to occur after pet adoption certificate creation, allowing users to build their pet before creating an account.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"], \"sign_in\": {\"headline\": \"Save Your Companion To Your Account\", \"body\": \"Sign in now to lock in your companion certificate and enable cloud sync.\"}}\n7: [finish, new_screen] Desktop Companion Quick Interaction Reference Screen: Adds a dedicated summary screen right before completing onboarding that highlights primary hotkeys and pet interaction modes.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_quick_reference\"], \"new_quick_reference\": {\"headline\": \"Quick Reference Guide\", \"body\": \"Keep these key commands handy to summon, feed, or pause your companion anytime.\", \"layout\": \"card\", \"components\": [{\"type\": \"checklist\", \"text\": \"Click pet to interact | Right-click for menu | Drag to move\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Got It, Launch Pet!\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n8: [home, wait_info] Desktop Layer & Window Compatibility Wait Monitor: Provides real-time system display hook and desktop overlay status text during the waiting render step.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"hint\": \"Configuring desktop overlay window and display priority for smooth rendering...\", \"components\": [{\"type\": \"badge\", \"text\": \"Desktop Window Layer: Active\", \"style\": \"subtle\"}]}}\n9: [adoption, incentive] Companion Trait Personalization Bonus Card: Displays a starter companion personality badge on the adoption certificate upon completion.\n   config: {\"adoption_certificate\": {\"components\": [{\"type\": \"badge\", \"text\": \"Starter Trait Unlocked: Loyal Companion\", \"style\": \"highlight\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of an interactive task practice screen after home intro."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid update to waiting screen status information and rendering progress display."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a pet tray tutorial screen following home intro."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of sign-in sync status hint and badge."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of render diagnostic hint on the photo upload screen."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of choose path layout while retaining path selection options."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid reordering of sign-in step after adoption certificate."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of quick reference guide screen after home intro."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid update to waiting screen status information."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of starter trait badge on adoption certificate."
+   }
+  ]
+ }
+}

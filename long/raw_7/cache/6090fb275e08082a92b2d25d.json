@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [choose_path, new_screen] Companion Behavior Mode Selection Screen: Insert a new screen 'new_companion_behavior' after story screen where users choose their companion's primary activity style (Desk Companion, Active Playmate, Focus Partner).\n   config: {\"_order\": [\"story\", \"new_companion_behavior\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_companion_behavior\": {\"headline\": \"Select Your Pet's Preferred Activity Style\", \"body\": \"Choose how active or quiet you would like your companion to be on your desktop.\", \"components\": [{\"type\": \"choice_cards\", \"action\": \"choose\", \"style\": \"playful\"}]}}\n1: [sign_in, redesign] Compact Layout Account Preservation Sign-In Redesign: Redesign sign_in screen into a compact layout with an explicit pet account safety badge component.\n   config: {\"sign_in\": {\"layout\": \"compact\", \"headline\": \"Sign In to Keep Your Pet Safe\", \"components\": [{\"type\": \"badge\", \"text\": \"Your pet state is saved automatically to your profile\", \"style\": \"highlight\"}]}}\n2: [adoption, new_screen] Pet Voice & Audio Accent Selection Screen: Add a new screen 'new_pet_voice_accent' before adoption certificate to let users pick their companion's sound reactions.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_pet_voice_accent\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_pet_voice_accent\": {\"headline\": \"Choose Companion Voice Accent\", \"body\": \"Select how your pet sounds when greeting or seeking attention on your desktop.\", \"components\": [{\"type\": \"sound\", \"action\": \"play\", \"style\": \"playful\"}, {\"type\": \"button\", \"label\": \"Set Voice Accent\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n3: [home, wait_info] Desktop Initialization Stage Progress Status: Add explicit desktop render stage progress text and engine status checklist to the waiting screen.\n   config: {\"waiting\": {\"show_progress\": true, \"notify_when_ready\": true, \"components\": [{\"type\": \"checklist\", \"text\": \"Initializing desktop window overlay\", \"style\": \"plain\"}, {\"type\": \"progress\", \"style\": \"emphasis\"}]}}\n4: [finish, redesign] Stage Layout Desktop Control Action Redesign: Redesign home_intro into a stage layout featuring an interactive preview component demonstrating pet desktop commands.\n   config: {\"home_intro\": {\"layout\": \"stage\", \"headline\": \"Your Companion is Ready on Your Desktop\", \"body\": \"Right-click your companion anytime to access controls, switch modes, or hide them.\", \"components\": [{\"type\": \"preview\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Start Desktop Experience\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n5: [choose_path, layout] Full-Bleed Visual Layout for Choose Path: Update choose_path screen layout to full_bleed with large visual choice card components.\n   config: {\"choose_path\": {\"layout\": \"full_bleed\", \"headline\": \"Select Your Desktop Companion Journey\", \"components\": [{\"type\": \"choice_cards\", \"action\": \"choose\", \"style\": \"large\"}]}}\n6: [adoption, new_flow] Pet Visual Preset Customization Sub-Flow: Add a new visual preset customization screen 'new_pet_style_preset' prior to photo upload in adoption.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_pet_style_preset\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_pet_style_preset\": {\"headline\": \"Choose Visual Style Preset\", \"body\": \"Select the art style base for your companion before generating or custom painting.\", \"components\": [{\"type\": \"choice_cards\", \"action\": \"choose\", \"style\": \"playful\"}]}}\n7: [home, new_screen] Multi-Monitor Desktop Display Verification Screen: Insert 'new_display_verify' screen before waiting to help users set multi-monitor display options.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_display_verify\", \"waiting\", \"home_intro\"], \"new_display_verify\": {\"headline\": \"Desktop Display & Overlay Setup\", \"body\": \"Ensure your companion spawns on your primary screen or select multi-monitor mode.\", \"components\": [{\"type\": \"checklist\", \"text\": \"Set primary screen for companion\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Confirm Display Settings\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n8: [finish, new_screen] Companion Quick Interaction Gesture Screen: Add a dedicated 'new_interaction_gestures' screen right after home intro showing quick mouse click gestures.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_interaction_gestures\"], \"new_interaction_gestures\": {\"headline\": \"Quick Desktop Mouse Gestures\", \"body\": \"Single click to pet, double click to talk, and drag to place anywhere on screen.\", \"components\": [{\"type\": \"animation\", \"style\": \"playful\"}, {\"type\": \"button\", \"label\": \"Got It!\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n9: [sign_in, hint] Pet Account Protection Security Guarantee Hint: Add a security guarantee hint to the sign-in screen assuring users that sign-in preserves companion memory.\n   config: {\"sign_in\": {\"hint\": \"Signing in backs up your pet's personality and unlocks cross-device sync securely.\", \"components\": [{\"type\": \"text\", \"text\": \"Your pet progress is protected instantly upon sign-in.\", \"style\": \"subtle\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a companion behavior selection screen inside onboarding is allowed."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the sign-in screen into a compact layout retains its core job."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a pet voice accent screen inside onboarding is allowed."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress checklist information to the waiting screen is permitted."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro with a stage layout and command preview is valid."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating choose_path screen layout to full-bleed preserves its core job."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a pet visual style preset sub-flow prior to photo upload is allowed."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a multi-monitor display verification screen before waiting is permitted."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a gesture tutorial screen after home_intro inside onboarding is allowed."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a security guarantee hint to sign-in does not violate any rules."
+   }
+  ]
+ }
+}

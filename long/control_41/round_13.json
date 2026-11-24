@@ -1,0 +1,496 @@
+{
+ "round": 13,
+ "starts_week": 13,
+ "funnel": {
+  "choose_path": 0.7989701826000001,
+  "sign_in": 0.8483621374499039,
+  "adoption": 0.746607204,
+  "home": 0.813,
+  "finish": 0.7168176
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Interactive Companion Accessory Selection Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Adds a dedicated accessory customization screen right before adoption finalization to let users select starter items.",
+   "why": "Adoption step drops conversion to 74.7% with a mean duration of 1017s; adding immediate item ownership increases completion drive.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "new_accessory_select",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ],
+    "pick_friend": {
+     "headline": "Pick Starter Accessories for Your New Desktop Pet",
+     "body": "Equip your pet with initial gear before signing the official adoption certificate."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_accessory_select']"
+   }
+  },
+  {
+   "title": "Desktop Control Overview Cards Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesigns the home_intro finish screen with visual cards showing hotkeys and desktop hide options.",
+   "why": "Support received multiple tickets regarding confusion about controlling, hiding, or talking to pets after completing setup.",
+   "config": {
+    "home_intro": {
+     "layout": "card",
+     "headline": "Master Your Desktop Pet Controls",
+     "body": "Learn how to interact, minimize to system tray, and summon your pet on demand.",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "choice_cards",
+        "text": "Controls: Right-click pet for menu, double-click to chat, drag to reposition on desktop.",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.replace.home_welcome[0]': a choice_cards cannot do the home_welcome job (use ['animation', 'button', 'checklist', 'image', 'mascot', 'text'])"
+   }
+  },
+  {
+   "title": "Move Sign In Screen Before Path Choice",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves the sign_in screen to the front right after story to establish cloud save state prior to pet creation.",
+   "why": "8 support emails complained of pets missing or reset upon re-signing in; early sign in ensures progress and existing pets sync before adoption.",
+   "config": {
+    "_order": [
+     "story",
+     "sign_in",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "sign_in": {
+     "headline": "Sign In Early to Preserve Desktop Pet Sync",
+     "hint": "Signing in now secures your cloud saves so customized pets never get lost."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "sign_in may move later, not before choose_path"
+   }
+  },
+  {
+   "title": "Path Companion Archetype Selection Flow",
+   "target_step": "choose_path",
+   "type": "new_flow",
+   "change": "Introduces a video-assisted archetype comparison layout for choosing path styles on choose_path.",
+   "why": "choose_path step has a mean duration of 514s and 79.9% conversion; vivid archetype previews help users make quick decisions.",
+   "config": {
+    "choose_path": {
+     "layout": "full_bleed",
+     "headline": "Select Your Desktop Companion Archetype",
+     "components": [
+      {
+       "type": "video",
+       "asset": "asset:archetype_preview_video",
+       "style": "highlight",
+       "action": "choose"
+      },
+      {
+       "type": "text",
+       "text": "Preview live pet behaviors on active windows before choosing.",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "The choose_path screen replaces the choice between adopting and making your own with a single archetype selection, losing its required job."
+   }
+  },
+  {
+   "title": "Account Switch Data Merge Protection Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Displays an explicit sign-in hint explaining how to log into existing pet accounts safely without resetting data.",
+   "why": "8 support tickets mentioned pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Returning user? Sign in with your original credentials to automatically restore saved desktop pets.",
+     "body": "Avoid using alternative sign in providers if you previously adopted pets under a different account."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid hint addition to the sign_in screen without violating any onboarding or fair design rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 5.0,
+   "score_note": "Sign-in step drops 15.2%; 8 support tickets indicate data loss fear, but hint mostly prevents support complaints and moderate drop-off.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 170.8
+  },
+  {
+   "title": "Desktop Engine Initialization Diagnostic Status",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays real-time diagnostic status checks on the waiting screen while pet assets prepare to launch.",
+   "why": "Waiting step takes median 201s / mean 2336s, and support received 3 emails about pets failing to appear on desktop.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "headline": "Initializing Desktop Engine & Overlay",
+     "body": "Checking graphic engine compatibility and system tray overlay permissions.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Desktop overlay compatibility verified",
+       "style": "subtle"
+      },
+      {
+       "type": "progress",
+       "text": "Loading desktop mascot assets...",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid update to the waiting screen displaying real engine initialization progress."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.05,
+   "score": 5.42,
+   "score_note": "Home step has extreme 201s median wait time and 18.7% drop-off; diagnostics help set expectations, though building live checks requires dev work."
+  },
+  {
+   "title": "Adoption Certificate Badge Reward Preview",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Adds an unlockable early-adopter desktop badge reward preview to the adoption certificate screen.",
+   "why": "Adoption step conversion is 74.7%; offering a exclusive badge reward motivates users to complete certificate steps.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Complete Adoption to Claim Founder's Desktop Badge",
+     "body": "Finalizing your adoption certificate grants your pet an exclusive Founder's Badge visible on your desktop.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Founder's Desktop Badge Unlocked",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions an exclusive reward/gift badge, violating the restriction on mentioning gifts or free extras."
+   }
+  },
+  {
+   "title": "Desktop Spawning Sound & Notify Toggle",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Adds an audio chime toggle on the waiting screen to alert users when the desktop pet finishes rendering.",
+   "why": "The waiting step mean time is 5815s overall finish with high waiting times; users switch windows and miss when rendering completes.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "label": "Play audio chime when pet spawns",
+       "style": "rounded",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of an audio chime toggle to the waiting screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 5.83,
+   "score_note": "Addresses long wait times causing window switching; notification chime alerts returning users, though audio controls require moderate UI work.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 170.8
+  },
+  {
+   "title": "Story Scroll Layout for Welcome Experience",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Swaps the initial story screen layout to story_scroll with animated mascot preview elements.",
+   "why": "20.1% of users drop off at choose_path / story step within 8 seconds; interactive scrolling engages users immediately.",
+   "config": {
+    "story": {
+     "layout": "story_scroll",
+     "headline": "Discover Your Interactive Desktop Companion",
+     "body": "Scroll down to see live companion behaviors and workspace integration.",
+     "components": [
+      {
+       "type": "mascot",
+       "asset": "asset:scroll_mascot_intro",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of the story screen layout while preserving its job of introducing the pet."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.06,
+   "score": 3.75,
+   "score_note": "20.1% leave at choose_path within 8 seconds; interactive scroll layout addresses immediate bounce but requires full design and build.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 170.8
+  },
+  {
+   "title": "Desktop Tray & Hide Instructions Copy Update",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Updates the home_intro headline and body to explicitly instruct how to hide and summon the pet via system tray.",
+   "why": "Support received tickets regarding confusion on how to control or hide the pet once setup finishes.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Companion is Ready! Access via System Tray",
+     "body": "Your pet is now active on your screen. Right-click its tray icon anytime to pause, hide, or open controls.",
+     "button_label": "Launch Desktop Companion"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update for the home_intro screen explaining pet controls and system tray actions."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.07,
+   "score": 8.75,
+   "score_note": "Target step finish has the highest drop-off (28.3%) and direct support tickets; copy changes are quick config/text updates.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 106.2
+  }
+ ],
+ "picked": [
+  "Desktop Tray & Hide Instructions Copy Update",
+  "Desktop Spawning Sound & Notify Toggle",
+  "Account Switch Data Merge Protection Hint",
+  "Story Scroll Layout for Welcome Experience"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 618.6,
+ "decisions": [
+  {
+   "test": "sim-53",
+   "title": "Desktop Tray & Hide Instructions Copy Update",
+   "target_step": "finish",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 106.2,
+   "result": {
+    "step": {
+     "control": 0.6691,
+     "treatment": 0.6783,
+     "lift": 0.0137,
+     "lift_se": 0.0303,
+     "p": 0.649385
+    },
+    "finish": {
+     "control": 0.24,
+     "treatment": 0.246,
+     "lift": 0.025,
+     "lift_se": 0.0467,
+     "p": 0.58795
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.75,
+   "predicted_lift": 0.07,
+   "true_lift_hidden": -0.0285,
+   "finishers_delta_hidden": -21.07
+  },
+  {
+   "test": "sim-54",
+   "title": "Desktop Spawning Sound & Notify Toggle",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 170.8,
+   "result": {
+    "step": {
+     "control": 0.7666,
+     "treatment": 0.8139,
+     "lift": 0.0616,
+     "lift_se": 0.021,
+     "p": 0.00241
+    },
+    "finish": {
+     "control": 0.242,
+     "treatment": 0.2573,
+     "lift": 0.0634,
+     "lift_se": 0.0476,
+     "p": 0.170043
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 5.83,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": 0.0282,
+   "finishers_delta_hidden": 20.85
+  },
+  {
+   "test": "sim-55",
+   "title": "Account Switch Data Merge Protection Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 170.8,
+   "result": {
+    "step": {
+     "control": 0.806,
+     "treatment": 0.833,
+     "lift": 0.0335,
+     "lift_se": 0.0143,
+     "p": 0.017471
+    },
+    "finish": {
+     "control": 0.2373,
+     "treatment": 0.2547,
+     "lift": 0.073,
+     "lift_se": 0.0485,
+     "p": 0.119057
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 5.0,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": 0.0279,
+   "finishers_delta_hidden": 20.62
+  },
+  {
+   "test": "sim-56",
+   "title": "Story Scroll Layout for Welcome Experience",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 170.8,
+   "result": {
+    "step": {
+     "control": 0.7503,
+     "treatment": 0.7943,
+     "lift": 0.0586,
+     "lift_se": 0.0149,
+     "p": 4.8e-05
+    },
+    "finish": {
+     "control": 0.224,
+     "treatment": 0.267,
+     "lift": 0.192,
+     "lift_se": 0.0542,
+     "p": 0.000109
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 3.75,
+   "predicted_lift": 0.06,
+   "true_lift_hidden": 0.0389,
+   "finishers_delta_hidden": 28.75
+  }
+ ],
+ "shipped": [
+  "Desktop Spawning Sound & Notify Toggle",
+  "Account Switch Data Merge Protection Hint",
+  "Story Scroll Layout for Welcome Experience"
+ ],
+ "ends_week": 13,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

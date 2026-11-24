@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, redesign] Interactive Desktop Controls Overview Redesign: Redesign the final home intro screen into a split view showcasing interactive control guides for hiding, summoning, and talking to the desktop pet.\n   config: {\"home_intro\": {\"layout\": \"split\", \"headline\": \"Master Your Desktop Pet Controls\", \"body\": \"Learn how to summon, move, toggle visibility, and interact with your pet anytime on your screen.\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"checklist\", \"label\": \"Control Guide\", \"text\": \"Right-click pet for menu; Press hotkey to hide/show; Click to feed or talk.\", \"style\": \"emphasis\"}]}}}\n1: [home, wait_info] Desktop Screen Overlay Readiness Check: Display a live system readiness status list on the waiting screen confirming display permissions and desktop overlay setup while generation completes.\n   config: {\"waiting\": {\"headline\": \"Preparing Your Pet & System Environment\", \"body\": \"Setting up desktop overlay permissions and graphics rendering...\", \"show_progress\": true, \"show_time_estimate\": true, \"components\": [{\"type\": \"checklist\", \"label\": \"System Check\", \"text\": \"Desktop Overlay: Ready | Graphics Renderer: Initialized | Notification Permissions: Active\", \"style\": \"rounded\"}]}}\n2: [choose_path, new_screen] Companion Path Selection Quiz Screen: Insert a new interactive quiz screen before path selection to help users determine whether a story, standard, or custom pet path fits them best.\n   config: {\"_order\": [\"story\", \"new_lifestyle_quiz\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_lifestyle_quiz\": {\"layout\": \"card\", \"headline\": \"Find Your Ideal Pet Path\", \"body\": \"Answer 2 quick questions to discover your best companion match.\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Preferred Style\", \"text\": \"Guided Adventure vs Free Play Customization\", \"style\": \"playful\", \"action\": \"next\"}]}}\n3: [sign_in, hint] Sign-In Multi-Device Safeguard Notice: Add an explicit safeguard helper notice below sign-in options explaining that signing in links pets to the account to prevent reset or loss on re-login.\n   config: {\"sign_in\": {\"hint\": \"Signing in secures your pet companion data across device restarts and app updates.\", \"components\": [{\"type\": \"badge\", \"label\": \"Account Protection Active\", \"text\": \"Your pet progress will be automatically saved to your account.\", \"style\": \"highlight\"}]}}\n4: [finish, new_flow] First Desktop Interaction Practice Flow: Introduce an interactive mini-practice tutorial module directly within the finish screen allowing users to try hiding and summoning a test desktop pet.\n   config: {\"home_intro\": {\"headline\": \"Practice Controlling Your Companion\", \"body\": \"Try the interactive buttons below to test hiding and summoning your pet right now.\", \"components\": [{\"type\": \"button\", \"label\": \"Test Hide / Show Pet\", \"text\": \"Toggle pet visibility test\", \"style\": \"rounded\", \"action\": \"play\"}, {\"type\": \"button\", \"label\": \"Test Pet Voice\", \"text\": \"Trigger test pet speech bubble\", \"style\": \"playful\", \"action\": \"replay\"}]}}\n5: [adoption, hint] Custom Photo Lighting Guidance Banner: Add a visual photo lighting and framing checklist banner above the photo upload component.\n   config: {\"upload_photos\": {\"hint\": \"Ensure bright, direct lighting and clear subject framing for optimal AI pet generation results.\", \"components\": [{\"type\": \"checklist\", \"label\": \"Best Results Guide\", \"text\": \"Good lighting: Yes | Clear face/body: Yes | No heavy shadows: Yes\", \"style\": \"calm\"}]}}\n6: [choose_path, layout] Companion Path Selection Grid Redesign: Reorganize path options into a structured grid layout featuring distinct visual icons and time estimates for each companion journey.\n   config: {\"choose_path\": {\"layout\": \"grid\", \"headline\": \"Choose Your Companion Journey\", \"body\": \"Select the path that best matches your onboarding preference.\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"label\": \"Path Options\", \"text\": \"Quick Companion (2 min) | Guided Story (5 min) | Custom Pet Creation\", \"style\": \"rounded\", \"action\": \"choose\"}]}}}\n7: [sign_in, reorder] Post-Adoption Certificate Sign-In Reorder: Reorder the sign_in screen to occur right after adoption certificate approval so users bond with their pet before registering an account.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n8: [home, notification] Generation Completion Audio Cue Toggle: Add an optional audio chime notification toggle and visible alert banner on the waiting screen when pet rendering completes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"sound\", \"label\": \"Completion Sound Alert\", \"text\": \"Play a friendly chime when your pet is ready on your desktop\", \"style\": \"playful\", \"action\": \"play\"}]}}\n9: [adoption, copy] Pet Trait and Behavior Summary Card: Update friend selection copy with clear behavior descriptions explaining pet personalities and desktop interaction styles.\n   config: {\"pick_friend\": {\"headline\": \"Meet Your Future Desktop Companion\", \"body\": \"Every pet has unique desk behaviors—some love idle animations, while others react to mouse clicks and typing.\", \"hint\": \"You can customize behaviors and sound settings anytime after setup.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro with interactive desktop control guides is allowed inside onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a live system readiness status checklist to the waiting screen maintains its purpose while generation completes."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserting a new quiz screen into the onboarding order is permitted as all required onboarding steps remain intact."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding explicit account protection hints to the sign-in screen is compliant with onboarding rules."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interactive practice flow within the home intro screen is allowed inside onboarding."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding lighting and photo framing guidance to the photo upload screen is permitted."
+   },
+   {
+    "index": 6,
+    "pass": false,
+    "rule": 2,
+    "reason": "The choose path screen must offer both adopting and making your own, but replacing options with time-based choices loses the clear adoption path option."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to occur after the adoption certificate is explicitly allowed by rule 4."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an optional audio notification toggle to the waiting screen is permitted."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating copy on the pick a friend screen to describe pet desktop behaviors retains the screen's core job."
+   }
+  ]
+ }
+}

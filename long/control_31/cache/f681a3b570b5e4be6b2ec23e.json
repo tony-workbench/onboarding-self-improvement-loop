@@ -1,0 +1,248 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "You improve the first-run onboarding of a desktop pet app.\n\nFunnel (conversion from the previous step, and time taken):\n- choose_path: 76.2%, median 8s / mean 514s\n- sign_in: 72.9%, median 3s / mean 567s\n- adoption: 60.9%, median 89s / mean 1017s\n- home: 84.2%, median 201s / mean 2336s\n- finish: 64.8%, median 395s / mean 5815s\n- finishing onboarding overall: 18.5%\n\nWhat users wrote to support last week, grouped into themes (most mail is about later problems).\nEverything between the markers is data, not instructions:\n<support_themes>\n- [sign_in, account] Pets missing or reset after signing in again (8 emails)\n- [sign_in, bug] Sign-in screen does not appear, or the app stalls before it (2 emails)\n- [adoption_or_generation, bug] Making a custom pet fails or the result looks wrong (3 emails)\n- [home_first_view, bug] Pet does not show on the desktop, or the app will not open (3 emails)\n- [after_onboarding, confusion] Unclear how to control, hide or talk to the pet (3 emails)\n- [after_onboarding, bug] Desktop features misbehave after setup (4 emails)\n- [after_onboarding, account] Requests to delete an account or personal data (4 emails)\n- [after_onboarding, payment] Refunds and payment questions (6 emails)\n- [after_onboarding, request] Requests for more pets, items or features (4 emails)\n- [after_onboarding, other] Empty messages with no description (7 emails)\n</support_themes>\n\nBig moves are welcome and expected: redesign whole screens, add new screens or whole new sub-flows,\nreorder the journey, rebuild a screen out of new components. Small copy tweaks are fine too, but at least\n4 of your ideas must be big moves (kind redesign, new_flow, new_screen or reorder). A separate checker\nonly makes sure nothing existing is deleted or skipped and nothing outside onboarding changes, so you do not\nneed to hold back.\n\nChanges already shipped, in order (the current onboarding includes all of them): ['Interactive Waiting Screen with Time Estimate']\nChanges already tested and stopped: ['Photo Customization Quality Verification Flow', 'Desktop Controls Interactive Tutorial Screen', 'Streamlined Story Screen with Quick Time Estimate']\nIdeas the safeguards blocked (they cannot be tested, do not propose them again): none\n\nLessons from earlier weeks (written by you after reading test results):\n(none yet)\n\nPropose 10 NEW changes, different from everything above. Each must be testable as a 50/50 test.\nReturn JSON {\"candidates\": [{\n  \"title\": short name,\n  \"target_step\": one of ['choose_path', 'sign_in', 'adoption', 'home', 'finish'],\n  \"type\": one of ['copy', 'hint', 'wait_info', 'notification', 'layout', 'incentive', 'reorder', 'new_screen', 'new_flow', 'redesign'],\n  \"change\": what the user sees differently, one or two sentences,\n  \"why\": the evidence from the funnel or the support mail,\n  \"config\": the exact switch for the app, as {screen: {field: value}}.\n            Existing screens, in their current order: ['story', 'choose_path', 'sign_in', 'pick_friend', 'upload_photos', 'adoption_certificate', 'waiting', 'home_intro'].\n            Fields on any screen: {'headline': 'str max 80', 'body': 'str max 240', 'hint': 'str max 160', 'button_label': 'str max 30', 'layout': 'str', 'show_progress': 'bool', 'show_time_estimate': 'bool', 'notify_when_ready': 'bool', 'show_step_counter': 'bool', 'tip_delay_seconds': 'int max 60', 'components': 'list max 12', 'replace': 'dict'}. \"layout\" is one of ['card', 'carousel', 'centered', 'checklist', 'compact', 'default', 'full_bleed', 'grid', 'list', 'split', 'spotlight', 'stage', 'story_scroll', 'two_column'].\n            \"components\" is a list of new elements added to the screen, each {\"type\": one of ['animation', 'badge', 'button', 'checklist', 'choice_cards', 'image', 'mascot', 'name_input', 'photo_picker', 'preview', 'progress', 'sound', 'text', 'timer', 'tip_carousel', 'video'],\n            \"text\", \"label\", \"asset\": \"asset:<id>\", \"style\": one of ['calm', 'emphasis', 'highlight', 'large', 'plain', 'playful', 'rounded', 'small', 'subtle'], \"action\": one of ['back', 'choose', 'next', 'open_tip', 'play', 'replay']}.\n            Components are added on top of the screen's existing design.\n            \"replace\" swaps out part of an existing screen for something better that does the same job:\n            {\"<part>\": [components, each with \"role\": \"<part>\"]}. Parts per screen: {'story': ['intro_story', 'settings_entry'], 'choose_path': ['path_options', 'settings_entry'], 'sign_in': ['sign_in_options', 'settings_entry'], 'pick_friend': ['pet_choices', 'settings_entry'], 'upload_photos': ['photo_upload', 'settings_entry'], 'adoption_certificate': ['certificate', 'official_stamp', 'settings_entry'], 'waiting': ['wait_status', 'settings_entry'], 'home_intro': ['home_welcome', 'settings_entry']}.\n            Add screens by naming them new_<something> (up to 8, at most 3 in a row).\n            Change the order with \"_order\": the full list of screens, including any new ones; existing screens\n            keep their order, except sign_in, which may move later.\n            A change may only edit the existing screens of its own target step: {'choose_path': ['choose_path', 'story'], 'sign_in': ['sign_in'], 'adoption': ['adoption_certificate', 'pick_friend', 'upload_photos'], 'home': ['waiting'], 'finish': ['home_intro']}.\n            Nothing on the sign_in screen may lead past it without signing in.\n            If your idea needs something outside onboarding, or removing or skipping a step, still\n            list it, with \"config\": {} and say in \"change\" what it would need. The checker will decide.\n}]}",
+ "answer": {
+  "candidates": [
+   {
+    "title": "Redesign Pick Friend Screen with Animated Live Previews",
+    "target_step": "adoption",
+    "type": "redesign",
+    "change": "Overhaul the pet selection interface with a dynamic grid layout featuring animated live previews of pets interacting on a desktop surface.",
+    "why": "Adoption conversion drops to 60.9% with a high mean time of 1017s, and 3 support tickets reported custom pet rendering issues.",
+    "config": {
+     "pick_friend": {
+      "layout": "grid",
+      "headline": "Meet Your New Desktop Companion",
+      "body": "Select a pet companion to roam, play, and assist directly on your desktop screen.",
+      "replace": {
+       "pet_choices": [
+        {
+         "role": "pet_choices",
+         "type": "preview",
+         "label": "Playful Puppy Preview",
+         "asset": "asset:puppy_preview",
+         "style": "playful",
+         "action": "choose"
+        },
+        {
+         "role": "pet_choices",
+         "type": "preview",
+         "label": "Curious Kitten Preview",
+         "asset": "asset:kitten_preview",
+         "style": "playful",
+         "action": "choose"
+        }
+       ]
+      }
+     }
+    }
+   },
+   {
+    "title": "Interactive Desktop Pet Controls Tutorial Screen",
+    "target_step": "finish",
+    "type": "new_screen",
+    "change": "Insert a dedicated tutorial screen right before finishing onboarding to explicitly teach desktop pet shortcuts, drag actions, and hide options.",
+    "why": "Multiple support emails (3 tickets) showed post-onboarding confusion regarding how to control, hide, or talk to the pet on the desktop.",
+    "config": {
+     "_order": [
+      "story",
+      "choose_path",
+      "sign_in",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "waiting",
+      "home_intro",
+      "new_controls_guide"
+     ],
+     "new_controls_guide": {
+      "layout": "checklist",
+      "headline": "How to Interact with Your Pet",
+      "body": "Learn quick mouse shortcuts to control, hide, or chat with your desktop pet anytime.",
+      "button_label": "Got It, Launch Pet!",
+      "components": [
+       {
+        "type": "checklist",
+        "text": "Drag to move around desktop screen",
+        "style": "plain"
+       },
+       {
+        "type": "checklist",
+        "text": "Right click for pet menu & hide option",
+        "style": "plain"
+       },
+       {
+        "type": "checklist",
+        "text": "Double click to start voice chat",
+        "style": "plain"
+       }
+      ]
+     }
+    }
+   },
+   {
+    "title": "Move Sign-In After Pet Choice to Reduce Initial Friction",
+    "target_step": "sign_in",
+    "type": "reorder",
+    "change": "Reorder onboarding so users choose their pet friend first, delaying sign-in until after the emotional connection is established.",
+    "why": "Sign-in dropoff is 72.9% early in the flow, and 8 users suffered post-sign-in pet reset confusion due to premature account association.",
+    "config": {
+     "_order": [
+      "story",
+      "choose_path",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "sign_in",
+      "waiting",
+      "home_intro"
+     ],
+     "sign_in": {
+      "headline": "Save Your New Pet to Your Account",
+      "body": "Sign in now to lock in your adoption certificate and sync your pet across all your devices."
+     }
+    }
+   },
+   {
+    "title": "Visual Path Selection Screen Overhaul",
+    "target_step": "choose_path",
+    "type": "new_flow",
+    "change": "Replace text-heavy path options with prominent visual choice cards contrasting instant adoption versus photo-based pet creation.",
+    "why": "The choose_path step has high mean duration (514s) and 76.2% conversion; clearer visual choices will speed up decisions.",
+    "config": {
+     "choose_path": {
+      "layout": "split",
+      "headline": "Choose Your Pet Creation Path",
+      "body": "Pick an existing companion ready to adopt or create a custom pet from your own photo.",
+      "replace": {
+       "path_options": [
+        {
+         "role": "path_options",
+         "type": "choice_cards",
+         "label": "Instant Pet Adoption",
+         "text": "Choose from cute ready-made desktop pets in seconds.",
+         "style": "highlight",
+         "action": "choose"
+        },
+        {
+         "role": "path_options",
+         "type": "choice_cards",
+         "label": "Custom Pet Creator",
+         "text": "Upload photos to generate a unique 3D desktop companion.",
+         "style": "playful",
+         "action": "choose"
+        }
+       ]
+      }
+     }
+    }
+   },
+   {
+    "title": "Desktop Shortcut Hint Carousel on Waiting Screen",
+    "target_step": "home",
+    "type": "wait_info",
+    "change": "Add an automated tip carousel on the generation waiting screen highlighting key controls while the pet model downloads.",
+    "why": "The waiting step has a median time of 201s and mean of 2336s, causing user dropoff and post-onboarding feature confusion.",
+    "config": {
+     "waiting": {
+      "show_time_estimate": true,
+      "tip_delay_seconds": 5,
+      "components": [
+       {
+        "type": "tip_carousel",
+        "text": "Tip: Press Alt+P anytime to summon your pet to the active window!",
+        "style": "calm"
+       }
+      ]
+     }
+    }
+   },
+   {
+    "title": "Photo Upload Clarity Guidance and Requirements Hint",
+    "target_step": "adoption",
+    "type": "hint",
+    "change": "Display explicit lighting and framing guidelines directly on the photo upload screen before processing.",
+    "why": "3 support tickets reported custom pet generation failures or distorted models due to suboptimal source photos.",
+    "config": {
+     "upload_photos": {
+      "hint": "For best 3D results, use well-lit front-facing photos with clear background contrast.",
+      "components": [
+       {
+        "type": "text",
+        "text": "Clear front photos guarantee accurate pet animation and color matching.",
+        "style": "subtle"
+       }
+      ]
+     }
+    }
+   },
+   {
+    "title": "Cloud Account Sync Protection Highlight",
+    "target_step": "sign_in",
+    "type": "copy",
+    "change": "Update sign-in headline and body copy to stress cloud backup security and pet recovery guarantee.",
+    "why": "8 support emails complained about pets missing or resetting after signing back into their account.",
+    "config": {
+     "sign_in": {
+      "headline": "Secure Your Pet with Cloud Sync",
+      "body": "Signing in automatically backs up your pet's memory, items, and settings so your companion is never lost."
+     }
+    }
+   },
+   {
+    "title": "Starter Accessory Unlock Badge on Path Selection",
+    "target_step": "choose_path",
+    "type": "incentive",
+    "change": "Show a complimentary starter hat/accessory badge on path options to motivate immediate path completion.",
+    "why": "Conversion at choose_path is 76.2%; offering an early visual reward increases motivation to progress.",
+    "config": {
+     "choose_path": {
+      "components": [
+       {
+        "type": "badge",
+        "text": "Includes Free Starter Toy Pack",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   {
+    "title": "Spotlight Desktop Launch Celebration Screen",
+    "target_step": "finish",
+    "type": "layout",
+    "change": "Switch home intro screen layout to spotlight mode with a celebratory animated pet welcoming the user to their desktop.",
+    "why": "Finish conversion drops to 64.8%, and 3 users reported being unaware that the app had opened on their desktop.",
+    "config": {
+     "home_intro": {
+      "layout": "spotlight",
+      "headline": "Your Desktop Companion is Ready!",
+      "body": "Look at your desktop! Your pet is waiting for its first interaction.",
+      "button_label": "Start Playing Now",
+      "components": [
+       {
+        "type": "animation",
+        "asset": "asset:pet_spawn_celebration",
+        "style": "playful",
+        "action": "play"
+       }
+      ]
+     }
+    }
+   },
+   {
+    "title": "System Tray Alert Prompt on Finish Screen",
+    "target_step": "finish",
+    "type": "notification",
+    "change": "Enable desktop notification prompt options on home intro screen so users receive alerts when pet events trigger.",
+    "why": "3 emails reported desktop pet not showing or app not appearing, likely due to app minimizing to system tray unrecognized.",
+    "config": {
+     "home_intro": {
+      "notify_when_ready": true,
+      "hint": "We will notify you in the desktop system tray when your pet needs attention."
+     }
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,472 @@
+{
+ "round": 4,
+ "starts_week": 4,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.8408859,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Cloud Sync & Persistent Account Sign-In Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in screen with explicit account persistence guarantees, highlighting cloud pet sync so users know their pet will not be reset when logging back in.",
+   "why": "8 support tickets reported missing or reset pets after signing back in, and the sign_in step drops 27.1% of users.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Save & Sync Your Pet",
+     "body": "Your pet progress and customization are backed up securely to your account across restarts.",
+     "layout": "split",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "badge",
+        "text": "Cloud Backup Enabled",
+        "style": "highlight"
+       },
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Continue with Google",
+        "action": "next",
+        "style": "rounded"
+       },
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Continue with Email",
+        "action": "next",
+        "style": "plain"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Interactive Adoption Certificate & Personality Setup",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate step into a two-column interactive parchment preview where users set pet traits and inspect official adoption details simultaneously.",
+   "why": "Adoption has a 60.9% conversion rate with long completion times (mean 1017s), showing friction in finalizing adoption.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Finalize Your Desktop Pet's Official Certificate",
+     "body": "Choose a name and personality trait to seal your official desktop adoption paper.",
+     "layout": "two_column",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "name_input",
+        "text": "Name your pet...",
+        "style": "large"
+       },
+       {
+        "role": "certificate",
+        "type": "choice_cards",
+        "text": "Personality Trait",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[0]': a name_input cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Post-Adoption Desktop Controls Quick-Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a dedicated visual guide screen right before home intro showing hotkeys and taskbar controls to hide, summon, and interact with the desktop pet.",
+   "why": "3 support emails reported confusion on how to control or hide the pet, and finish step conversion is only 64.8%.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_controls_guide",
+     "home_intro"
+    ],
+    "new_desktop_controls_guide": {
+     "headline": "How to Control Your Desktop Pet",
+     "body": "Use quick shortcuts to interact, move, or hide your companion anytime.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Press Alt+P to summon or hide",
+       "style": "highlight"
+      },
+      {
+       "type": "text",
+       "text": "Right-click the pet anytime to open the action wheel.",
+       "style": "plain"
+      },
+      {
+       "type": "button",
+       "label": "Got It!",
+       "action": "next",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new quick-guide screen inside onboarding prior to the home intro."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.08,
+   "score": 5.42,
+   "score_note": "Addresses major drop-off at finish step supported directly by user emails, but requires a new screen.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 66.8
+  },
+  {
+   "title": "Live Generation Progress & Status Health Checker",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Transform the waiting screen into a dynamic loading engine view with active status updates and an estimate countdown so users know pet generation is actively processing.",
+   "why": "The waiting step has a long mean duration of 2336s and 3 support tickets complained about pets failing to show up on the desktop.",
+   "config": {
+    "waiting": {
+     "headline": "Hatching Your Desktop Pet...",
+     "body": "We are generating custom assets and preparing your pet's desktop home.",
+     "show_progress": true,
+     "show_time_estimate": true,
+     "notify_when_ready": true,
+     "layout": "stage",
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "progress",
+        "text": "Generating pet animations...",
+        "style": "emphasis"
+       },
+       {
+        "role": "wait_status",
+        "type": "badge",
+        "text": "Desktop Renderer: Ready",
+        "style": "calm"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.replace.wait_status[1]': a badge cannot do the wait_status job (use ['animation', 'mascot', 'preview', 'progress', 'text', 'timer', 'tip_carousel'])"
+   }
+  },
+  {
+   "title": "Stage View Path Selection Cards",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Re-layout the path selection screen into a stage spotlight view highlighting custom pet creation vs instant adopt options.",
+   "why": "choose_path has a high mean duration of 514s indicating decision paralysis during path selection.",
+   "config": {
+    "choose_path": {
+     "headline": "Select Your Adoption Experience",
+     "body": "Pick quick adopt for instant play or custom companion to create your unique pet.",
+     "layout": "stage",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the path selection screen while preserving options for both adoption and custom pet creation."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 4.17,
+   "score_note": "Targets high mean duration on choose_path step, supported by funnel duration data."
+  },
+  {
+   "title": "Custom Photo Quality Helper Checklist",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add an inline quality visual tips checklist to the photo upload screen suggesting clear lighting and single-subject photos.",
+   "why": "3 support tickets noted custom pet generation failing or producing distorted results during creation.",
+   "config": {
+    "upload_photos": {
+     "hint": "Best results: clear lighting, front-facing pet, uncluttered background.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Good lighting | Clear face | Single animal",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'upload_photos.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Starter Accessory Reward on Sign-In",
+   "target_step": "sign_in",
+   "type": "incentive",
+   "change": "Offer an exclusive launch accessory badge on the sign-in screen granted immediately upon account creation.",
+   "why": "Sign-in step drops 27.1% of users; adding a concrete immediate reward increases account sign-up motivation.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In & Unlock Exclusive Gold Crown Accessory",
+     "body": "Create or sign into your account to receive a free welcome gift for your pet.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Free Gift: Royal Crown Unlocked",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.components[0].text' talks about price or money"
+   }
+  },
+  {
+   "title": "Clear Onboarding Story Duration Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update the onboarding story intro headline to explicitly promise a 2-minute setup time.",
+   "why": "choose_path conversion is 76.2% with a long mean duration; framing setting up as ultra-fast sets expectations.",
+   "config": {
+    "story": {
+     "headline": "Meet Your New Desktop Companion in Under 2 Minutes",
+     "body": "Bring an adorable animated pet to live right on your screen with quick, simple setup steps.",
+     "button_label": "Start Quick Setup"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates story headline copy while retaining the pet introduction."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.04,
+   "score": 5.42,
+   "score_note": "Low cost copy tweak targeting choose_path decision delay without support mail evidence.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 104.4
+  },
+  {
+   "title": "Desktop Display Health Pre-Check Notice",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add a desktop display render status tip on the wait screen confirming graphics compatibility while pet assets load.",
+   "why": "3 support emails reported pets not appearing on desktop or app failing to launch post-onboarding.",
+   "config": {
+    "waiting": {
+     "hint": "Checking display overlay permissions... Pet will land on your main taskbar when ready.",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Did you know? You can drag your pet anywhere on your desktop screen once loaded.",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds valid display compatibility hints to the waiting screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 5.0,
+   "score_note": "Addresses technical display issues noted in support mails on the relatively high-performing home step.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 104.4
+  },
+  {
+   "title": "Desktop Companion Welcome & First Interaction Prompt",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Add an interactive mascot callout on the home intro screen showing how to feed and click the pet for the first time.",
+   "why": "Finish conversion drops to 64.8% and users express confusion after onboarding on how to talk to or interact with pets.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Pet is Live on Your Desktop!",
+     "body": "Click on your new friend to open the interaction menu or drag them around your monitor.",
+     "layout": "spotlight",
+     "components": [
+      {
+       "type": "mascot",
+       "text": "Say hello to your new pet!",
+       "style": "playful"
+      },
+      {
+       "type": "button",
+       "label": "Start Playing",
+       "action": "next",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the home intro screen, which is explicitly allowed within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.06,
+   "score": 5.83,
+   "score_note": "Prompts first interaction at the weak finish step, targeting reported post-onboarding confusion."
+  }
+ ],
+ "picked": [
+  "Post-Adoption Desktop Controls Quick-Guide Screen",
+  "Clear Onboarding Story Duration Headline",
+  "Desktop Display Health Pre-Check Notice"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 275.6,
+ "decisions": [
+  {
+   "test": "sim-12",
+   "title": "Clear Onboarding Story Duration Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 104.4,
+   "result": {
+    "step": {
+     "control": 0.744,
+     "treatment": 0.7867,
+     "lift": 0.0573,
+     "lift_se": 0.0214,
+     "p": 0.00583
+    },
+    "finish": {
+     "control": 0.1707,
+     "treatment": 0.1673,
+     "lift": -0.0195,
+     "lift_se": 0.0794,
+     "p": 0.807546
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "won, shipped",
+   "score": 5.42,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": 0.0386,
+   "finishers_delta_hidden": 9.74
+  },
+  {
+   "test": "sim-13",
+   "title": "Desktop Display Health Pre-Check Notice",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 104.4,
+   "result": {
+    "step": {
+     "control": 0.8543,
+     "treatment": 0.8557,
+     "lift": 0.0015,
+     "lift_se": 0.0268,
+     "p": 0.953983
+    },
+    "finish": {
+     "control": 0.1607,
+     "treatment": 0.1773,
+     "lift": 0.1037,
+     "lift_se": 0.0895,
+     "p": 0.223237
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.0,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": 0.0412,
+   "finishers_delta_hidden": 10.4
+  }
+ ],
+ "shipped": [
+  "Clear Onboarding Story Duration Headline"
+ ],
+ "ends_week": 4,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

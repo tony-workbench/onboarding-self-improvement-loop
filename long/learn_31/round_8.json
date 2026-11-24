@@ -1,0 +1,446 @@
+{
+ "round": 8,
+ "starts_week": 8,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.87908636352,
+  "finish": 0.7855056
+ },
+ "weights_used": {
+  "impact": 0.285,
+  "evidence": 0.468,
+  "confidence": 2.346,
+  "cost": 0.901
+ },
+ "lessons_used": [
+  "Predictions were generally too high compared to noise-corrected results across most tests.",
+  "Evidence is still thin for adoption copy, choose_path layout, finish copy, finish new_flow, finish new_screen, finish notification, home new_flow, sign_in hint, sign_in incentive, and sign_in layout because each has only 1 test.",
+  "No clear effect was seen for choose_path reorder and home notification changes across 2 tests each.",
+  "Home wait_info changes were helpful in 1 test (+4.2%), while 3 other tests showed no clear effect.",
+  "Adoption redesign (3 tests), adoption hint (2 tests), choose_path copy (2 tests), sign_in notification (2 tests), and sign_in reorder (2 tests) hurt performance or showed no clear effect."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop Display Verification Step Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Inserts a dedicated desktop visibility setup screen before final completion to help users locate their pet and test tray controls.",
+   "why": "Support mail shows 3 users reported pets missing on desktop upon launch, and 3 users were confused about how to hide or interact with the pet.",
+   "config": {
+    "home_intro": {
+     "_order": [
+      "story",
+      "choose_path",
+      "sign_in",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "waiting",
+      "new_desktop_display_verify",
+      "home_intro"
+     ]
+    },
+    "new_desktop_display_verify": {
+     "headline": "Locate Your Pet on Desktop",
+     "body": "Your pet lives right on your screen. Check your system tray to adjust visibility and toggle controls at any time.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "mascot",
+       "style": "playful",
+       "action": "next"
+      },
+      {
+       "type": "text",
+       "text": "Look at the bottom right corner of your taskbar for pet quick settings.",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Two Column Pet Selector Layout",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Rebuilds the friend selection screen into a side-by-side layout displaying pet stats and instant desktop behavior previews.",
+   "why": "Adoption has the highest drop-off in the funnel (60.9% conversion), indicating users need clearer visuals before committing.",
+   "config": {
+    "pick_friend": {
+     "layout": "two_column",
+     "headline": "Choose Your Desktop Companion",
+     "body": "Select a companion personality to watch live animations before confirming adoption.",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "style": "rounded",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Interactive Desktop Pet Command Setup Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Transforms the home intro into a guided checklist flow where users practice summoning, moving, and hiding their desktop pet.",
+   "why": "Support mailbox received multiple complaints post-onboarding asking how to control, minimize, or speak with the pet.",
+   "config": {
+    "home_intro": {
+     "layout": "checklist",
+     "headline": "Master Your Pet Controls",
+     "body": "Try these 3 quick shortcuts now to get comfortable managing your desktop friend.",
+     "components": [
+      {
+       "type": "checklist",
+       "style": "emphasis"
+      },
+      {
+       "type": "button",
+       "label": "Complete Practice",
+       "style": "rounded",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns home intro within allowed onboarding boundaries."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.05,
+   "score": 4.19,
+   "score_note": "Support mail directly targets pet controls at finish step; past new_flow test was positive (+9.4%) but only tested once.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 84.1
+  },
+  {
+   "title": "Stage Mode Path Selection Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Rebuilds the initial onboarding path screen into a spotlighted stage layout featuring animated companion previews.",
+   "why": "Path selection sees a high mean time of 514s despite a fast median (8s), showing hesitation for users exploring options.",
+   "config": {
+    "choose_path": {
+     "layout": "stage",
+     "headline": "How Would You Like to Create Your Pet?",
+     "body": "Pick a quick preset companion or customize your pet from scratch.",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Photo Clarity Guidelines Callout",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Adds explicit photo lighting and angle guidance right above the image uploader component.",
+   "why": "Support tickets highlight 3 cases of custom pet rendering failures or malformed models caused by poor source images.",
+   "config": {
+    "upload_photos": {
+     "hint": "For best results, upload a clear front-facing photo with good lighting and no background clutter.",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Asks for personal information (a user photo)"
+   }
+  },
+  {
+   "title": "Account Sync Pet Recovery Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Adds a clear hint on the sign-in screen explaining how signing into an existing account restores previous pets.",
+   "why": "The largest volume of support emails (8 messages) reported missing pets after re-authenticating with a different method.",
+   "config": {
+    "sign_in": {
+     "hint": "Use your primary email to instantly sync and preserve all existing desktop pets.",
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Companion Setup Status Monitor",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays real-time asset rendering milestones and time estimates on the waiting screen.",
+   "why": "The adoption waiting step takes a median of 201 seconds and mean 2336 seconds, causing potential user abandonment.",
+   "config": {
+    "waiting": {
+     "headline": "Building Your Desktop Companion",
+     "body": "We are generating 3D behavior models and system tray integration.",
+     "show_time_estimate": true,
+     "tip_delay_seconds": 15
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enhances waiting screen status monitor while retaining pet creation indicator."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.018,
+   "score": 4.69,
+   "score_note": "Addresses long wait times on home step; historical tests average +1.8% lift across 4 runs.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 159.2
+  },
+  {
+   "title": "Welcome Starter Toy Unlocking Bonus",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Offers an exclusive starter desk accessory badge upon finishing the final welcome step.",
+   "why": "Final onboarding conversion sits at 23.4% overall, so giving an instant reward boosts completion momentum.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Pet is Ready + Bonus Toy Unlocked!",
+     "body": "Finish setup to receive an exclusive desktop ball toy inside your pet inventory.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Free Starter Accessory",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions bonus toys and free extras ('Free Starter Accessory')."
+   }
+  },
+  {
+   "title": "Desktop Life Companion Onboarding Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Updates headline and body copy on the path selection screen to emphasize lightweight screen companionship.",
+   "why": "Clarifying app expectations upfront improves downstream onboarding retention across all paths.",
+   "config": {
+    "choose_path": {
+     "headline": "Bring an Interactive Friend to Your Desktop",
+     "body": "Choose preset companions or build a custom friend that lives right alongside your everyday work."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates path selection copy while preserving both choices."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.027,
+   "score": 3.12,
+   "score_note": "Low-cost copy change, but choose_path copy changes reduced conversion (-2.7%) across 2 prior tests.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 159.2
+  },
+  {
+   "title": "System Tray Completion Alert Toggle",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Adds a notification option during the pet generation wait screen to alert users when their pet is ready on desktop.",
+   "why": "Mean wait time on the generation screen reaches 2336s, causing users to minimize or forget the desktop application.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "hint": "We'll send a quick desktop sound alert when your pet finishes rendering."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds completion notification toggle on waiting screen within onboarding limits."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.006,
+   "score": 1.75,
+   "score_note": "Targets high wait time on home step, but home notifications showed no positive effect (-0.6%) across 2 tests."
+  }
+ ],
+ "picked": [
+  "Interactive Desktop Pet Command Setup Flow",
+  "Companion Setup Status Monitor",
+  "Desktop Life Companion Onboarding Headline"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 402.5,
+ "decisions": [
+  {
+   "test": "sim-30",
+   "title": "Interactive Desktop Pet Command Setup Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 84.1,
+   "result": {
+    "step": {
+     "control": 0.7311,
+     "treatment": 0.8031,
+     "lift": 0.0984,
+     "lift_se": 0.032,
+     "p": 0.001225
+    },
+    "finish": {
+     "control": 0.1777,
+     "treatment": 0.1917,
+     "lift": 0.0788,
+     "lift_se": 0.0586,
+     "p": 0.162302
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 4.19,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.0724,
+   "finishers_delta_hidden": 39.14
+  },
+  {
+   "test": "sim-31",
+   "title": "Companion Setup Status Monitor",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 159.2,
+   "result": {
+    "step": {
+     "control": 0.847,
+     "treatment": 0.8535,
+     "lift": 0.0076,
+     "lift_se": 0.0203,
+     "p": 0.706241
+    },
+    "finish": {
+     "control": 0.1863,
+     "treatment": 0.1813,
+     "lift": -0.0268,
+     "lift_se": 0.053,
+     "p": 0.61712
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.69,
+   "predicted_lift": 0.018,
+   "true_lift_hidden": 0.0361,
+   "finishers_delta_hidden": 19.52
+  },
+  {
+   "test": "sim-32",
+   "title": "Desktop Life Companion Onboarding Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 159.2,
+   "result": {
+    "step": {
+     "control": 0.7333,
+     "treatment": 0.717,
+     "lift": -0.0223,
+     "lift_se": 0.0155,
+     "p": 0.156486
+    },
+    "finish": {
+     "control": 0.1863,
+     "treatment": 0.197,
+     "lift": 0.0572,
+     "lift_se": 0.0561,
+     "p": 0.293922
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.12,
+   "predicted_lift": -0.027,
+   "true_lift_hidden": -0.0255,
+   "finishers_delta_hidden": -13.79
+  }
+ ],
+ "shipped": [
+  "Interactive Desktop Pet Command Setup Flow"
+ ],
+ "ends_week": 8,
+ "weights_next": {
+  "impact": 0.278,
+  "evidence": 0.469,
+  "confidence": 2.594,
+  "cost": 0.658
+ },
+ "lessons_next": [
+  "Predictions were generally too high compared to noise-corrected results across most tests.",
+  "Evidence is still thin for adoption copy, choose_path layout, finish copy, finish new_screen, finish notification, home new_flow, sign_in hint, sign_in incentive, and sign_in layout because each has only 1 test.",
+  "Interactive finish flows (finish new_flow) were consistently helpful, winning across 2 tests.",
+  "No clear effect was seen for choose_path reorder and home notification changes across 2 tests each.",
+  "Home wait_info changes were helpful in 1 test (+4.2%), while 4 other tests showed no clear effect.",
+  "Adoption redesign (3 tests), choose_path copy (3 tests), adoption hint (2 tests), sign_in notification (2 tests), and sign_in reorder (2 tests) hurt performance or showed no clear effect."
+ ]
+}

@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, new_screen] Pet posture selection new screen in adoption: Add a new posture selection screen in adoption allowing users to select how their pet rests on the desktop screen.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_pet_posture\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_pet_posture\": {\"headline\": \"Choose Desktop Idle Posture\", \"body\": \"Select how your desktop pet rests on your screen while you work.\", \"layout\": \"grid\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Choose Posture\", \"action\": \"choose\", \"style\": \"emphasis\"}]}}\n1: [sign_in, redesign] Sign in account choice grid layout redesign: Redesign the sign-in screen into a grid layout emphasizing existing account login versus new account creation.\n   config: {\"sign_in\": {\"layout\": \"grid\", \"headline\": \"Sign In to Keep Your Pet Safe\", \"body\": \"Log in with your existing account to restore existing pets or back up your new companion.\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"button\", \"label\": \"Continue with Existing Account\", \"action\": \"next\", \"style\": \"emphasis\"}, {\"role\": \"sign_in_options\", \"type\": \"text\", \"text\": \"Signing in ensures your pets sync across reinstalls.\", \"style\": \"subtle\"}]}}}\n2: [finish, new_flow] Desktop pet wake up celebration flow: Introduce a mascot celebration stage flow on the home intro screen when desktop setup completes.\n   config: {\"home_intro\": {\"layout\": \"stage\", \"headline\": \"Your Companion Is Awake!\", \"body\": \"Your pet is now active on your desktop screen.\", \"components\": [{\"type\": \"mascot\", \"asset\": \"asset:mascot_awake\", \"style\": \"playful\"}, {\"type\": \"sound\", \"asset\": \"asset:chime\", \"action\": \"play\"}]}}\n3: [choose_path, new_screen] Path choice preview gallery new screen: Insert a preview screen right before choose path showing a carousel of sample pets created via each path.\n   config: {\"_order\": [\"story\", \"new_path_preview\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_path_preview\": {\"headline\": \"Explore Companion Styles\", \"body\": \"Compare pre-made friends with custom photo creation before deciding.\", \"layout\": \"carousel\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:styles_preview\", \"style\": \"large\"}, {\"type\": \"button\", \"label\": \"Continue to Selection\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n4: [home, wait_info] Desktop render stage progress indicator: Display a explicit render progress bar component with status updates during the rendering wait screen.\n   config: {\"waiting\": {\"show_progress\": true, \"hint\": \"Preparing desktop graphics assets and companion physics...\", \"components\": [{\"type\": \"progress\", \"text\": \"Rendering desktop companion engine\", \"style\": \"emphasis\"}]}}\n5: [finish, copy] Desktop pet visibility guidance body copy update: Update the home intro text to explain how to summon, control, or hide the desktop pet via the system tray.\n   config: {\"home_intro\": {\"body\": \"Your pet lives on your desktop! Right-click the tray icon to interact, hide, or summon your companion anytime.\"}}\n6: [adoption, layout] Adoption certificate compact preview layout: Switch the adoption certificate screen to a compact layout.\n   config: {\"adoption_certificate\": {\"layout\": \"compact\"}}\n7: [sign_in, hint] Account switch pet recovery reminder hint: Add a hint box on the sign in screen reminding returning users to sign in with their original account method.\n   config: {\"sign_in\": {\"hint\": \"Already have a pet? Sign in with your original account to restore your companion without starting over.\"}}\n8: [choose_path, incentive] Path selection quick start badge incentive: Add a quick-setup highlight badge to the choose path screen.\n   config: {\"choose_path\": {\"components\": [{\"type\": \"badge\", \"text\": \"Fastest Setup: 1 Minute\", \"style\": \"highlight\"}]}}\n9: [home, notification] Background readiness desktop system notification: Enable background notifications on the waiting screen to alert users when rendering is finished.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"hint\": \"We'll notify you when your desktop pet is ready to play.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a posture selection screen inside onboarding is allowed and preserves all required steps and screen jobs."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the sign-in screen layout while maintaining account options inside onboarding complies with all rules."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating the home intro screen layout and adding mascot celebration components within onboarding is permitted."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a path choice preview gallery screen before selection inside onboarding preserves required steps and rules."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a render progress indicator component to the waiting screen is allowed and enhances screen job context."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating body copy on the home intro screen to explain tray controls is permitted within onboarding."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Switching the adoption certificate layout to compact is an allowed redesign that preserves required functionality."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a helpful sign-in hint for returning users complies with all onboarding rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a quick setup badge component to path selection is allowed and does not violate fair design rules."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling background readiness notification alerts on the waiting screen is permitted inside onboarding."
+   }
+  ]
+ }
+}

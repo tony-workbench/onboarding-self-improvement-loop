@@ -1,0 +1,526 @@
+{
+ "round": 7,
+ "starts_week": 7,
+ "funnel": {
+  "choose_path": 0.8036814,
+  "sign_in": 0.729,
+  "adoption": 0.7178283000000001,
+  "home": 0.8699136422399998,
+  "finish": 0.7183080000000001
+ },
+ "weights_used": {
+  "impact": 0.438,
+  "evidence": 0.111,
+  "confidence": 1.989,
+  "cost": 1.462
+ },
+ "lessons_used": [
+  "Predictions were generally too high in early tests, but winning new_flow changes were consistently under-predicted.",
+  "sign_in hint and sign_in copy changes showed no clear effect across 2 tests each.",
+  "choose_path layout and finish copy changes showed no clear effect across 2 tests each.",
+  "home wait_info changes showed no clear effect across 2 tests.",
+  "Evidence remains thin for home new_flow and home notification due to mixed results across 2 tests each.",
+  "Evidence is still thin for any kind of change tested only once."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Adoption Ceremony Experience Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Transform the adoption certificate step into an interactive ceremony experience where users sign their name with visual sparkles.",
+   "why": "Adoption loses 28.2% of users with high mean duration (1017s). Making pet creation feel memorable increases emotional investment and completion.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "headline": "Official Adoption Ceremony",
+     "body": "Welcome your new companion into your digital home with an official signing ceremony.",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:ceremony_sparkles",
+       "style": "playful"
+      },
+      {
+       "type": "name_input",
+       "text": "Name your companion",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.components[1]': inputs may only ask for the pet's name"
+   }
+  },
+  {
+   "title": "Story Scroll Path Discovery Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the welcome story into a continuous story scroll layout that showcases paths visually as users scroll down.",
+   "why": "The choose_path step has a mean duration of 514s indicating hesitation. A story scroll layout seamlessly introduces choice cards.",
+   "config": {
+    "story": {
+     "layout": "story_scroll",
+     "headline": "Begin Your Pet Companion Journey",
+     "body": "Scroll to explore custom creations or adoption paths tailored to your desktop experience.",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "choice_cards",
+        "text": "Select your journey path",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'story.replace.intro_story[0]': a choice_cards cannot do the intro_story job (use ['animation', 'button', 'image', 'mascot', 'text', 'video'])"
+   }
+  },
+  {
+   "title": "Desktop Pet Care Basics Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a dedicated onboarding screen demonstrating desktop controls, right-click menus, and pet interaction features before completing setup.",
+   "why": "Support receives frequent emails under [after_onboarding, confusion] asking how to control, hide, or talk to the pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_care_basics"
+    ],
+    "home_intro": {
+     "headline": "Your Desktop Pet is Ready!",
+     "body": "Let us quickly review how to interact with your pet on your screen."
+    },
+    "new_care_basics": {
+     "headline": "How to Interact with Your Pet",
+     "body": "Right-click your pet on the desktop to talk, feed, or hide them at any time.",
+     "components": [
+      {
+       "type": "image",
+       "asset": "asset:desktop_controls_demo",
+       "style": "plain"
+      },
+      {
+       "type": "button",
+       "label": "Got it!",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a care basics onboarding screen after home_intro is allowed and preserves all required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.034,
+   "score": 0.92,
+   "score_note": "Adding a new screen in finish step increases dropoff; prior test yielded -3.4%."
+  },
+  {
+   "title": "Deferred Sign In Path Reorder",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move the sign_in screen after pet creation screens (pick_friend and upload_photos), allowing users to pick or design their pet before authenticating.",
+   "why": "sign_in early in the flow drops 27.1% of users. Allowing users to build affinity with their pet first increases sign-in motivation.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "sign_in",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "sign_in": {
+     "headline": "Save Your New Companion",
+     "body": "Sign in now to sync your chosen companion to the cloud and ensure they are never lost."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Moving the sign-in step after pet creation is explicitly permitted and retains all required onboarding steps."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.045,
+   "score": 3.77,
+   "score_note": "Deferring sign_in reduces high early dropoff (27.1%) by building pet affinity first.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": null
+  },
+  {
+   "title": "Companion Stage Live Audio Waiting Room",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Add an ambient sound player and stage loading animation on the waiting screen while pet generation processes in the background.",
+   "why": "The waiting step has a long mean duration of 2336s and support received bug reports of users thinking the app stalled during pet generation.",
+   "config": {
+    "waiting": {
+     "layout": "stage",
+     "headline": "Your Companion is Hatching...",
+     "body": "Listen to gentle ambient sounds while your desktop pet is prepared for arrival.",
+     "components": [
+      {
+       "type": "sound",
+       "asset": "asset:ambient_hatching",
+       "action": "play",
+       "style": "calm"
+      },
+      {
+       "type": "timer",
+       "label": "Preparing desktop environment",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding ambient audio and visual loading elements to the waiting screen keeps its core job of showing the pet being made."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.025,
+   "score": 3.49,
+   "score_note": "Addresses long stall times and user confusion; new_flow changes tend to perform well.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": null
+  },
+  {
+   "title": "Special Adoption Certificate Crest Incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Display a verified ownership crest badge on the adoption certificate screen to celebrate completing pet adoption.",
+   "why": "Adoption conversion drops off 28.2%. Visual incentives like verified crests increase pride of completion.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Official Digital Pet Adoption Certificate",
+     "body": "Complete adoption to receive your verified digital ownership crest.",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Verified Desktop Companion Crest",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a verified companion crest badge maintains the official stamp requirement on the adoption certificate without violating pricing rules."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.02,
+   "score": 5.5,
+   "score_note": "Adoption has high dropoff (28.2%); visual incentives show positive trend.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": null
+  },
+  {
+   "title": "Account Retrieval & Lost Pet Recovery Option",
+   "target_step": "sign_in",
+   "type": "notification",
+   "change": "Add explicit account recovery guidance text on the sign-in screen reminding returning users to use their original sign-in method.",
+   "why": "Support received 8 emails regarding pets missing or reset after signing in again with a secondary account.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Your Pet Account",
+     "body": "Sign in with your existing account to recover existing pets and prevent account resets.",
+     "components": [
+      {
+       "type": "text",
+       "text": "Looking for a previously adopted pet? Make sure to use your original sign-in provider.",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding sign-in recovery guidance text is allowed inside onboarding and does not violate any base rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 6.78,
+   "score_note": "Directly targets explicit support complaints regarding lost account access via simple config."
+  },
+  {
+   "title": "Full Bleed Companion Discovery Showcase",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch the pet selection screen layout to full bleed, highlighting full artwork previews of available pets.",
+   "why": "Pet adoption choice takes median 89s. Full bleed visual presentation makes selection faster and more engaging.",
+   "config": {
+    "pick_friend": {
+     "layout": "full_bleed",
+     "headline": "Meet Your Next Desktop Companion",
+     "body": "Explore available pets in full visual resolution."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating the pet selection screen to a full-bleed layout preserves its function of letting the user pick a pet."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.002,
+   "score": 2.65,
+   "score_note": "Adoption layout changes showed negative lift (-0.2%) in prior testing."
+  },
+  {
+   "title": "Desktop Display Verification Readiness Headline",
+   "target_step": "home",
+   "type": "copy",
+   "change": "Update waiting screen text to explicitly inform users that the pet will appear directly on their desktop screen once loading completes.",
+   "why": "Support received 3 emails reporting pets not appearing on desktop or users missing the initial spawn window.",
+   "config": {
+    "waiting": {
+     "headline": "Preparing Companion Desktop Display",
+     "body": "Ensure your desktop is visible. Your pet will spawn directly on your main monitor once loading finishes."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating waiting screen text to clarify desktop appearance still conveys that the pet is being prepared."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.005,
+   "score": 4.21,
+   "score_note": "Low cost copy tweak addressing minor support email issue, but copy changes have minimal impact."
+  },
+  {
+   "title": "Desktop Pet Sound & Behavior Setup Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a pre-arrival behavior preferences screen where users configure initial pet sound effects and activity levels.",
+   "why": "Finish step conversion drops 28.2% and mean time is 5815s. Giving users control over pet volume and behavior reduces post-onboarding confusion.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_behavior_setup",
+     "home_intro"
+    ],
+    "new_behavior_setup": {
+     "headline": "Pet Behavior & Interaction Setup",
+     "body": "Choose how active and vocal you want your pet to be on your desktop.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Enable desktop sound effects",
+       "style": "rounded"
+      },
+      {
+       "type": "button",
+       "label": "Save Preferences",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a pet behavior setup screen before home_intro is permitted and maintains all required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.03,
+   "score": 0.82,
+   "score_note": "Adding setup screens during finish increases friction on a 28.2% dropoff step."
+  }
+ ],
+ "picked": [
+  "Deferred Sign In Path Reorder",
+  "Companion Stage Live Audio Waiting Room",
+  "Special Adoption Certificate Crest Incentive"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-27",
+   "title": "Deferred Sign In Path Reorder",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7318,
+     "treatment": 0.7545,
+     "lift": 0.031,
+     "lift_se": 0.0249,
+     "p": 0.206212
+    },
+    "finish": {
+     "control": 0.264,
+     "treatment": 0.2593,
+     "lift": -0.0177,
+     "lift_se": 0.0603,
+     "p": 0.771234
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.77,
+   "predicted_lift": 0.045,
+   "true_lift_hidden": 0.0531,
+   "finishers_delta_hidden": 20.7
+  },
+  {
+   "test": "sim-28",
+   "title": "Companion Stage Live Audio Waiting Room",
+   "target_step": "home",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.8677,
+     "treatment": 0.8236,
+     "lift": -0.0508,
+     "lift_se": 0.0225,
+     "p": 0.027814
+    },
+    "finish": {
+     "control": 0.2587,
+     "treatment": 0.2573,
+     "lift": -0.0052,
+     "lift_se": 0.0616,
+     "p": 0.933489
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: worse",
+   "score": 3.49,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": -0.0356,
+   "finishers_delta_hidden": -13.88
+  },
+  {
+   "test": "sim-29",
+   "title": "Special Adoption Certificate Crest Incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7059,
+     "treatment": 0.7083,
+     "lift": 0.0034,
+     "lift_se": 0.0308,
+     "p": 0.912462
+    },
+    "finish": {
+     "control": 0.2673,
+     "treatment": 0.256,
+     "lift": -0.0424,
+     "lift_se": 0.0588,
+     "p": 0.480104
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.5,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": -0.0104,
+   "finishers_delta_hidden": -4.05
+  }
+ ],
+ "shipped": [],
+ "ends_week": 7,
+ "weights_next": {
+  "impact": 0.398,
+  "evidence": 0.105,
+  "confidence": 2.155,
+  "cost": 1.342
+ },
+ "lessons_next": [
+  "Predictions were generally too high in early tests, but winning new_flow changes were consistently under-predicted.",
+  "sign_in hint and sign_in copy changes showed no clear effect across 2 tests each.",
+  "choose_path layout and finish copy changes showed no clear effect across 2 tests each.",
+  "home wait_info changes showed no clear effect across 2 tests.",
+  "Evidence remains thin for home new_flow and home notification due to mixed results across tests.",
+  "Evidence is still thin for any kind of change tested only once."
+ ]
+}

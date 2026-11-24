@@ -1,0 +1,492 @@
+{
+ "round": 3,
+ "starts_week": 3,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.8110854,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.261,
+  "evidence": 0.494,
+  "confidence": 1.234,
+  "cost": 1.011
+ },
+ "lessons_used": [
+  "Reordering the onboarding flow (moving sign-in after selection) was helpful (+13.0%).",
+  "Redesigning screens with interactive elements hurt performance (-7.6%).",
+  "Desktop hint notifications hurt performance (-8.9%), while background notifications showed no clear effect.",
+  "Copy changes and guidelines/hints showed no clear effect.",
+  "Predictions for flow reordering were accurate (+12.0% predicted vs +13.0% measured).",
+  "Predictions were consistently too high for visual redesigns, hint notifications, guidelines, and copy tweaks."
+ ],
+ "carried_retests": [
+  "Presets Fallback Choice on Photo Upload"
+ ],
+ "candidates": [
+  {
+   "title": "Defer Sign-In to End of Onboarding",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move sign-in step to the very end of onboarding after home intro, allowing users to experience pet setup completely before committing to an account.",
+   "why": "Sign-in step currently stalls users (81.1% conversion, mean 567s) and reordering sign-in earlier boosted conversion by +13%. Deferring to the end removes early friction.",
+   "config": {
+    "sign_in": {
+     "headline": "Create account to save your desktop pet",
+     "_order": [
+      "story",
+      "choose_path",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "waiting",
+      "home_intro",
+      "sign_in"
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "field 'sign_in._order' is not adjustable"
+   }
+  },
+  {
+   "title": "Desktop Display Check Screen Before Waiting Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Insert a new screen before pet generation waiting screen to verify desktop display compatibility and screen permissions.",
+   "why": "Support received 3 emails reporting pet not appearing on desktop or app failing to open during desktop initial setup.",
+   "config": {
+    "waiting": {
+     "_order": [
+      "story",
+      "choose_path",
+      "sign_in",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "new_desktop_check",
+      "waiting",
+      "home_intro"
+     ]
+    },
+    "new_desktop_check": {
+     "headline": "Checking Desktop Display Compatibility",
+     "body": "Verifying screen overlay permissions and display drivers before rendering your pet.",
+     "layout": "centered",
+     "button_label": "Continue",
+     "components": [
+      {
+       "type": "progress",
+       "label": "Checking display engine..."
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Preset Pet Quick Selection Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Provide an instant preset pet selection flow that skips custom photo upload steps entirely for users wanting starter pets.",
+   "why": "Adoption stage has the lowest step conversion at 60.9% and takes a median of 89s / mean 1017s due to complex custom photo upload requirements.",
+   "config": {
+    "pick_friend": {
+     "layout": "grid",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Quick Starter Pets",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Preset pet selection layout retains the required pick a friend onboarding step."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.12,
+   "score": 7.06,
+   "score_note": "Adoption step has highest drop-off (60.9%); flow shortcuts historically deliver strong positive lift."
+  },
+  {
+   "title": "Split Grid Layout Redesign for Path Choice",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the path selection screen with a split card layout separating standard pet selection from custom pet creation.",
+   "why": "Choose path drops off to 76.2% conversion with a very high mean duration of 514s, indicating decision paralysis.",
+   "config": {
+    "choose_path": {
+     "layout": "split",
+     "replace": {
+      "path_options": [
+       {
+        "type": "choice_cards",
+        "label": "Select Creation Path",
+        "style": "emphasis",
+        "action": "choose",
+        "role": "path_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Calm Stage Redesign for Waiting Screen",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesign the waiting screen using a non-interactive stage layout focused purely on generation status.",
+   "why": "Home waiting step has a median time of 201s (mean 2336s). Interactive elements previously hurt performance (-7.6%), so a clean non-interactive layout keeps focus simple.",
+   "config": {
+    "waiting": {
+     "layout": "stage",
+     "show_progress": true,
+     "replace": {
+      "wait_status": [
+       {
+        "type": "progress",
+        "label": "Generating desktop pet model...",
+        "role": "wait_status"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the waiting screen maintains the status display of pet generation."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.05,
+   "score": 1.46,
+   "score_note": "Visual screen redesigns consistently hurt conversion (-7.6% previously).",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 107.1
+  },
+  {
+   "title": "Pet Control Cheat Sheet End Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a new cheat sheet screen right after home intro explaining hotkeys and desktop control shortcuts.",
+   "why": "Support received multiple complaints from users who were unclear how to control, hide, or talk to their pet post-onboarding.",
+   "config": {
+    "home_intro": {
+     "_order": [
+      "story",
+      "choose_path",
+      "sign_in",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "waiting",
+      "home_intro",
+      "new_controls_sheet"
+     ]
+    },
+    "new_controls_sheet": {
+     "headline": "Desktop Pet Controls Quick Reference",
+     "body": "Right-click your pet anytime on desktop to open options, hide pet, or toggle pet interaction.",
+     "layout": "card",
+     "button_label": "Start Desktop Pet"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Time Estimate Display on Waiting Screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Enable estimated wait time display on the waiting screen so users know how long generation will take.",
+   "why": "Users spend a median of 201s (mean 2336s) on the home waiting screen, causing drop-offs when waiting times are unknown.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying estimated wait time for pet generation is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.04,
+   "score": 8.54,
+   "score_note": "Wait info on home screen previously measured +3.9% lift and is a low-cost config change."
+  },
+  {
+   "title": "Guest Continuation Flow on Sign-In Screen",
+   "target_step": "sign_in",
+   "type": "new_flow",
+   "change": "Add a Guest Profile button on the sign-in screen allowing users to proceed without immediate account setup.",
+   "why": "Sign-in conversion drops 18.9% of users and support logged issues where sign-in screen fails or stalls.",
+   "config": {
+    "sign_in": {
+     "components": [
+      {
+       "type": "button",
+       "label": "Continue as Guest",
+       "style": "plain",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.components[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Two Column Layout for Path Options Screen",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Switch choose path layout to a two-column structure to clearly differentiate options side-by-side.",
+   "why": "Mean time spent on choose_path is 514s, showing that users take long to compare available options in the default layout.",
+   "config": {
+    "choose_path": {
+     "layout": "two_column"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Changing the choose_path layout to two columns is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.0,
+   "score": 3.78,
+   "score_note": "Layout and visual option changes have shown no positive impact in historical tests.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 107.1
+  },
+  {
+   "title": "Progress Bar and Step Counter on Upload Screen",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Display a progress bar and step counter on the photo upload screen.",
+   "why": "Adoption drops off significantly to 60.9% and has a long mean completion time of 1017s due to unclear upload progress.",
+   "config": {
+    "upload_photos": {
+     "show_step_counter": true,
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress indicators to the photo upload screen is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 5.24,
+   "score_note": "Adoption step loses many users, but hints and visual indicators show negligible historical lift."
+  }
+ ],
+ "picked": [
+  "Calm Stage Redesign for Waiting Screen",
+  "Two Column Layout for Path Options Screen"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 321.3,
+ "decisions": [
+  {
+   "test": "sim-9",
+   "title": "Calm Stage Redesign for Waiting Screen",
+   "target_step": "home",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 107.1,
+   "result": {
+    "step": {
+     "control": 0.8045,
+     "treatment": 0.7937,
+     "lift": -0.0133,
+     "lift_se": 0.0301,
+     "p": 0.659906
+    },
+    "finish": {
+     "control": 0.1813,
+     "treatment": 0.1667,
+     "lift": -0.0809,
+     "lift_se": 0.0732,
+     "p": 0.289376
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 1.46,
+   "predicted_lift": -0.05,
+   "true_lift_hidden": 0.0059,
+   "finishers_delta_hidden": 1.6
+  },
+  {
+   "test": "sim-10",
+   "title": "Two Column Layout for Path Options Screen",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 107.1,
+   "result": {
+    "step": {
+     "control": 0.752,
+     "treatment": 0.7413,
+     "lift": -0.0142,
+     "lift_se": 0.021,
+     "p": 0.5018
+    },
+    "finish": {
+     "control": 0.17,
+     "treatment": 0.1893,
+     "lift": 0.1137,
+     "lift_se": 0.0871,
+     "p": 0.167852
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.78,
+   "predicted_lift": 0.0,
+   "true_lift_hidden": -0.0029,
+   "finishers_delta_hidden": -0.79
+  },
+  {
+   "test": "sim-4",
+   "title": "Presets Fallback Choice on Photo Upload",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "weeks": 2,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 107.1,
+   "result": {
+    "step": {
+     "control": 0.5903,
+     "treatment": 0.6693,
+     "lift": 0.1337,
+     "lift_se": 0.0285,
+     "p": 1e-06
+    },
+    "finish": {
+     "control": 0.193,
+     "treatment": 0.2233,
+     "lift": 0.1572,
+     "lift_se": 0.0585,
+     "p": 0.003808
+    },
+    "users_per_group": 3000,
+    "first_week": {
+     "step": {
+      "control": 0.5971,
+      "treatment": 0.6879,
+      "lift": 0.1521,
+      "lift_se": 0.0392,
+      "p": 2.7e-05
+     },
+     "finish": {
+      "control": 0.218,
+      "treatment": 0.2473,
+      "lift": 0.1346,
+      "lift_se": 0.0754,
+      "p": 0.057273
+     },
+     "users_per_group": 1500
+    },
+    "retest": {
+     "step": {
+      "control": 0.5832,
+      "treatment": 0.6485,
+      "lift": 0.1119,
+      "lift_se": 0.0415,
+      "p": 0.004364
+     },
+     "finish": {
+      "control": 0.168,
+      "treatment": 0.1993,
+      "lift": 0.1865,
+      "lift_se": 0.0917,
+      "p": 0.026685
+     },
+     "users_per_group": 1500
+    }
+   },
+   "outcome": "won after re-test, shipped",
+   "score": 5.42,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": 0.0772,
+   "finishers_delta_hidden": 46.48
+  }
+ ],
+ "shipped": [
+  "Presets Fallback Choice on Photo Upload"
+ ],
+ "ends_week": 3,
+ "weights_next": {
+  "impact": 1.556,
+  "evidence": 0.306,
+  "confidence": 1.348,
+  "cost": 0.79
+ },
+ "lessons_next": [
+  "Reordering the onboarding flow and adding preset fallback choices were helpful.",
+  "Interactive screen redesigns and desktop hint notifications hurt performance.",
+  "Copy changes, guidelines, layout tweaks, and background notifications showed no clear effect.",
+  "Predictions for flow reordering and fallback choices were accurate or slightly underestimated.",
+  "Predictions were consistently too high for copy changes, guidelines, hint notifications, layout tweaks, and visual redesigns."
+ ]
+}

@@ -1,0 +1,562 @@
+{
+ "round": 3,
+ "starts_week": 3,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.7309218,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.116,
+  "evidence": 0.911,
+  "confidence": 1.737,
+  "cost": 0.235
+ },
+ "lessons_used": [
+  "Predictions were generally too high, except for the pet companion redesign where the prediction was too low.",
+  "Redesigning the grid view pet companion was helpful.",
+  "Reordering the onboarding flow to narrative-first performed significantly worse.",
+  "Deferring sign-in after adoption showed no clear effect.",
+  "Adding hints, shortcut guides, desktop notification prompts, or tip carousels showed no clear effect.",
+  "Simplifying the path choice layout showed no clear effect."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Account Recovery and Existing Pet Sync Notice",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in screen options to prominent account status choices and clear warnings regarding multi-account pet loss.",
+   "why": "Support receives 8 emails about pets missing or reset after signing in with a different account during setup.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Sync Your Pet Companion",
+     "body": "Use your primary account so your companion and past adoptions stay linked.",
+     "layout": "card",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "text",
+        "text": "Signing in ensures your desktop companion is backed up safely.",
+        "style": "emphasis"
+       },
+       {
+        "role": "sign_in_options",
+        "type": "badge",
+        "text": "Important: Sign in with your original account to retrieve existing pets",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[1]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Custom Photo Quality Validation Stage",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Insert a new photo validation screen immediately after photo upload to verify image clarity and pet outlines before custom generation.",
+   "why": "Support reported 3 issues where custom pet generation failed or resulted in distorted graphics, causing adoption stalls.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "new_photo_check",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_photo_check": {
+     "headline": "Check Photo Quality",
+     "body": "Ensure your pet photo is clear and well-lit for accurate desktop rendering.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "preview",
+       "label": "Uploaded Photo Preview",
+       "style": "rounded"
+      },
+      {
+       "type": "checklist",
+       "text": "Single pet in frame, Good lighting, Sharp focus",
+       "style": "plain"
+      },
+      {
+       "type": "button",
+       "label": "Confirm & Generate Pet",
+       "action": "next",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a photo quality check screen inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 2.62,
+   "score_note": "Adding a new screen adds friction; evidence comes mainly from support rather than the funnel.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 109.3
+  },
+  {
+   "title": "Desktop Spawn Test Stage",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Add a dedicated desktop render test screen right after waiting to confirm the pet window displays properly on screen.",
+   "why": "Support received 3 emails where pets failed to show on the desktop or the app stalled upon launching to the desktop.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_test",
+     "home_intro"
+    ],
+    "new_desktop_test": {
+     "headline": "Testing Desktop Window Rendering",
+     "body": "Verifying display permissions and desktop overlay compatibility for your pet.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:desktop_test_render",
+       "style": "highlight"
+      },
+      {
+       "type": "text",
+       "text": "Click below if your pet is visible on your screen background.",
+       "style": "plain"
+      },
+      {
+       "type": "button",
+       "label": "Pet Visible, Continue",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a desktop window render test screen inside onboarding."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.0,
+   "score": 1.69,
+   "score_note": "Extra test step increases flow drop-off with low confidence of positive impact."
+  },
+  {
+   "title": "Interactive Adoption Certificate Showcase",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen into a spotlight layout showcasing the companion's assigned personality traits.",
+   "why": "Adoption step has a 1017s mean time and 73.1% conversion rate, indicating friction before final confirmation.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Meet Your Official Companion",
+     "body": "Your companion certificate is ready with custom attributes and personality.",
+     "layout": "spotlight",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "mascot",
+        "asset": "asset:companion_certificate_render",
+        "style": "playful"
+       },
+       {
+        "role": "certificate",
+        "type": "badge",
+        "text": "Certified Desktop Companion",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[0]': a mascot cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Full-Bleed Animated Story Prologue",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the initial story screen into a full-bleed animated intro presenting the world of desktop pets.",
+   "why": "Choose path step has a high mean time of 514s and drop-off rate of nearly 24%.",
+   "config": {
+    "story": {
+     "headline": "Welcome to Your New Desktop Life",
+     "body": "Discover AI companions that live, react, and play right on your monitor screen.",
+     "layout": "full_bleed",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "animation",
+        "asset": "asset:desktop_pet_prologue",
+        "style": "large"
+       },
+       {
+        "role": "intro_story",
+        "type": "button",
+        "label": "Choose My Path",
+        "action": "next",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'story.intro_story' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'video'] with an asset:story/ asset"
+   }
+  },
+  {
+   "title": "Background Generation Audio Notification",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add an audio completion chime and explicit notify toggle on the waiting screen when companion generation finishes.",
+   "why": "The waiting screen has an exceptionally long mean duration of 2336s (nearly 39 minutes) as users tab away.",
+   "config": {
+    "waiting": {
+     "headline": "Generating Your Pet Companion...",
+     "body": "Feel free to minimize this window. We will play a sound when your pet arrives.",
+     "notify_when_ready": true,
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "sound",
+       "asset": "asset:completion_chime",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid enhancement to the waiting screen with notification sound and status details."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.035,
+   "score": 8.78,
+   "score_note": "Funnel clearly shows extreme 39-minute wait time; wait_info changes previously yielded +3.5%.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 109.3
+  },
+  {
+   "title": "Pick Friend Character Selection Split View",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch the character selection screen layout to split view featuring side-by-side animated companion previews.",
+   "why": "Adoption target step conversion drops to 73.1% with long decision times during pet selection.",
+   "config": {
+    "pick_friend": {
+     "headline": "Choose Your Desktop Companion",
+     "body": "Select a friend style to bring onto your screen.",
+     "layout": "split",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "text": "Classic Pixel Pet vs 3D Desktop Buddy",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout update for picking a friend while preserving pet selection functionality."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.15,
+   "score": 8.95,
+   "score_note": "Adoption redesigns previously showed strong +17.5% lift and target step has high drop-off and duration."
+  },
+  {
+   "title": "Path Choice Value Proposition Cards",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Reformat the path selection screen layout to two-column cards comparing custom pet creation against pre-made companion selection.",
+   "why": "23.8% of users drop off at choose_path, spending a median of 8s but mean of 514s due to confusion between pathways.",
+   "config": {
+    "choose_path": {
+     "headline": "Select How You Want to Adopt",
+     "body": "Upload your own photo or pick from ready-to-play desktop companions.",
+     "layout": "two_column",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "text": "Custom Creation: Unique pet built from photo",
+        "style": "emphasis",
+        "action": "choose"
+       },
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "text": "Instant Companion: Ready-to-use pet species",
+        "style": "plain",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Home Intro Stage Greeting Presentation",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign home_intro into a stage layout featuring an interactive companion greeting animation and completion checklist.",
+   "why": "The final completion step has the lowest conversion rate (64.8%) and a mean completion time of 5815s.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Companion Has Arrived!",
+     "body": "Your pet is now active on your computer screen. Click below to start interacting.",
+     "layout": "stage",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "mascot",
+        "asset": "asset:active_pet_greeting",
+        "style": "playful"
+       },
+       {
+        "role": "home_welcome",
+        "type": "button",
+        "label": "Start Playing with Pet",
+        "action": "next",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  },
+  {
+   "title": "Finish Step Desktop Visibility Status Banner",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Add a highlighted status banner to the home intro screen detailing how to locate and activate the desktop companion overlay.",
+   "why": "3 support tickets reported pets not displaying on desktop and 3 tickets asked how to control or hide the pet post-onboarding.",
+   "config": {
+    "home_intro": {
+     "headline": "Setup Complete - Pet is Active",
+     "body": "Look at your desktop taskbar and screen corners to find your companion.",
+     "hint": "Tip: Right-click your pet on screen anytime to access controls, settings, or hide it.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Active on Desktop Taskbar & Main Screen",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of visibility status banner and helpful hint to home intro screen."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.02,
+   "score": 4.9,
+   "score_note": "Finish step has highest drop-off and strong support evidence, but hint changes historically showed negative or no effect.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 71.8
+  }
+ ],
+ "picked": [
+  "Custom Photo Quality Validation Stage",
+  "Background Generation Audio Notification",
+  "Finish Step Desktop Visibility Status Banner"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 290.4,
+ "decisions": [
+  {
+   "test": "sim-9",
+   "title": "Custom Photo Quality Validation Stage",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": 38,
+   "share": 0.5,
+   "planned_harm": 109.3,
+   "result": {
+    "step": {
+     "control": 0.7512,
+     "treatment": 0.59,
+     "lift": -0.2146,
+     "lift_se": 0.0523,
+     "p": 0.000266
+    },
+    "finish": {
+     "control": 0.2159,
+     "treatment": 0.1774,
+     "lift": -0.1786,
+     "lift_se": 0.1198,
+     "p": 0.176058
+    },
+    "users_per_group": 389
+   },
+   "outcome": "stopped early: adoption worse",
+   "score": 2.62,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": -0.1655,
+   "finishers_delta_hidden": -14.58
+  },
+  {
+   "test": "sim-10",
+   "title": "Background Generation Audio Notification",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 109.3,
+   "result": {
+    "step": {
+     "control": 0.8094,
+     "treatment": 0.8278,
+     "lift": 0.0228,
+     "lift_se": 0.0278,
+     "p": 0.406523
+    },
+    "finish": {
+     "control": 0.2033,
+     "treatment": 0.2093,
+     "lift": 0.0295,
+     "lift_se": 0.0737,
+     "p": 0.684707
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.78,
+   "predicted_lift": 0.035,
+   "true_lift_hidden": 0.022,
+   "finishers_delta_hidden": 7.07
+  },
+  {
+   "test": "sim-11",
+   "title": "Finish Step Desktop Visibility Status Banner",
+   "target_step": "finish",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 71.8,
+   "result": {
+    "step": {
+     "control": 0.6694,
+     "treatment": 0.666,
+     "lift": -0.0052,
+     "lift_se": 0.0452,
+     "p": 0.909138
+    },
+    "finish": {
+     "control": 0.2147,
+     "treatment": 0.2153,
+     "lift": 0.0031,
+     "lift_se": 0.07,
+     "p": 0.964553
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.9,
+   "predicted_lift": -0.02,
+   "true_lift_hidden": 0.0087,
+   "finishers_delta_hidden": 2.8
+  }
+ ],
+ "shipped": [],
+ "ends_week": 3,
+ "weights_next": {
+  "impact": 1.045,
+  "evidence": 0.803,
+  "confidence": 1.976,
+  "cost": 0.175
+ },
+ "lessons_next": [
+  "Predictions were generally too high, except for the pet companion redesign where the prediction was too low.",
+  "Redesigning the grid view pet companion was helpful.",
+  "Adding a new validation stage screen performed significantly worse.",
+  "Reordering the onboarding flow to narrative-first performed worse, while deferring sign-in showed no clear effect.",
+  "Adding hints, shortcut guides, notifications, status banners, or tip carousels showed no clear effect.",
+  "Simplifying the path choice layout showed no clear effect."
+ ]
+}

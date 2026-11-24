@@ -1,0 +1,392 @@
+{
+ "round": 13,
+ "starts_week": 13,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7932978,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.063,
+  "evidence": 0.063,
+  "confidence": 0.063,
+  "cost": 3.81
+ },
+ "lessons_used": [
+  "Predictions were mostly too high compared to actual noise-corrected results, except for sign_in notification where the prediction was too low.",
+  "No effect was seen for home new_flow changes across 2 tests.",
+  "No effect was seen for adoption redesign across 2 tests, while another 2 tests made adoption worse.",
+  "No effect was seen for finish new_screen in 1 test, while 1 test made finish worse.",
+  "Sign-in notification was helpful, but with only 1 test, evidence is still thin.",
+  "Evidence is still thin for adoption new_flow, choose_path reorder, sign_in notification, and sign_in reorder, as each has only 1 test."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Upload Photos Carousel Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the photo upload stage into an interactive carousel layout with step-by-step upload cards to make photo creation intuitive.",
+   "why": "Adoption stage drops to 60.9% conversion with long completion time (mean 1017s) and support issues regarding custom pet creation.",
+   "config": {
+    "upload_photos": {
+     "layout": "carousel",
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'upload_photos.photo_upload' does not do the job: needs 1 of ['photo_picker'] with real words"
+   }
+  },
+  {
+   "title": "Account Sync Recovery Screen",
+   "target_step": "sign_in",
+   "type": "new_screen",
+   "change": "Adds a dedicated account verification screen after sign-in to confirm existing pets and data before proceeding.",
+   "why": "Support receives the highest number of complaints (8 emails) regarding missing or reset pets after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in syncs existing pet profiles and saved preferences to this device."
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "new_account_sync_check",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_account_sync_check']"
+   }
+  },
+  {
+   "title": "Sign-In After Photo Selection Reorder",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves sign-in screen to take place right after photo selection, allowing users to invest in photo picking before account creation.",
+   "why": "Sign-in mean time is high (567s) and asking for credentials early before seeing pet options causes drop-off.",
+   "config": {
+    "sign_in": {
+     "headline": "Save Your Custom Pet Profile"
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "sign_in",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid reordering of sign-in within onboarding."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": -0.001,
+   "score": 4.95,
+   "score_note": "Reordering sign-in showed virtually no effect (-0.1%) in previous testing.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 106.0
+  },
+  {
+   "title": "Desktop Controls Setup Checklist Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Transforms the home welcome screen into an interactive checklist flow explaining pet controls, tray icon commands, and hiding options.",
+   "why": "Finish conversion drops to 64.8% and support users report post-onboarding confusion on how to control or hide the pet.",
+   "config": {
+    "home_intro": {
+     "layout": "checklist",
+     "headline": "Quick Desktop Pet Controls Guide",
+     "body": "Follow these quick tips to easily control, interact with, or hide your companion.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Right-click pet for instant controls & hide options",
+       "style": "emphasis"
+      },
+      {
+       "type": "checklist",
+       "text": "Use the desktop tray menu to access app settings",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of the home intro overlay layout."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.015,
+   "score": 0.26,
+   "score_note": "Strong evidence from support, but introducing new flows routinely regresses conversion.",
+   "slot": "big move"
+  },
+  {
+   "title": "Ready Desktop Notification Alert",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Adds a desktop notification option and clear status message during pet generation on the waiting screen.",
+   "why": "Home waiting screen has a high mean time (2336s), causing users to wander off while the pet renders.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "tip_delay_seconds": 15,
+     "hint": "Feel free to minimize this window. We'll send a system tray notification when your pet arrives!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid update to waiting screen notification settings and tips."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 4.95,
+   "score_note": "Targets high waiting duration; notification interventions have shown positive results.",
+   "slot": "best score"
+  },
+  {
+   "title": "Photo Processing Estimate Display",
+   "target_step": "adoption",
+   "type": "wait_info",
+   "change": "Displays estimated custom generation processing time and quality guidance on the photo upload screen.",
+   "why": "Adoption stage suffers from long completion times (mean 1017s) and 3 support tickets about failed/incorrect custom pets.",
+   "config": {
+    "upload_photos": {
+     "show_time_estimate": true,
+     "hint": "High-resolution front-facing photos yield the best custom 3D companion results within 60 seconds."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid informational addition to the photo upload screen."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.04,
+   "score": 10.0,
+   "score_note": "Addresses the largest funnel bottleneck and support tickets via low-risk info display.",
+   "slot": "best score"
+  },
+  {
+   "title": "Path Selection Direct Copy Clarification",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Rewrites path selection screen text to explicitly contrast instant pre-made pet adoption against custom photo creation.",
+   "why": "Choose path stage mean time is 514s, indicating confusion between custom photo generation and standard pet options.",
+   "config": {
+    "choose_path": {
+     "headline": "How Would You Like to Pick Your Pet?",
+     "body": "Choose a ready-to-adopt companion instantly, or create a unique custom pet from your own photos."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update clarifying options on choose path screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 9.79,
+   "score_note": "Low-cost copy clarification targeting path confusion and high drop duration.",
+   "slot": "best score"
+  },
+  {
+   "title": "Desktop Tray Interactivity Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Adds a clear hint banner on home_intro instructing users how to interact with the pet via mouse clicks and system tray.",
+   "why": "Multiple support emails complain about lack of clarity regarding how to control, hide, or talk to the pet after onboarding.",
+   "config": {
+    "home_intro": {
+     "hint": "Tip: Right-click your pet on the desktop or click the tray icon to open controls, chat, or hide options anytime."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid hint banner addition to home intro overlay."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.025,
+   "score": 9.95,
+   "score_note": "Directly resolves user confusion reported in support emails via a simple hint banner."
+  },
+  {
+   "title": "Adoption Certificate Completion Badge",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Displays an official adoption verification badge on the certificate screen to encourage users to finish setup.",
+   "why": "Adoption is the largest bottleneck in the funnel with only 60.9% conversion rate.",
+   "config": {
+    "adoption_certificate": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Official Adoption Certificate Verified",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a verification badge component to the adoption certificate screen."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 5.05,
+   "score_note": "Targets major adoption drop-off, though incentive badges have unproven lift here."
+  },
+  {
+   "title": "Choose Path Split Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Changes choose_path layout to split view side-by-side comparison between preset pets and photo customization.",
+   "why": "Choose path stage has a high mean duration of 514s, suggesting users need clearer visual distinction between paths.",
+   "config": {
+    "choose_path": {
+     "layout": "split"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout modification to the choose path screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.005,
+   "score": 4.95,
+   "score_note": "Split layout aims to clarify path choices, but redesigns carry mixed performance."
+  }
+ ],
+ "picked": [
+  "Sign-In After Photo Selection Reorder"
+ ],
+ "held_by_harm_budget": [
+  "Desktop Controls Setup Checklist Flow",
+  "Photo Processing Estimate Display",
+  "Path Selection Direct Copy Clarification",
+  "Ready Desktop Notification Alert"
+ ],
+ "harm_budget": 116.4,
+ "planned_harm": 106.0,
+ "decisions": [
+  {
+   "test": "sim-13",
+   "title": "Sign-In After Photo Selection Reorder",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 106.0,
+   "result": {
+    "step": {
+     "control": 0.7746,
+     "treatment": 0.7514,
+     "lift": -0.0299,
+     "lift_se": 0.0232,
+     "p": 0.204025
+    },
+    "finish": {
+     "control": 0.1473,
+     "treatment": 0.172,
+     "lift": 0.1674,
+     "lift_se": 0.0981,
+     "p": 0.065154
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.95,
+   "predicted_lift": -0.001,
+   "true_lift_hidden": -0.0123,
+   "finishers_delta_hidden": -2.88
+  }
+ ],
+ "shipped": [],
+ "ends_week": 13,
+ "weights_next": {
+  "impact": 0.065,
+  "evidence": 0.065,
+  "confidence": 0.065,
+  "cost": 3.806
+ },
+ "lessons_next": [
+  "Predictions were mostly too high compared to actual noise-corrected results, except for sign_in notification where the prediction was too low.",
+  "No effect was seen for home new_flow changes across 2 tests.",
+  "No effect was seen for sign_in reorder changes across 2 tests.",
+  "No effect was seen for adoption redesign across 2 tests, while another 2 tests made adoption worse.",
+  "No effect was seen for finish new_screen in 1 test, while 1 test made finish worse.",
+  "Evidence is still thin for adoption new_flow, choose_path reorder, and sign_in notification, as each has only 1 test."
+ ]
+}

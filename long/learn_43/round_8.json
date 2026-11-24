@@ -1,0 +1,536 @@
+{
+ "round": 8,
+ "starts_week": 8,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.7482154999200001,
+  "home": 0.89051550939,
+  "finish": 0.8244471340799999
+ },
+ "weights_used": {
+  "impact": 2.404,
+  "evidence": 0.524,
+  "confidence": 0.16,
+  "cost": 0.912
+ },
+ "lessons_used": [
+  "Evidence remains thin for single-test categories: adoption redesigns, adoption wait_info, finish layout/new_screen/redesign, home new_flow, and sign-in reordering.",
+  "Home wait_info changes are helpful, supported by 2 winning tests out of 4.",
+  "Choose_path redesigns (2 tests) and choose_path copy updates (2 tests) showed no positive effect, ranging from no effect to worse.",
+  "Adoption hints (3 tests), home redesigns (2 tests), sign-in copy updates (2 tests), and sign-in incentives (2 tests) showed no clear effect.",
+  "Finish hints (2 tests) and sign-in notifications (2 tests) showed no clear effect or performed worse.",
+  "Predictions were consistently too low for winning changes and too high for changes that had no clear effect or performed worse."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Sign-In Existing Account Email Lookup Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Adds an account lookup hint on the sign-in screen helping users verify their original login method to prevent accidental secondary account creation.",
+   "why": "Support received 8 emails regarding missing or reset pets after signing in, indicating users accidentally create fresh accounts with alternate emails.",
+   "config": {
+    "sign_in": {
+     "hint": "Using an existing account? Ensure you use the same email to keep your saved pet.",
+     "components": [
+      {
+       "type": "text",
+       "text": "Need help finding your existing account?",
+       "style": "subtle",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Waiting Screen Pet Animation Preview Display",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays a live animated preview of pet idle actions on the waiting screen while background generation finishes.",
+   "why": "The waiting step has a long mean duration (2336s). Lessons learned show home wait_info changes are effective (2 out of 4 tested were winners).",
+   "config": {
+    "waiting": {
+     "headline": "Your pet is coming to life...",
+     "body": "Here is a sneak peek of your desktop companion while final files render.",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:pet_preview_idle",
+       "style": "large"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an animated pet preview to the waiting screen while maintaining the screen's core function of showing generation progress."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.024,
+   "score": 3.98,
+   "score_note": "Home wait_info is a proven category with 2 winning tests, though home step already has high completion (89.1%)."
+  },
+  {
+   "title": "Desktop Pet Interaction Controls Video Showcase",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Inserts a dedicated onboarding end screen with short video clips showing how to drag, hide, summon, and talk to the pet on desktop.",
+   "why": "Support received 3 emails from users confused about how to interact with, hide, or control their pet after setup.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_interaction_showcase"
+    ],
+    "new_interaction_showcase": {
+     "headline": "How to Interact with Your Companion",
+     "body": "Watch quick demos of desktop controls, hiding shortcuts, and companion chats.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "video",
+       "asset": "asset:desktop_controls_demo",
+       "style": "rounded"
+      },
+      {
+       "type": "button",
+       "label": "Got It! Start Using Pet",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a new desktop interaction showcase screen after home intro, which is explicitly allowed by onboarding rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.065,
+   "score": 5.08,
+   "score_note": "Supported by 3 support emails, but requires a new screen (cost 0) and finish new_screen has thin single-test evidence.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 91.5
+  },
+  {
+   "title": "Adoption Certificate Interactive Signature Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the adoption certificate screen into a centered interactive layout featuring an editable owner sign-off and mascot seal.",
+   "why": "Adoption conversion drop-off is 25.2% with a long mean duration (1017s). An engaging redesign strengthens emotional ownership prior to wait times.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "centered",
+     "headline": "Official Adoption Certificate",
+     "body": "Sign below to seal your bond with your new desktop companion.",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "name_input",
+        "text": "Enter Owner Name",
+        "style": "large"
+       },
+       {
+        "role": "certificate",
+        "type": "badge",
+        "text": "Certified Companion",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[0]': a name_input cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Home Intro Interactive Desktop Docking Stage",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesigns the final home intro screen into a stage layout with interactive trial buttons for docking and auto-hiding the pet.",
+   "why": "Overall onboarding completion is low (30.5%) and multiple support tickets mention post-onboarding confusion around desktop pet controls.",
+   "config": {
+    "home_intro": {
+     "layout": "stage",
+     "headline": "Meet Your Desktop Companion",
+     "body": "Try out pet docking and desktop positioning controls before completing setup.",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "choice_cards",
+        "text": "Test Docking Position",
+        "style": "rounded",
+        "action": "choose"
+       },
+       {
+        "role": "home_welcome",
+        "type": "button",
+        "label": "Launch Companion to Desktop",
+        "action": "next",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.replace.home_welcome[0]': a choice_cards cannot do the home_welcome job (use ['animation', 'button', 'checklist', 'image', 'mascot', 'text'])"
+   }
+  },
+  {
+   "title": "Sign-In Account Recovery Diagnostic Flow",
+   "target_step": "sign_in",
+   "type": "new_flow",
+   "change": "Adds an inline account verification helper flow on the sign-in screen to help returning users locate past credentials before authenticating.",
+   "why": "8 support emails complained about missing/reset pets upon logging in, and 2 reported sign-in stalls or missing login options.",
+   "config": {
+    "sign_in": {
+     "layout": "two_column",
+     "headline": "Sign In or Restore Account",
+     "body": "Choose your provider or verify past account email to preserve pet data.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Sign In with Google / Provider",
+        "action": "next",
+        "style": "emphasis"
+       },
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Check Existing Account Email",
+        "action": "open_tip",
+        "style": "subtle"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.body' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Desktop Visibility Status Progress Checklist",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Adds a detailed system readiness checklist to the waiting screen verifying overlay display, graphics rendering, and window permissions.",
+   "why": "Support logged 3 issues where pets failed to render on desktop, and home wait_info components have shown strong test performance.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Desktop Overlay Authorization",
+       "style": "plain"
+      },
+      {
+       "type": "checklist",
+       "text": "Graphics Render Pipeline Ready",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a system readiness checklist to the waiting screen while keeping its primary function of indicating pet generation."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 6.86,
+   "score_note": "Both funnel duration and 3 support emails point to this issue, matching the reliable home wait_info pattern.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 173.9
+  },
+  {
+   "title": "Choose Path Pet Archetype Clarification Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Adds a hint on the choose_path screen explaining that chosen pet paths can be customized or switched anytime after setup.",
+   "why": "Choose_path has a high mean time (514s) relative to its median (8s), suggesting decision hesitation among stuck users.",
+   "config": {
+    "choose_path": {
+     "hint": "Don't worry—you can adjust or switch your pet path anytime later in settings.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Flexible Choice",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a clarification hint to the choose path screen without removing options or violating pricing/fair design rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.01,
+   "score": 5.58,
+   "score_note": "Choose_path modifications have consistently shown no positive effect or regressed in previous tests.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 173.9
+  },
+  {
+   "title": "Custom Pet Render Preview Confirmation Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Inserts a render confirmation screen after photo upload, allowing users to verify pet visual feature extraction before adoption.",
+   "why": "3 support emails reported that custom pet creation failed or resulted in wrong visual outputs.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "new_render_preview",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_render_preview": {
+     "headline": "Confirm Pet Appearance",
+     "body": "Review your pet's feature rendering before finalizing adoption.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "preview",
+       "asset": "asset:custom_pet_render",
+       "style": "rounded"
+      },
+      {
+       "type": "button",
+       "label": "Looks Great, Adopt!",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a valid preview confirmation screen into the onboarding flow after photo upload without removing any existing steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.035,
+   "score": 5.08,
+   "score_note": "Backed by 3 support emails on visual errors, but adoption changes lack strong historical backing and require a new screen."
+  },
+  {
+   "title": "Background Pet Readiness Audio Chime Alert",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Adds an option on the waiting screen to sound an audio chime when the desktop pet generation finishes.",
+   "why": "The waiting screen mean time is 2336s (approx 38 minutes), showing users minimize the app while waiting and miss completion.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "text": "Play completion sound when ready",
+       "style": "playful",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a completion sound chime option to the waiting screen without modifying rules outside onboarding or adding dark patterns."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 3.78,
+   "score_note": "Funnel shows long mean wait duration, but notifications generally showed no clear or negative effect in past tests."
+  }
+ ],
+ "picked": [
+  "Desktop Pet Interaction Controls Video Showcase",
+  "Desktop Visibility Status Progress Checklist",
+  "Choose Path Pet Archetype Clarification Hint"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 439.3,
+ "decisions": [
+  {
+   "test": "sim-29",
+   "title": "Desktop Pet Interaction Controls Video Showcase",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": 71,
+   "share": 1.0,
+   "planned_harm": 91.5,
+   "result": {
+    "step": {
+     "control": 0.7918,
+     "treatment": 0.7012,
+     "lift": -0.1144,
+     "lift_se": 0.0355,
+     "p": 0.002221
+    },
+    "finish": {
+     "control": 0.2293,
+     "treatment": 0.1975,
+     "lift": -0.1387,
+     "lift_se": 0.0604,
+     "p": 0.032954
+    },
+    "users_per_group": 1509
+   },
+   "outcome": "stopped early: finish worse",
+   "score": 5.08,
+   "predicted_lift": 0.065,
+   "true_lift_hidden": -0.0653,
+   "finishers_delta_hidden": -23.79
+  },
+  {
+   "test": "sim-30",
+   "title": "Desktop Visibility Status Progress Checklist",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 173.9,
+   "result": {
+    "step": {
+     "control": 0.8571,
+     "treatment": 0.8312,
+     "lift": -0.0302,
+     "lift_se": 0.0178,
+     "p": 0.093582
+    },
+    "finish": {
+     "control": 0.2503,
+     "treatment": 0.2383,
+     "lift": -0.0479,
+     "lift_se": 0.0432,
+     "p": 0.279426
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.86,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": 0.0079,
+   "finishers_delta_hidden": 5.85
+  },
+  {
+   "test": "sim-31",
+   "title": "Choose Path Pet Archetype Clarification Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 173.9,
+   "result": {
+    "step": {
+     "control": 0.7333,
+     "treatment": 0.747,
+     "lift": 0.0186,
+     "lift_se": 0.0156,
+     "p": 0.227444
+    },
+    "finish": {
+     "control": 0.2413,
+     "treatment": 0.264,
+     "lift": 0.0939,
+     "lift_se": 0.0486,
+     "p": 0.043359
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.58,
+   "predicted_lift": -0.01,
+   "true_lift_hidden": 0.0123,
+   "finishers_delta_hidden": 9.11
+  }
+ ],
+ "shipped": [],
+ "ends_week": 8,
+ "weights_next": {
+  "impact": 2.849,
+  "evidence": 0.418,
+  "confidence": 0.125,
+  "cost": 0.608
+ },
+ "lessons_next": [
+  "Evidence remains thin for single-test categories: adoption redesigns, adoption wait_info, choose_path hints, finish layout/redesign, home new_flow, and sign-in reordering.",
+  "Home wait_info changes are helpful, supported by 2 winning tests out of 5.",
+  "Choose_path redesigns (2 tests) and choose_path copy updates (2 tests) showed no clear positive effect, ranging from no effect to worse.",
+  "Adoption hints (3 tests), home redesigns (2 tests), sign-in copy updates (2 tests), and sign-in incentives (2 tests) showed no clear effect.",
+  "Finish hints (2 tests) and sign-in notifications (2 tests) showed no clear effect or performed worse.",
+  "Predictions were consistently too low for winning changes and too high for changes that had no clear effect or performed worse."
+ ]
+}

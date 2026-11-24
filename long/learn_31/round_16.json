@@ -1,0 +1,520 @@
+{
+ "round": 16,
+ "starts_week": 16,
+ "funnel": {
+  "choose_path": 0.8620883189999999,
+  "sign_in": 0.80438215752,
+  "adoption": 0.6721240680000001,
+  "home": 0.9275488827123124,
+  "finish": 0.9042852968568842
+ },
+ "weights_used": {
+  "impact": 0.218,
+  "evidence": 0.458,
+  "confidence": 3.146,
+  "cost": 0.178
+ },
+ "lessons_used": [
+  "Predictions consistently overstated gains overall, though several unexpected winning updates performed better than predicted.",
+  "Evidence is still thin for adoption new_flow, adoption wait_info, choose_path hint, choose_path new_flow, choose_path redesign, finish copy, finish notification, home hint, sign_in incentive, sign_in layout, sign_in new_flow, and sign_in wait_info because each has only 1 test.",
+  "Interactive finish flows (finish new_flow) remained effective, winning in 4 of 7 tests (+9.3%, +5.6%, +4.3%, and +4.4%).",
+  "Home wait_info changes were helpful in 3 of 9 tests (+4.2%, +3.9%, and +2.6%), while the remaining 6 showed no clear effect.",
+  "Adoption redesign consistently hurt performance or showed no clear effect across 3 tests.",
+  "No clear effect was seen across tests for adoption copy, choose_path layout, choose_path reorder, finish new_screen, home notification, and sign_in hint."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Interactive Companion Daily Routine Setup Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Adds an interactive routine selector component on the home intro screen so users configure feeding and break alert schedules before entering desktop mode.",
+   "why": "Interactive finish flows consistently win in testing (+9.3%, +5.6%), while support receives emails asking how to manage and interact with pets post-onboarding.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Select Daily Activity Routine",
+       "style": "playful",
+       "action": "choose"
+      },
+      {
+       "type": "button",
+       "label": "Save Pet Schedule",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of daily routine setup components to home_intro."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.045,
+   "score": 9.21,
+   "score_note": "Interactive finish flows have a proven track record (+3.0% average, winning up to +9.3%), though finish step overall drop is moderate (9.6%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 81.1
+  },
+  {
+   "title": "Desk Companion Care Ritual Setup Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Adds a new setup screen 'new_desk_routine' right after home intro where users choose focus triggers and desktop break intervals.",
+   "why": "Finish interactive and setup flows are highly effective (+9.3% in recent tests), and users report confusion about managing companion behavior post-onboarding.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_desk_routine"
+    ],
+    "new_desk_routine": {
+     "headline": "Customize Desktop Rituals",
+     "body": "Set up your companion's break reminders and work hours.",
+     "layout": "card",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Select Focus Interval",
+       "style": "rounded",
+       "action": "choose"
+      },
+      {
+       "type": "button",
+       "label": "Complete Setup",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a new setup screen following home_intro."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.01,
+   "score": 0.95,
+   "score_note": "Finish new_screen tests historically underperformed (-1.0% avg), and adding full screens requires major release effort."
+  },
+  {
+   "title": "Photo Upload First Adoption Sequence",
+   "target_step": "adoption",
+   "type": "reorder",
+   "change": "Reorders the adoption steps so users upload custom photos prior to choosing preset friends, streamlining custom pet creation.",
+   "why": "Adoption has a heavy 67.2% conversion rate and median 89s completion time; prompt photo handling helps users committing custom assets earlier.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "upload_photos",
+     "pick_friend",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "existing screens must keep their order; only sign_in may move"
+   }
+  },
+  {
+   "title": "Companion Path Spotlight Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesigns the choose_path screen into a spotlight layout showcasing path specific desktop capabilities, background behaviors, and interaction modes.",
+   "why": "choose_path drop-off is 86.2% with a mean duration of 514s, indicating users pause to understand path differences before choosing.",
+   "config": {
+    "choose_path": {
+     "layout": "spotlight",
+     "headline": "Choose Your Companion Journey",
+     "body": "Select how your pet interacts with your desktop environment."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "Redesigned choose_path screen loses the required choice between adopting and making your own pet."
+   }
+  },
+  {
+   "title": "Desktop Environment & Layering Status Wait Info",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays GPU rendering, window layering, and display permissions status directly on the waiting screen.",
+   "why": "Support received 3 support tickets about pets failing to appear on desktop or app failing to open during first view.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "tip_delay_seconds": 3,
+     "components": [
+      {
+       "type": "badge",
+       "label": "Checking Desktop Layering Permissions",
+       "style": "calm"
+      },
+      {
+       "type": "text",
+       "text": "Verifying screen overlay capability...",
+       "style": "small"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of system status information to the waiting screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.018,
+   "score": 5.32,
+   "score_note": "Home wait_info shows positive gains (+1.7% avg across 9 tests), matching reported setup issues at low implementation cost.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 187.6
+  },
+  {
+   "title": "Cloud Save Protection Reassurance Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Updates the headline and body on the sign_in screen to explicitly state that signing in prevents pet resets and protects save data across logins.",
+   "why": "Sign_in drops to 80.4% conversion and 8 emails complained about pets missing or resetting after signing in again.",
+   "config": {
+    "sign_in": {
+     "headline": "Secure & Preserve Your Pet Data",
+     "body": "Signing in links your pet adoption progress permanently to prevent profile resets."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update reassuring users about data preservation on sign_in."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 5.89,
+   "score_note": "Sign-in step loses 19.6% of users and has strong support email alignment; copy changes show reliable modest gains (+1.3% avg).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 187.6
+  },
+  {
+   "title": "Desktop Tray Controls Guidance Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Adds a guidance hint on home_intro explaining how to summon, hide, and access system tray controls.",
+   "why": "Support logged multiple tickets from users confused about how to control, hide, or talk to their pet after setup.",
+   "config": {
+    "home_intro": {
+     "hint": "Tip: Right-click your pet or use the system tray icon anytime to summon, hide, or access settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid guidance hint added to home_intro."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 5.32,
+   "score_note": "Low cost hint addition addressing real user confusion tickets, though hint changes historically yield modest improvements."
+  },
+  {
+   "title": "Adoption Certificate Official Seal Badge Incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Adds an exclusive verified owner seal badge on the adoption certificate screen upon finalizing pet setup.",
+   "why": "Adoption step has the lowest conversion in the main funnel (67.2%); adding visual ownership incentives encourages completion.",
+   "config": {
+    "adoption_certificate": {
+     "components": [
+      {
+       "type": "badge",
+       "label": "Verified Companion Owner Seal",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of an official seal badge to the adoption certificate."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.005,
+   "score": 1.15,
+   "score_note": "Adoption stage has the largest funnel drop (32.8%), but visual incentive changes have shown negative results in prior testing."
+  },
+  {
+   "title": "Interactive Pet Desktop Interaction Command Builder Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Adds an interactive command key assignment flow on home_intro to let users map custom hotkeys for pet interactions.",
+   "why": "Interactive finish flows show strong win rates (+9.3%, +5.6%), and users report post-onboarding confusion regarding pet controls.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "checklist",
+       "label": "Assign Interaction Hotkeys",
+       "style": "rounded"
+      },
+      {
+       "type": "button",
+       "label": "Test Quick Key",
+       "style": "playful",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid hotkey command builder components added to home_intro."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.042,
+   "score": 8.81,
+   "score_note": "Interactive finish flows consistently succeed (+3.0% overall gain across 7 tests), though creating a command builder requires new code."
+  },
+  {
+   "title": "Custom Photo Processing Troubleshooting Wait Info",
+   "target_step": "adoption",
+   "type": "wait_info",
+   "change": "Displays real-time image validation status and retry tips on the photo upload screen.",
+   "why": "Support received 3 emails stating custom pet generation fails or looks wrong, causing drop-offs at the adoption stage.",
+   "config": {
+    "upload_photos": {
+     "hint": "Ensure photo features clear lighting and centered framing for best 3D pet generation results."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid troubleshooting hint added to the photo upload screen."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.035,
+   "score": 5.85,
+   "score_note": "Targeting adoption's huge 32.8% drop with direct support mail evidence; wait_info showed strong early potential (+5.2%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 187.6
+  }
+ ],
+ "picked": [
+  "Interactive Companion Daily Routine Setup Flow",
+  "Cloud Save Protection Reassurance Copy",
+  "Custom Photo Processing Troubleshooting Wait Info",
+  "Desktop Environment & Layering Status Wait Info"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 643.9,
+ "decisions": [
+  {
+   "test": "sim-63",
+   "title": "Interactive Companion Daily Routine Setup Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 81.1,
+   "result": {
+    "step": {
+     "control": 0.8678,
+     "treatment": 0.8873,
+     "lift": 0.0225,
+     "lift_se": 0.0166,
+     "p": 0.169859
+    },
+    "finish": {
+     "control": 0.3063,
+     "treatment": 0.315,
+     "lift": 0.0283,
+     "lift_se": 0.0396,
+     "p": 0.468249
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 9.21,
+   "predicted_lift": 0.045,
+   "true_lift_hidden": 0.0327,
+   "finishers_delta_hidden": 29.58
+  },
+  {
+   "test": "sim-64",
+   "title": "Cloud Save Protection Reassurance Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 187.6,
+   "result": {
+    "step": {
+     "control": 0.7638,
+     "treatment": 0.7431,
+     "lift": -0.0272,
+     "lift_se": 0.0159,
+     "p": 0.090585
+    },
+    "finish": {
+     "control": 0.3087,
+     "treatment": 0.294,
+     "lift": -0.0475,
+     "lift_se": 0.0375,
+     "p": 0.215718
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.89,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": -0.0283,
+   "finishers_delta_hidden": -25.6
+  },
+  {
+   "test": "sim-65",
+   "title": "Custom Photo Processing Troubleshooting Wait Info",
+   "target_step": "adoption",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 187.6,
+   "result": {
+    "step": {
+     "control": 0.6452,
+     "treatment": 0.6649,
+     "lift": 0.0305,
+     "lift_se": 0.0244,
+     "p": 0.204803
+    },
+    "finish": {
+     "control": 0.3063,
+     "treatment": 0.3257,
+     "lift": 0.0631,
+     "lift_se": 0.0404,
+     "p": 0.107273
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.85,
+   "predicted_lift": 0.035,
+   "true_lift_hidden": 0.0185,
+   "finishers_delta_hidden": 16.74
+  },
+  {
+   "test": "sim-66",
+   "title": "Desktop Environment & Layering Status Wait Info",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 187.6,
+   "result": {
+    "step": {
+     "control": 0.8702,
+     "treatment": 0.8977,
+     "lift": 0.0316,
+     "lift_se": 0.0153,
+     "p": 0.036092
+    },
+    "finish": {
+     "control": 0.3023,
+     "treatment": 0.2983,
+     "lift": -0.0132,
+     "lift_se": 0.0389,
+     "p": 0.735397
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 5.32,
+   "predicted_lift": 0.018,
+   "true_lift_hidden": 0.016,
+   "finishers_delta_hidden": 14.47
+  }
+ ],
+ "shipped": [
+  "Desktop Environment & Layering Status Wait Info"
+ ],
+ "ends_week": 16,
+ "weights_next": {
+  "impact": 0.222,
+  "evidence": 0.468,
+  "confidence": 3.151,
+  "cost": 0.159
+ },
+ "lessons_next": [
+  "Predictions consistently overstated gains overall, though several unexpected winning updates performed better than predicted.",
+  "Evidence is still thin for adoption new_flow, choose_path hint, choose_path new_flow, choose_path redesign, finish copy, finish notification, home hint, sign_in incentive, sign_in layout, sign_in new_flow, and sign_in wait_info because each has only 1 test.",
+  "Interactive finish flows (finish new_flow) were helpful, winning in 4 of 8 tests (+9.2%, +5.5%, +4.3%, and +4.4%), while the other 4 showed no clear effect.",
+  "Home wait_info changes were helpful in 4 of 10 tests (+4.2%, +3.9%, +2.6%, and +2.7%), while the remaining 6 showed no clear effect.",
+  "Adoption redesign consistently hurt performance or showed no clear effect across 3 tests.",
+  "No clear effect was seen across tests for adoption copy, choose_path layout, choose_path reorder, finish new_screen, home notification, and sign_in hint."
+ ]
+}

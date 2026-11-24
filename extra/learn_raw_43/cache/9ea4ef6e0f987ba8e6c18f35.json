@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, redesign] Account Recovery and Existing Pet Sync Notice: Redesign the sign-in screen options to prominent account status choices and clear warnings regarding multi-account pet loss.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Sync Your Pet Companion\", \"body\": \"Use your primary account so your companion and past adoptions stay linked.\", \"layout\": \"card\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"text\", \"text\": \"Signing in ensures your desktop companion is backed up safely.\", \"style\": \"emphasis\"}, {\"role\": \"sign_in_options\", \"type\": \"badge\", \"text\": \"Important: Sign in with your original account to retrieve existing pets\", \"style\": \"highlight\"}]}}}\n1: [adoption, new_screen] Custom Photo Quality Validation Stage: Insert a new photo validation screen immediately after photo upload to verify image clarity and pet outlines before custom generation.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_photo_check\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_photo_check\": {\"headline\": \"Check Photo Quality\", \"body\": \"Ensure your pet photo is clear and well-lit for accurate desktop rendering.\", \"layout\": \"centered\", \"components\": [{\"type\": \"preview\", \"label\": \"Uploaded Photo Preview\", \"style\": \"rounded\"}, {\"type\": \"checklist\", \"text\": \"Single pet in frame, Good lighting, Sharp focus\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Confirm & Generate Pet\", \"action\": \"next\", \"style\": \"playful\"}]}}\n2: [home, new_screen] Desktop Spawn Test Stage: Add a dedicated desktop render test screen right after waiting to confirm the pet window displays properly on screen.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_test\", \"home_intro\"], \"new_desktop_test\": {\"headline\": \"Testing Desktop Window Rendering\", \"body\": \"Verifying display permissions and desktop overlay compatibility for your pet.\", \"layout\": \"centered\", \"components\": [{\"type\": \"animation\", \"asset\": \"asset:desktop_test_render\", \"style\": \"highlight\"}, {\"type\": \"text\", \"text\": \"Click below if your pet is visible on your screen background.\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Pet Visible, Continue\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n3: [adoption, redesign] Interactive Adoption Certificate Showcase: Redesign the adoption certificate screen into a spotlight layout showcasing the companion's assigned personality traits.\n   config: {\"adoption_certificate\": {\"headline\": \"Meet Your Official Companion\", \"body\": \"Your companion certificate is ready with custom attributes and personality.\", \"layout\": \"spotlight\", \"replace\": {\"certificate\": [{\"role\": \"certificate\", \"type\": \"mascot\", \"asset\": \"asset:companion_certificate_render\", \"style\": \"playful\"}, {\"role\": \"certificate\", \"type\": \"badge\", \"text\": \"Certified Desktop Companion\", \"style\": \"highlight\"}]}}}\n4: [choose_path, redesign] Full-Bleed Animated Story Prologue: Redesign the initial story screen into a full-bleed animated intro presenting the world of desktop pets.\n   config: {\"story\": {\"headline\": \"Welcome to Your New Desktop Life\", \"body\": \"Discover AI companions that live, react, and play right on your monitor screen.\", \"layout\": \"full_bleed\", \"replace\": {\"intro_story\": [{\"role\": \"intro_story\", \"type\": \"animation\", \"asset\": \"asset:desktop_pet_prologue\", \"style\": \"large\"}, {\"role\": \"intro_story\", \"type\": \"button\", \"label\": \"Choose My Path\", \"action\": \"next\", \"style\": \"playful\"}]}}}\n5: [home, wait_info] Background Generation Audio Notification: Add an audio completion chime and explicit notify toggle on the waiting screen when companion generation finishes.\n   config: {\"waiting\": {\"headline\": \"Generating Your Pet Companion...\", \"body\": \"Feel free to minimize this window. We will play a sound when your pet arrives.\", \"notify_when_ready\": true, \"show_time_estimate\": true, \"components\": [{\"type\": \"sound\", \"asset\": \"asset:completion_chime\", \"style\": \"plain\"}]}}\n6: [adoption, layout] Pick Friend Character Selection Split View: Switch the character selection screen layout to split view featuring side-by-side animated companion previews.\n   config: {\"pick_friend\": {\"headline\": \"Choose Your Desktop Companion\", \"body\": \"Select a friend style to bring onto your screen.\", \"layout\": \"split\", \"replace\": {\"pet_choices\": [{\"role\": \"pet_choices\", \"type\": \"choice_cards\", \"text\": \"Classic Pixel Pet vs 3D Desktop Buddy\", \"style\": \"playful\", \"action\": \"choose\"}]}}}\n7: [choose_path, layout] Path Choice Value Proposition Cards: Reformat the path selection screen layout to two-column cards comparing custom pet creation against pre-made companion selection.\n   config: {\"choose_path\": {\"headline\": \"Select How You Want to Adopt\", \"body\": \"Upload your own photo or pick from ready-to-play desktop companions.\", \"layout\": \"two_column\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"text\": \"Custom Creation: Unique pet built from photo\", \"style\": \"emphasis\", \"action\": \"choose\"}, {\"role\": \"path_options\", \"type\": \"choice_cards\", \"text\": \"Instant Companion: Ready-to-use pet species\", \"style\": \"plain\", \"action\": \"choose\"}]}}}\n8: [finish, redesign] Home Intro Stage Greeting Presentation: Redesign home_intro into a stage layout featuring an interactive companion greeting animation and completion checklist.\n   config: {\"home_intro\": {\"headline\": \"Your Companion Has Arrived!\", \"body\": \"Your pet is now active on your computer screen. Click below to start interacting.\", \"layout\": \"stage\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"mascot\", \"asset\": \"asset:active_pet_greeting\", \"style\": \"playful\"}, {\"role\": \"home_welcome\", \"type\": \"button\", \"label\": \"Start Playing with Pet\", \"action\": \"next\", \"style\": \"emphasis\"}]}}}\n9: [finish, hint] Finish Step Desktop Visibility Status Banner: Add a highlighted status banner to the home intro screen detailing how to locate and activate the desktop companion overlay.\n   config: {\"home_intro\": {\"headline\": \"Setup Complete - Pet is Active\", \"body\": \"Look at your desktop taskbar and screen corners to find your companion.\", \"hint\": \"Tip: Right-click your pet on screen anytime to access controls, settings, or hide it.\", \"components\": [{\"type\": \"badge\", \"text\": \"Active on Desktop Taskbar & Main Screen\", \"style\": \"highlight\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": false,
+    "rule": 2,
+    "reason": "Sign-in options are replaced with static text and a badge, losing the ability to sign in."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a photo quality check screen inside onboarding."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a desktop window render test screen inside onboarding."
+   },
+   {
+    "index": 3,
+    "pass": false,
+    "rule": 2,
+    "reason": "Redesign removes the required official stamp from the adoption certificate."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of the story screen introducing the pet companion."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid enhancement to the waiting screen with notification sound and status details."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout update for picking a friend while preserving pet selection functionality."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of choose path screen offering both custom creation and adopting a ready-made pet."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of the home intro screen."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of visibility status banner and helpful hint to home intro screen."
+   }
+  ]
+ }
+}

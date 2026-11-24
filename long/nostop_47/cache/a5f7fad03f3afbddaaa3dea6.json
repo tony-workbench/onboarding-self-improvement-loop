@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_screen] Desktop Pet Controls Quick Reference Screen: Insert a dedicated quick-reference screen before home intro showing visual callouts for how to hide, summon, and right-click control the desktop pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_controls_summary\", \"home_intro\"], \"new_desktop_controls_summary\": {\"headline\": \"Mastering Your Desktop Companion\", \"body\": \"Right-click your pet on the desktop anytime to open quick actions, mute sound, or minimize to the system tray.\", \"layout\": \"centered\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:desktop_controls_diagram\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Got It, Take Me Home\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n1: [sign_in, new_screen] Account Recovery Guidance Screen: Add an account data recovery informational screen directly prior to sign in, explaining how existing pets and save data are restored when signing in.\n   config: {\"_order\": [\"story\", \"choose_path\", \"new_account_recovery_guide\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_account_recovery_guide\": {\"headline\": \"Signing In Keeps Your Pets Safe\", \"body\": \"Log into your existing account to automatically sync and restore all previously created desktop pets and progress.\", \"layout\": \"card\", \"components\": [{\"type\": \"badge\", \"text\": \"Cloud Pet Sync Enabled\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Continue to Sign In\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n2: [adoption, new_flow] Interactive Personality Trait Adoption Sub-Flow: Introduce a interactive trait selection step during adoption where users choose their pet's core temperament before generating the adoption certificate.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_personality_step\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_personality_step\": {\"headline\": \"Choose Your Pet's Personality\", \"body\": \"Select how your desktop pet behaves during your workday.\", \"layout\": \"grid\", \"components\": [{\"type\": \"choice_cards\", \"text\": \"Playful, Calm, Focused, Energetic\", \"style\": \"playful\", \"action\": \"choose\"}, {\"type\": \"button\", \"label\": \"Confirm Temperament\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n3: [adoption, redesign] Adoption Certificate Visual Preview Redesign: Redesign the adoption certificate layout into a centered spotlight view with animated pet rendering previews and custom pet validation status.\n   config: {\"adoption_certificate\": {\"layout\": \"spotlight\", \"headline\": \"Your Companion is Ready to Adopt!\", \"body\": \"Verify your pet's appearance and name before finalizing your adoption certificate.\", \"replace\": {\"certificate\": [{\"role\": \"certificate\", \"type\": \"preview\", \"asset\": \"asset:pet_live_preview\", \"style\": \"highlight\"}, {\"role\": \"certificate\", \"type\": \"name_input\", \"label\": \"Pet Name\", \"style\": \"rounded\"}]}}}\n4: [home, redesign] Render Waiting Interactive Teaser Stage: Redesign the render waiting screen into an interactive preview stage featuring live mascot animations and companion tips while the desktop pet builds.\n   config: {\"waiting\": {\"layout\": \"stage\", \"headline\": \"Bringing Your Desktop Pet to Life...\", \"body\": \"Our engine is rendering your pet's desktop physics and animations.\", \"show_progress\": true, \"show_time_estimate\": true, \"replace\": {\"wait_status\": [{\"role\": \"wait_status\", \"type\": \"mascot\", \"asset\": \"asset:rendering_mascot\", \"style\": \"playful\"}, {\"role\": \"wait_status\", \"type\": \"tip_carousel\", \"text\": \"Tip: Press Ctrl+Shift+P anytime on your desktop to summon your pet!\", \"style\": \"subtle\"}]}}}\n5: [sign_in, hint] Existing Pet Account Sync Safety Hint: Add a clear hint on the sign-in screen assuring returning users that signing in syncs existing pet saves across desktop devices.\n   config: {\"sign_in\": {\"hint\": \"Signing in automatically syncs your saved pets and progress from cloud backup.\"}}\n6: [home, notification] Desktop Render Ready System Notification: Enable desktop system completion notification prompts on the render waiting screen so users can minimize the app while waiting.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"hint\": \"Feel free to work on other tasks; we will alert you as soon as your pet lands on your desktop!\"}}\n7: [finish, copy] Desktop Companion Controls Welcome Guide Copy: Update the home intro headline and body copy to explicitly instruct users on how to access the pet tray icon and hide/show controls.\n   config: {\"home_intro\": {\"headline\": \"Your Pet is Live on Your Desktop!\", \"body\": \"Look for your pet walking on your screen or find the pet icon in your system tray to adjust volume, toggle visibility, or open settings.\"}}\n8: [home, wait_info] Render Stage Live Step Progress Bar: Display explicit step counters and estimated remaining time on the desktop render waiting screen.\n   config: {\"waiting\": {\"show_step_counter\": true, \"show_time_estimate\": true, \"tip_delay_seconds\": 15}}\n9: [adoption, incentive] Pet Selection Quality Assurance Badge: Add an interactive quality badge indicator on the pet selection stage reassuring users that their custom pet rendering is verified and cloud-backed.\n   config: {\"pick_friend\": {\"components\": [{\"type\": \"badge\", \"text\": \"HD Render & Cloud Save Verified\", \"style\": \"highlight\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a controls quick reference screen inside onboarding is allowed and preserves all required steps."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an account recovery guide screen before sign in preserves all required steps and screen functions."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a trait selection sub-flow during adoption is permitted inside onboarding."
+   },
+   {
+    "index": 3,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replacing certificate components without including an official stamp fails Rule 2, which requires the adoption certificate to display an official stamp."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the waiting screen while keeping the pet rendering progress indicator fulfills the screen's required job."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a sync hint on the sign-in screen is allowed within onboarding."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling desktop notification prompts on the waiting screen is a valid onboarding enhancement."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating text copy on home intro is permitted inside onboarding."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying step counters and time estimates on the waiting screen is allowed."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a visual quality assurance badge on the pet selection screen complies with all base rules."
+   }
+  ]
+ }
+}

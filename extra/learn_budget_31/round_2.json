@@ -1,0 +1,404 @@
+{
+ "round": 2,
+ "starts_week": 2,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "Evidence is still thin across all change types with only one test completed so far."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Postpone Account Sign In",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move the sign-in step to occur after pet selection so users build an emotional bond before creating an account.",
+   "why": "Sign-in currently drops 27.1% of users early and has a long mean duration of 567s before users even choose a pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Moving sign in after adoption pet selection is explicitly allowed under Rule 4."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.08,
+   "score": 5.83,
+   "score_note": "Postponing sign-in reduces early friction where 27.1% of users drop off.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Interactive Adoption Certificate Stage",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen using a stage layout featuring live pet preview and official certificate styling.",
+   "why": "Adoption drops nearly 40% of users (60.9% conversion) and has a long median time of 89s.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "replace": {
+      "certificate": [
+       {
+        "type": "preview",
+        "asset": "asset:pet_preview",
+        "style": "playful",
+        "role": "certificate"
+       },
+       {
+        "type": "text",
+        "text": "Official Adoption Certificate",
+        "style": "large",
+        "role": "certificate"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'adoption_certificate.certificate' does not do the job: needs 1 of ['animation', 'image', 'preview'] with an asset:certificate/ asset"
+   }
+  },
+  {
+   "title": "Desktop Controls Walkthrough Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Introduce a dedicated interactive screen explaining desktop pet controls and key shortcuts right before completing onboarding.",
+   "why": "Multiple support emails reported confusion regarding how to control, hide, or talk to the desktop pet after setup.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_controls_guide",
+     "home_intro"
+    ],
+    "new_controls_guide": {
+     "headline": "Master Your Desktop Pet Controls",
+     "body": "Learn quick shortcuts to interact, chat, or minimize your pet while working.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "text",
+       "text": "Press Alt+P to summon or hide your pet anytime.",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new controls guide screen inside onboarding before home intro is permitted under Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 5.42,
+   "score_note": "Directly addresses multiple support emails, but requires building a new screen."
+  },
+  {
+   "title": "Pet Account Recovery Flow",
+   "target_step": "sign_in",
+   "type": "new_flow",
+   "change": "Add a dedicated account verification and pet restore action directly on the sign-in screen for returning users.",
+   "why": "8 support emails (the top issue) reported pets going missing or resetting after signing in again.",
+   "config": {
+    "sign_in": {
+     "layout": "split",
+     "replace": {
+      "sign_in_options": [
+       {
+        "type": "text",
+        "text": "Existing user? Sign in to restore your saved pets.",
+        "style": "highlight",
+        "role": "sign_in_options"
+       },
+       {
+        "type": "button",
+        "label": "Restore Saved Pet",
+        "action": "choose",
+        "style": "rounded",
+        "role": "sign_in_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[1]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Desktop Pet Spawn Troubleshooting Status",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display progress indicators, time estimates, and desktop visibility troubleshooting tips on the waiting screen.",
+   "why": "3 support emails reported pets not showing up on the desktop, while waiting step median time is 201s.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "hint": "If your pet does not appear on your desktop, check your taskbar tray or press Alt+P.",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Ensure desktop overlay permissions are allowed in system settings.",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding troubleshooting status and hints to the waiting screen is explicitly allowed under Rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 5.83,
+   "score_note": "Solves reported pet spawn issues and long median wait time on home step.",
+   "slot": "best score"
+  },
+  {
+   "title": "Account Pet Cloud Backup Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add explicit hint copy on sign-in clarifying that logging in links all adopted pets permanently to the user account.",
+   "why": "Users lost or reset their pets when signing in with alternate account credentials.",
+   "config": {
+    "sign_in": {
+     "hint": "Sign in with your main email to keep your pet customization and adoption records safely backed up."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Photo Upload Pet Generation Guidance",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Provide clear photo quality guidelines and file format hints on the photo upload screen.",
+   "why": "3 support tickets noted custom pet creation failures or poor visually generated results.",
+   "config": {
+    "upload_photos": {
+     "hint": "Use clear, well-lit single-subject photos for the best 3D pet rendering results.",
+     "components": [
+      {
+       "type": "text",
+       "text": "Supported formats: JPG, PNG under 10MB",
+       "style": "small"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding photo quality guidance and file format tips to the photo upload screen is valid within onboarding."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.06,
+   "score": 8.75,
+   "score_note": "Low-cost guidance update targeting the largest step drop (39.1%) backed by support tickets.",
+   "slot": "best score"
+  },
+  {
+   "title": "Path Selection Step Counter & Clear Options",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update headline and body while enabling the step counter on the choose path screen to set clear expectations.",
+   "why": "Choose path screen has a very high mean time of 514s despite a median of 8s, indicating hesitation.",
+   "config": {
+    "choose_path": {
+     "show_step_counter": true,
+     "headline": "Choose Your Pet Companion Journey",
+     "body": "Select whether you want to adopt a ready companion or craft a custom pet."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating copy and enabling a step counter while preserving both adoption and custom pet paths is permitted."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 5.42,
+   "score_note": "Quick copy and counter change to address hesitation on initial path selection.",
+   "slot": "best score"
+  },
+  {
+   "title": "Two-Column Home Intro Dashboard",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Reorganize the home intro screen into a two-column dashboard layout presenting quick setup steps clearly.",
+   "why": "Finish step drops 35.2% of users (64.8% completion) with a median duration of 395s.",
+   "config": {
+    "home_intro": {
+     "layout": "two_column",
+     "headline": "Welcome Home to Your Desktop Companion!",
+     "body": "Your pet is now active on your desktop screen."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro layout within onboarding is permitted under Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.02,
+   "score": 5.0,
+   "score_note": "Redesign of finish layout to help reduce 35.2% drop-off rate.",
+   "slot": "best score"
+  },
+  {
+   "title": "Background Notification When Pet is Ready",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable background notifications on the waiting screen so users get alerted when their pet finishes loading.",
+   "why": "Home waiting screen has an average wait time of 2336s, suggesting users switch away to other desktop apps.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "headline": "Preparing Your Pet...",
+     "body": "Feel free to use other apps. We will notify you as soon as your pet lands on your desktop!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding notification options to the waiting screen is explicitly allowed under Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 5.0,
+   "score_note": "Re-engages users during long 2336s mean waiting time via background alerts."
+  }
+ ],
+ "picked": [
+  "Postpone Account Sign In"
+ ],
+ "held_by_harm_budget": [
+  "Photo Upload Pet Generation Guidance",
+  "Desktop Pet Spawn Troubleshooting Status",
+  "Path Selection Step Counter & Clear Options",
+  "Two-Column Home Intro Dashboard"
+ ],
+ "harm_budget": 106.9,
+ "planned_harm": 102.7,
+ "decisions": [
+  {
+   "test": "sim-2",
+   "title": "Postpone Account Sign In",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.7216,
+     "treatment": 0.769,
+     "lift": 0.0656,
+     "lift_se": 0.0262,
+     "p": 0.009822
+    },
+    "finish": {
+     "control": 0.168,
+     "treatment": 0.1873,
+     "lift": 0.1151,
+     "lift_se": 0.0878,
+     "p": 0.165993
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "won, shipped",
+   "score": 5.83,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": 0.0453,
+   "finishers_delta_hidden": 12.46
+  }
+ ],
+ "shipped": [
+  "Postpone Account Sign In"
+ ],
+ "ends_week": 2,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "Evidence is still thin for both adoption redesigns and sign-in reordering, as only one test has been completed for each kind of change.",
+  "Predictions were consistently too high compared to the noise-corrected measurements in both rounds."
+ ]
+}

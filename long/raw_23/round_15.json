@@ -1,0 +1,462 @@
+{
+ "round": 15,
+ "starts_week": 15,
+ "funnel": {
+  "choose_path": 0.7828788000000001,
+  "sign_in": 0.8794001258694155,
+  "adoption": 0.7714166947199999,
+  "home": 0.8530700358809999,
+  "finish": 0.73519544376
+ },
+ "weights_used": {
+  "impact": 0.081,
+  "evidence": 0.081,
+  "confidence": 2.621,
+  "cost": 1.217
+ },
+ "lessons_used": [
+  "New interactive flows (new_flow) generated the largest wins (up to +14.8%), but predictions were often overly optimistic as several flow additions caused severe drops (down to -11.8%).",
+  "Step reordering (reorder) achieved high-impact wins (up to +12.0%), but carried significant risk, frequently showing no clear effect or causing severe drops (down to -8.9%).",
+  "Wait-state indicators (wait_info) produced multiple solid wins (up to +6.1%), at times exceeding optimistic predictions (+6.1% vs +3.2% predicted), though several variants showed no clear effect.",
+  "Targeted copy updates (copy) yielded selective wins (up to +6.7%), though the majority of copy tests produced no clear effect.",
+  "UI redesigns, layout changes, hints, notifications, and standalone preview screens failed to produce any wins, with redesigns (down to -14.1%) and hints (down to -3.1%) often causing significant declines."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Interactive Desktop Pet Feeding Mini-Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Adds an interactive snack feeding activity sub-flow while waiting for desktop pet generation.",
+   "why": "The waiting step has a very high drop-off and massive latency (median 201s, mean 2336s). Providing interactive feeding keeps users engaged while assets render in the background.",
+   "config": {
+    "waiting": {
+     "headline": "Your Pet is Getting Ready!",
+     "body": "Feed your pet snacks while your desktop environment compiles."
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_feeding_flow",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_feeding_flow']"
+   }
+  },
+  {
+   "title": "Shift Sign-In Step Right Before Final Home Introduction",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves the sign-in step to occur after waiting pet generation completes, right before final desktop introduction.",
+   "why": "Sign-in sits early before waiting asset rendering, creating friction. Moving sign-in to after waiting lets users see their pet build before creating/verifying credentials.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "sign_in",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering the sign-in step to occur after waiting is explicitly allowed by rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 4.93,
+   "score_note": "Sign-in step reordering is high-risk and has shown negligible historical gains (+0.1% over 9 tests).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 179.9
+  },
+  {
+   "title": "Stage Layout Redesign for Companion Selection",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the pet selection screen into an immersive interactive stage layout with full-size preview cards.",
+   "why": "Adoption stage has a 77.1% conversion rate with long completion times (mean 1017s). A stage visual layout makes selecting a companion clearer and faster.",
+   "config": {
+    "pick_friend": {
+     "layout": "stage",
+     "headline": "Choose Your Perfect Desktop Companion",
+     "body": "Select a friend to join you on your desktop workspace.",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the pet selection layout while preserving its core function is allowed under rule 2 and 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.05,
+   "score": 0.27,
+   "score_note": "Adoption has high drop-off and long times, but UI redesigns consistently fail (-12.5% historical average).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 179.9
+  },
+  {
+   "title": "Desktop Shortcut & Controls Intro Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Adds a new interactive shortcut control orientation screen before entering the main desktop intro.",
+   "why": "Support receives multiple support tickets regarding post-onboarding confusion on how to control, hide, or interact with pets on the desktop.",
+   "config": {
+    "home_intro": {
+     "headline": "Welcome to Your Desktop Pet Workspace!",
+     "body": "Your pet is now active on your desktop."
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_pet_shortcut_guide",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_pet_shortcut_guide']"
+   }
+  },
+  {
+   "title": "Background Render Progress Breakdown & Timer",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays live rendering progress breakdown with explicit estimated time remaining on the waiting screen.",
+   "why": "Users spend up to 2336s on average in the waiting stage without clear feedback on render progress.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "hint": "Compiling 3D desktop assets and behaviors..."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying rendering progress and an estimated time for a real wait is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 8.34,
+   "score_note": "Wait-state info consistently delivers solid positive results, especially for high-wait steps like home.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 179.9
+  },
+  {
+   "title": "Account Pet Recovery Clarification Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Updates sign-in headline and body copy to clearly explain that signing in restores missing pets and account data.",
+   "why": "Support received 8 emails last week specifically reporting missing or reset pets after signing back into their accounts.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Restore Your Saved Pets & Purchases",
+     "body": "Log into your account to automatically load existing desktop pets, customizations, and settings."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Mentions purchases and paying"
+   }
+  },
+  {
+   "title": "Desktop Ready Notification Switch",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enables a system tray desktop notification toggle on the waiting screen when asset preparation finishes.",
+   "why": "The average waiting duration of 2336s causes users to switch away to other desktop apps while waiting.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "body": "You can minimize this window. We'll alert you on your desktop as soon as your pet is ready!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a desktop notification toggle on the waiting screen is permitted under rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.01,
+   "score": 0.14,
+   "score_note": "Desktop notifications require OS integration cost and historical notification tests failed (-1.3%)."
+  },
+  {
+   "title": "Interactive Pet Personality Matching Quiz Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Adds an interactive personality quiz mini-flow before pick_friend to help recommend suitable pet archetypes.",
+   "why": "Adoption has low conversion (77.1%) and high decision paralysis (mean 1017s). A quick quiz guides users to the right pet fast.",
+   "config": {
+    "pick_friend": {
+     "headline": "Your Recommended Desktop Friends",
+     "body": "Based on your quiz answers, here are the best companion matches for your workflow."
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "new_personality_quiz",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_personality_quiz']"
+   }
+  },
+  {
+   "title": "Bonus Desktop Wallpaper Pack Incentive",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Offers a free downloadable desktop wallpaper theme pack upon completing onboarding on the home intro screen.",
+   "why": "Completion drops to 73.5% at the final finish step. Adding a completion reward incentivizes reaching the end.",
+   "config": {
+    "home_intro": {
+     "headline": "Setup Complete! Claim Your Free Desktop Wallpapers",
+     "body": "Your pet is live! Enjoy your exclusive custom desktop wallpaper gift bundle."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy cannot mention free extras or gifts."
+   }
+  },
+  {
+   "title": "Path Flexibility Reassurance Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Adds a hint on path selection reassuring users that chosen playstyles can be altered anytime later.",
+   "why": "Mean time spent on choose_path is 514s despite 78.3% conversion, showing heavy hesitation before choosing.",
+   "config": {
+    "choose_path": {
+     "hint": "Don't worry — you can easily change your path settings or switch companions anytime in desktop preferences."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding reassurance copy regarding path flexibility on choose_path is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.02,
+   "score": 3.25,
+   "score_note": "Very low cost config change, but hints have historically failed to produce wins (-3.1% on choose_path).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 179.9
+  }
+ ],
+ "picked": [
+  "Shift Sign-In Step Right Before Final Home Introduction",
+  "Stage Layout Redesign for Companion Selection",
+  "Background Render Progress Breakdown & Timer",
+  "Path Flexibility Reassurance Hint"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 719.6,
+ "decisions": [
+  {
+   "test": "sim-51",
+   "title": "Shift Sign-In Step Right Before Final Home Introduction",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 179.9,
+   "result": {
+    "step": {
+     "control": 0.8696,
+     "treatment": 0.8793,
+     "lift": 0.0112,
+     "lift_se": 0.0113,
+     "p": 0.316221
+    },
+    "finish": {
+     "control": 0.3237,
+     "treatment": 0.2997,
+     "lift": -0.0742,
+     "lift_se": 0.0356,
+     "p": 0.044767
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.93,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": 0.0251,
+   "finishers_delta_hidden": 22.94
+  },
+  {
+   "test": "sim-52",
+   "title": "Stage Layout Redesign for Companion Selection",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 179.9,
+   "result": {
+    "step": {
+     "control": 0.7593,
+     "treatment": 0.8239,
+     "lift": 0.085,
+     "lift_se": 0.0177,
+     "p": 1e-06
+    },
+    "finish": {
+     "control": 0.2987,
+     "treatment": 0.3247,
+     "lift": 0.0871,
+     "lift_se": 0.0418,
+     "p": 0.0297
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 0.27,
+   "predicted_lift": -0.05,
+   "true_lift_hidden": 0.0826,
+   "finishers_delta_hidden": 75.49
+  },
+  {
+   "test": "sim-53",
+   "title": "Background Render Progress Breakdown & Timer",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 179.9,
+   "result": {
+    "step": {
+     "control": 0.8407,
+     "treatment": 0.857,
+     "lift": 0.0193,
+     "lift_se": 0.0156,
+     "p": 0.212946
+    },
+    "finish": {
+     "control": 0.2943,
+     "treatment": 0.2957,
+     "lift": 0.0045,
+     "lift_se": 0.0401,
+     "p": 0.909845
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.34,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": 0.0252,
+   "finishers_delta_hidden": 23.03
+  },
+  {
+   "test": "sim-54",
+   "title": "Path Flexibility Reassurance Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 179.9,
+   "result": {
+    "step": {
+     "control": 0.772,
+     "treatment": 0.7523,
+     "lift": -0.0255,
+     "lift_se": 0.0141,
+     "p": 0.073612
+    },
+    "finish": {
+     "control": 0.2933,
+     "treatment": 0.308,
+     "lift": 0.05,
+     "lift_se": 0.0414,
+     "p": 0.215429
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.25,
+   "predicted_lift": -0.02,
+   "true_lift_hidden": -0.0093,
+   "finishers_delta_hidden": -8.5
+  }
+ ],
+ "shipped": [
+  "Stage Layout Redesign for Companion Selection"
+ ],
+ "ends_week": 15,
+ "weights_next": {
+  "impact": 0.084,
+  "evidence": 0.084,
+  "confidence": 2.645,
+  "cost": 1.187
+ },
+ "lessons_next": [
+  "New interactive flows (new_flow) delivered the largest wins (up to +14.8%), but predictions were often overly optimistic as several variants caused severe drops (down to -11.8%).",
+  "Step reordering (reorder) drove major wins (up to +12.0%), though it carried high risk, frequently producing no clear effect or severe drops (down to -8.9%).",
+  "Wait-state information (wait_info) generated multiple solid wins (up to +6.1%), occasionally exceeding conservative predictions (+6.1% vs +3.2%), though several variants showed no clear effect.",
+  "Targeted copy updates (copy) yielded selective wins (up to +6.7%), though the majority of copy tests resulted in no clear effect.",
+  "UI redesigns (redesign) frequently caused severe drops (down to -19.3%), but a companion selection layout redesign produced a major win (+8.5%), vastly outperforming pessimistic predictions (-5.0%).",
+  "Hints (hint), notifications (notification), layout changes (layout), and standalone preview screens (new_screen) failed to produce any wins, with hints sometimes worsening performance (down to -3.1%)."
+ ]
+}

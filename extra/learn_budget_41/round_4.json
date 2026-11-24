@@ -1,0 +1,404 @@
+{
+ "round": 4,
+ "starts_week": 4,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "Evidence is still thin for adoption, new_flow, finish, and home changes, as only one test has been completed for each.",
+  "For new_screen changes (2 tests), no clear effect was seen, with both leaning negative after noise correction.",
+  "No kind of change has proven helpful yet, as no test has shown a clear significant effect.",
+  "Predictions were consistently too high across all three tests compared to noise-corrected results."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Account Sync Persistence Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in screen to prominently emphasize account backup and preventing pet data loss across sessions.",
+   "why": "8 support tickets reported pets missing or reset after signing in, and 27.1% of users drop off at sign_in.",
+   "config": {
+    "sign_in": {
+     "headline": "Sync & Secure Your Companion",
+     "body": "Sign in to save your pet safely in the cloud so your progress is never lost.",
+     "layout": "two_column",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "badge",
+        "text": "Cloud Save Active",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Photo Quality Guidance Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add clear image requirements and lighting tips directly on the photo upload view.",
+   "why": "3 support tickets reported custom pet generation failures or distorted results, and adoption retention is only 60.9%.",
+   "config": {
+    "upload_photos": {
+     "hint": "Use well-lit, clear front-facing photos for best pet generation results.",
+     "show_time_estimate": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds image requirement hints to photo upload within onboarding rules."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 7.5,
+   "score_note": "Targeted at highest drop-off step (39.1%) with strong support ticket evidence.",
+   "slot": "best score"
+  },
+  {
+   "title": "Desktop Controls Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a dedicated desktop pet interaction guide screen before onboarding completes.",
+   "why": "3 support emails mentioned confusion on how to control or hide the pet, and finish step conversion is 64.8%.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_controls_guide"
+    ],
+    "new_controls_guide": {
+     "headline": "Desktop Pet Controls",
+     "body": "Click your pet to play, right-click for settings, and drag to reposition anytime.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "text",
+       "text": "Left-click: Interact | Right-click: Options | Drag: Move",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'new_controls_guide.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Creation Status and Delay Tracker",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display progress indicators and accurate estimated completion times on the waiting screen.",
+   "why": "The waiting step has a very high mean duration of 2336s, leading to drop-offs before completion.",
+   "config": {
+    "waiting": {
+     "headline": "Assembling Your Desktop Companion",
+     "body": "We are generating custom assets and preparing your pet.",
+     "show_progress": true,
+     "show_time_estimate": true,
+     "tip_delay_seconds": 15
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds accurate progress and estimated completion time to the waiting screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.02,
+   "score": 5.0,
+   "score_note": "Addresses high wait time on home screen; supported by duration metrics.",
+   "slot": "best score"
+  },
+  {
+   "title": "Deferred Sign-In Sequence",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Reorder onboarding so users select their pet creation path before being asked to sign in.",
+   "why": "Asking for sign-in upfront causes friction; letting users pick a path first builds intent.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "sign_in",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in step after path selection, which is explicitly allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 5.0,
+   "score_note": "Reduces upfront sign-in friction by deferring authentication.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Desktop Visibility Setup Layout",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Update the home intro screen layout to split view focusing on desktop window positioning.",
+   "why": "3 support emails noted pets not appearing on screen or app failing to open after onboarding.",
+   "config": {
+    "home_intro": {
+     "headline": "Companion Active on Desktop",
+     "body": "Your companion is live on your screen. Check your desktop background or system tray.",
+     "layout": "split"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates home intro layout within onboarding without breaking rules."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 7.5,
+   "score_note": "Solves post-onboarding setup issues backed by 3 support emails and 35.2% drop-off.",
+   "slot": "best score"
+  },
+  {
+   "title": "One-Click Sign-In Copy Refresh",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Rewrite sign-in copy to emphasize fast account protection and instant setup.",
+   "why": "Sign-in stage drops 27.1% of users despite low median completion time.",
+   "config": {
+    "sign_in": {
+     "headline": "Quick Account Connection",
+     "body": "Link your account in seconds to sync companion progress across all your devices.",
+     "button_label": "Continue to Pet Setup"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Refreshes copy and button text on the sign-in screen without losing functionality."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 6.25,
+   "score_note": "Config-only copy tweak addressing 27.1% sign-in drop-off.",
+   "slot": "best score"
+  },
+  {
+   "title": "Interactive Certificate Builder Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Add a certificate personalization sub-flow allowing users to pick companion badges and names before finalizing adoption.",
+   "why": "Adoption stage has the highest drop-off rate (60.9% conversion) and long completion times.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "new_cert_builder",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_cert_builder": {
+     "headline": "Personalize Adoption Badge",
+     "body": "Name your companion and select your official adoption seal.",
+     "layout": "card",
+     "components": [
+      {
+       "type": "name_input",
+       "label": "Pet Name",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a certificate builder step inside onboarding without removing required steps."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 3.33,
+   "score_note": "High effort new flow; historical data shows weak lift for new_flow tests."
+  },
+  {
+   "title": "Starter Accessory Choice Incentive",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Highlight a free starter accessory bonus on the path selection screen.",
+   "why": "23.8% of users drop off on choose_path, spending significant time deciding (514s mean).",
+   "config": {
+    "choose_path": {
+     "headline": "Choose Your Companion Path",
+     "body": "Pick a path to unlock a free starter hat accessory for your desktop pet!",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Includes Free Accessory",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Mentions a 'free starter hat accessory' and 'Includes Free Accessory' in onboarding copy."
+   }
+  },
+  {
+   "title": "Background Generation Notification",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable desktop system alerts when pet generation finishes while minimized.",
+   "why": "Home stage waiting time averages 2336s, indicating users switch away and forget to return.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "body": "Feel free to minimize this window. We will send a desktop alert when your pet is ready!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enables desktop alerts for completion on the waiting screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.02,
+   "score": 5.0,
+   "score_note": "Re-engages users during long background generation wait times."
+  }
+ ],
+ "picked": [
+  "Deferred Sign-In Sequence"
+ ],
+ "held_by_harm_budget": [
+  "Photo Quality Guidance Hint",
+  "Desktop Visibility Setup Layout",
+  "One-Click Sign-In Copy Refresh",
+  "Creation Status and Delay Tracker"
+ ],
+ "harm_budget": 106.9,
+ "planned_harm": 102.7,
+ "decisions": [
+  {
+   "test": "sim-4",
+   "title": "Deferred Sign-In Sequence",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.7533,
+     "treatment": 0.8753,
+     "lift": 0.1619,
+     "lift_se": 0.0206,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.172,
+     "treatment": 0.1973,
+     "lift": 0.1473,
+     "lift_se": 0.0883,
+     "p": 0.07378
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "won, shipped",
+   "score": 5.0,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": 0.1737,
+   "finishers_delta_hidden": 42.39
+  }
+ ],
+ "shipped": [
+  "Deferred Sign-In Sequence"
+ ],
+ "ends_week": 4,
+ "weights_next": {
+  "impact": 0.819,
+  "evidence": 0.202,
+  "confidence": 1.3,
+  "cost": 1.679
+ },
+ "lessons_next": [
+  "For new_screen changes (2 tests), no clear effect was seen in either test.",
+  "Evidence is still thin for adoption, new_flow, finish, home, choose_path, and reorder changes, as only one test has been completed for each.",
+  "reorder and choose_path changes were helpful, winning Round 4 (+11.8% after noise correction).",
+  "Predictions were too high for tests with no clear effect, but underpredicted the winning reorder test."
+ ]
+}

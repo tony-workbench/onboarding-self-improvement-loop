@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [home, wait_info] Desktop Arrival Activity & Time Stream: Display an active time estimate counter alongside desktop rendering activity updates on the waiting screen while the pet is being prepared.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"show_progress\": true, \"tip_delay_seconds\": 15, \"replace\": {\"wait_status\": [{\"role\": \"wait_status\", \"type\": \"progress\", \"label\": \"Preparing pet desktop environment...\", \"style\": \"highlight\"}, {\"role\": \"wait_status\", \"type\": \"timer\", \"label\": \"Estimated completion time remaining\", \"style\": \"calm\"}]}}}\n1: [choose_path, redesign] Interactive Story Path Selector Stage: Redesign the path selection screen into a stage layout with interactive path choice cards and companion mascot previews.\n   config: {\"choose_path\": {\"layout\": \"stage\", \"headline\": \"Choose Your Companion Journey\", \"body\": \"Select how you would like your desktop companion to interact with your workspace daily.\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"label\": \"Select Companion Mode\", \"style\": \"playful\"}, {\"role\": \"path_options\", \"type\": \"mascot\", \"asset\": \"asset:mascot_preview\", \"style\": \"highlight\"}]}}}\n2: [choose_path, new_flow] Pre-Selection Companion Preference Flow: Embed a multi-option style and activity preference picker into the initial story screen before choosing a pet path.\n   config: {\"story\": {\"layout\": \"story_scroll\", \"headline\": \"Welcome to Your Desktop Pet Companion\", \"body\": \"Customize your expected companion presence before selecting your pet journey.\", \"replace\": {\"intro_story\": [{\"role\": \"intro_story\", \"type\": \"choice_cards\", \"label\": \"How active should your desktop companion be?\", \"style\": \"rounded\"}, {\"role\": \"intro_story\", \"type\": \"button\", \"label\": \"Continue to Path Selection\", \"action\": \"next\", \"style\": \"emphasis\"}]}}}\n3: [adoption, redesign] Spotlight Photo Customization Redesign: Rebuild the photo upload screen using a spotlight layout with real-time photo quality feedback components and instant photo picker preview.\n   config: {\"upload_photos\": {\"layout\": \"spotlight\", \"headline\": \"Upload Your Pet Reference Photo\", \"body\": \"Provide a clear photo for optimal 3D desktop pet generation.\", \"hint\": \"Ensure good lighting and a clear frontal view of your pet.\", \"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"photo_picker\", \"label\": \"Select Pet Photo\", \"style\": \"large\"}, {\"role\": \"photo_upload\", \"type\": \"preview\", \"label\": \"Photo Rendering Quality Check\", \"style\": \"highlight\"}]}}}\n4: [home, notification] Desktop Arrival Readiness Notification Prompt: Add an instant background notification opt-in prompt with a completion badge on the pet generation waiting screen.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"badge\", \"text\": \"Background Notification Enabled\", \"style\": \"emphasis\"}, {\"type\": \"text\", \"text\": \"We will alert you on your desktop as soon as your pet is ready to dock.\", \"style\": \"calm\"}]}}\n5: [finish, hint] Desktop Controls & Interaction Guide Hint: Add persistent control and tray icon navigation instructions to the home intro screen.\n   config: {\"home_intro\": {\"hint\": \"Right-click your pet on the desktop or use the system tray icon anytime to hide, configure, or interact with your pet.\", \"components\": [{\"type\": \"checklist\", \"label\": \"Quick Controls: Right-click for options | Drag to move | Tray icon to minimize\", \"style\": \"highlight\"}]}}\n6: [choose_path, layout] Story Carousel Journey Overview: Switch the story screen layout to a dynamic carousel showcasing desktop pet interaction features.\n   config: {\"story\": {\"layout\": \"carousel\", \"headline\": \"Meet Your Virtual Desktop Buddy\", \"body\": \"Swipe through to see what your pet can do on your screen.\", \"components\": [{\"type\": \"tip_carousel\", \"label\": \"Companion Highlights\", \"style\": \"playful\"}]}}\n7: [adoption, copy] Account Persistence & Pet Storage Clarity Copy: Update adoption certificate copy to explicitly assure users their pet companion is permanently linked to their signed-in account.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Companion Adoption Certificate\", \"body\": \"Your pet is officially registered and synced to your account. You can log in on any desktop device to access your pet.\", \"hint\": \"Account Sync Active: All pet progress and customizations are saved automatically.\"}}\n8: [choose_path, new_screen] Pre-Onboarding Experience Intro Screen: Insert a new introductory welcome screen 'new_desktop_companion_welcome' before the story screen to introduce app capabilities.\n   config: {\"_order\": [\"new_desktop_companion_welcome\", \"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_desktop_companion_welcome\": {\"layout\": \"centered\", \"headline\": \"Welcome to Your Desktop Companion Experience\", \"body\": \"Create, customize, and live with an interactive pet right on your desktop screen.\", \"button_label\": \"Start Onboarding\", \"components\": [{\"type\": \"mascot\", \"asset\": \"asset:welcome_mascot\", \"style\": \"playful\"}, {\"type\": \"button\", \"label\": \"Begin Setup\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n9: [home, wait_info] Interactive Generation Care Tip Stream: Add an automated pet care tip carousel that rotates every 10 seconds during the home stage pet rendering wait.\n   config: {\"waiting\": {\"tip_delay_seconds\": 10, \"components\": [{\"type\": \"tip_carousel\", \"label\": \"Pet Care & Desktop Tricks\", \"style\": \"calm\", \"action\": \"open_tip\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Displays progress and real wait time estimate on waiting screen while pet is prepared."
+   },
+   {
+    "index": 1,
+    "pass": false,
+    "rule": 2,
+    "reason": "Loses the job of choose path by replacing adopt vs. make your own options with companion interaction mode selection."
+   },
+   {
+    "index": 2,
+    "pass": false,
+    "rule": 2,
+    "reason": "Loses the job of the story screen by replacing the pet introduction with activity level preference selection."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns photo upload screen while preserving photo selection and upload functionality."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds notification opt-in prompt to waiting screen without replacing pet generation status."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds interaction hint to home intro screen within onboarding scope."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns story screen into a carousel that still introduces the pet companion features."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates certificate copy to clarify account sync while maintaining the adoption certificate screen."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new welcome screen at the start of onboarding without removing any required steps."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds automated care tip carousel to waiting screen while keeping pet generation status."
+   }
+  ]
+ }
+}

@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_screen] Desktop Controls Quick Card: Adds a dedicated quick-reference screen before completing setup that visually highlights desktop hotkeys, tray controls, and pet interaction modes.\n   config: {\"home_intro\": {\"headline\": \"Meet Your New Desktop Companion\", \"body\": \"Your pet is live! Here is how to control, hide, or chat with them anytime.\", \"layout\": \"spotlight\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Desktop Controls Summary\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Got It, Launch Desktop Pet\", \"action\": \"next\", \"style\": \"emphasis\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_controls_card\", \"home_intro\"]}\n1: [sign_in, hint] Account Cloud Recovery Guarantee Badge: Displays an explicit data preservation badge on the sign-in screen reassuring users that existing pets will be automatically synced rather than reset.\n   config: {\"sign_in\": {\"hint\": \"Signing in automatically saves and restores your existing pets to this device.\", \"components\": [{\"type\": \"badge\", \"text\": \"Safe Sync: Pet Data Protected\", \"style\": \"highlight\"}]}}\n2: [adoption, redesign] Photo Selection Requirements & Fallback Guide: Redesigns the photo upload screen with clear formatting tips (lighting, angle) and an instant preset animal fallback if custom generation fails.\n   config: {\"upload_photos\": {\"headline\": \"Create Your Custom Pet\", \"body\": \"Upload a clear photo with strong lighting. If photo processing encounters issues, default templates are applied instantly.\", \"layout\": \"two_column\", \"components\": [{\"type\": \"photo_picker\", \"label\": \"Upload Pet Photo\", \"style\": \"rounded\"}, {\"type\": \"tip_carousel\", \"text\": \"Best results: Single animal, well-lit, clear background.\", \"style\": \"calm\"}]}}\n3: [choose_path, redesign] Story-Driven Companion Path Intro: Redesigns the story screen into a carousel layout with vibrant companion visuals to set clear expectations before choosing a path.\n   config: {\"story\": {\"headline\": \"Welcome to Desktop Pets\", \"body\": \"Choose how you want to bring your desktop to life with animated AI companions.\", \"layout\": \"carousel\", \"components\": [{\"type\": \"mascot\", \"asset\": \"asset:hero_pet_intro\", \"style\": \"playful\"}, {\"type\": \"button\", \"label\": \"Start Journey\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n4: [home, wait_info] Desktop Renderer Manual Spawn Verification: Adds explicit rendering status indicators and a manual spawn button on the waiting screen if desktop rendering takes too long.\n   config: {\"waiting\": {\"headline\": \"Preparing Desktop Pet Render\", \"body\": \"We are placing your pet on your screen background now.\", \"show_time_estimate\": true, \"show_progress\": true, \"components\": [{\"type\": \"progress\", \"label\": \"Rendering pet sprites...\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Force Display Pet\", \"action\": \"next\", \"style\": \"subtle\"}]}}\n5: [adoption, layout] Adoption Certificate Name & Personality Preview: Changes the adoption certificate screen to a spotlight layout featuring pet personality tags and a dedicated name confirmation preview.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Adoption Certificate\", \"body\": \"Give your new desktop companion a name and sign their official adoption paper.\", \"layout\": \"spotlight\", \"components\": [{\"type\": \"name_input\", \"label\": \"Pet Name\", \"style\": \"large\"}, {\"type\": \"badge\", \"text\": \"Personality: Playful & Curious\", \"style\": \"highlight\"}]}}\n6: [sign_in, copy] Account Restoration Security Notice: Revises sign-in headline and body copy to explicitly clarify that signing in syncs existing local pet state rather than wiping it.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Sync & Protect Your Pet\", \"body\": \"Your current pet progress will be linked safely to your account. Returning users will seamlessly restore their saved pets.\", \"button_label\": \"Sign In & Sync\"}}\n7: [finish, new_flow] Post-Spawn Interactive Quick Tutorial: Replaces standard text intro on finish stage with a guided walkthrough showing pet tray icon access, pet dragging, and chat trigger.\n   config: {\"home_intro\": {\"headline\": \"Your Pet is Ready!\", \"body\": \"Follow this quick 3-step guide to interact with your pet anywhere on your desktop.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"label\": \"Desktop Shortcuts\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Finish Onboarding\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n8: [adoption, redesign] Pre-Adoption Pet Selection Grid Redesign: Redesigns the pick_friend screen with a stage layout featuring live animated preview cards and category choice badges.\n   config: {\"pick_friend\": {\"headline\": \"Choose Your Companion\", \"body\": \"Select your favorite pet style to get started.\", \"layout\": \"stage\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Pet Categories\", \"style\": \"playful\"}, {\"type\": \"preview\", \"asset\": \"asset:pet_preview_stage\", \"style\": \"large\"}]}}\n9: [choose_path, incentive] Express Path Instant Setup Banner: Adds an estimated completion time tag and instant setup guarantee badge on the choose_path screen.\n   config: {\"choose_path\": {\"headline\": \"Select Your Setup Experience\", \"body\": \"Pick Express for 1-click default pets (under 60s) or Custom for photo-based creation.\", \"show_time_estimate\": true, \"components\": [{\"type\": \"badge\", \"text\": \"Express Path: Ready in < 1 minute\", \"style\": \"highlight\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an instructional desktop controls card inside onboarding retains all required steps and complies with all rules."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Reassuring sync badge on sign-in screen maintains all required step functionality and complies with fair design rules."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the photo upload step with tips and preset fallback retains photo selection capability without breaking rules."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Carousel layout redesign of the story screen properly introduces the pet and preserves required step functionality."
+   },
+   {
+    "index": 4,
+    "pass": false,
+    "rule": 1,
+    "reason": "Adding a button with action 'next' allows skipping the mandatory waiting step."
+   },
+   {
+    "index": 5,
+    "pass": false,
+    "rule": 2,
+    "reason": "The redesigned adoption certificate removes the required official stamp."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Sign-in copy update retains account functionality and does not break any base rules."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro with interactive checklist guides remains within onboarding and follows fair design rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Stage layout redesign for pet selection maintains pet choice capability."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding time estimates and path badges still presents both adopting and making your own without dark patterns."
+   }
+  ]
+ }
+}

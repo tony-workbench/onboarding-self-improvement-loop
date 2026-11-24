@@ -1,0 +1,382 @@
+{
+ "round": 2,
+ "starts_week": 2,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.481,
+  "evidence": 0.481,
+  "confidence": 0.718,
+  "cost": 2.321
+ },
+ "lessons_used": [
+  "Evidence is still thin for all specific change types (sign_in reorder, home redesign, finish layout, choose_path copy) as each has only been tested once.",
+  "Predictions were consistently too optimistic across all tests compared to measured outcomes."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Story Screen Card Stage Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the initial story screen into a stage layout featuring companion animations and vibrant intro cards. This gives immediate visual feedback about what the desktop pet app offers before path selection.",
+   "why": "The choose_path step has a long mean duration of 514s and drop-off to 76.2%. Setting clear visual expectations early engages users right away.",
+   "config": {
+    "story": {
+     "layout": "stage",
+     "headline": "Welcome to Your Desktop Companion",
+     "body": "Bring your virtual pet to life directly on your desktop screen.",
+     "components": [
+      {
+       "type": "mascot",
+       "label": "Preview Pet",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the story screen layout retains its function of introducing the pet and respects all base rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 0.8,
+   "score_note": "Redesigns have shown poor historical lift (-2.5% to 0.0%) and require new screens.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Desktop Controls Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a dedicated new control overview screen before the home intro screen that explains how to hide, drag, and interact with the desktop pet.",
+   "why": "Support logs contain multiple complaints under [after_onboarding, confusion] where users are unsure how to control, hide, or talk to their pet after finishing onboarding.",
+   "config": {
+    "home_intro": {
+     "headline": "Ready to Interact With Your Pet!"
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_guide",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_desktop_guide']"
+   }
+  },
+  {
+   "title": "Multi-Step Pet Customization Sub-Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Add an interactive trait selection screen into the adoption sequence prior to generating the adoption certificate.",
+   "why": "The adoption step suffers from the lowest funnel conversion (60.9%) and long median time (89s), indicating users want more interactive customization steps.",
+   "config": {
+    "pick_friend": {
+     "layout": "carousel",
+     "headline": "Choose Your Companion Archetype"
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "new_trait_selection",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_trait_selection']"
+   }
+  },
+  {
+   "title": "Account Persistence Spotlight Sign-in",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in screen into a spotlight layout emphasizing cloud backup and pet recovery guarantees.",
+   "why": "8 support emails (the top issue category) reported missing or reset pets after signing back in. Clarifying account data protection improves user trust and sign-in completion.",
+   "config": {
+    "sign_in": {
+     "layout": "spotlight",
+     "headline": "Protect Your Pet with Cloud Sync",
+     "body": "Sign in to save your pet's memory, items, and settings safely to your account.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "type": "button",
+        "label": "Sign In to Save Progress",
+        "style": "emphasis",
+        "action": "choose",
+        "role": "sign_in_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Desktop Generation Progress & Estimate",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display explicit status progress indicators and remaining time estimates on the waiting screen while the desktop pet environment initializes.",
+   "why": "The home/waiting step has a very high median (201s) and mean time (2336s), leading to user drop-off (81.3% conversion) and support reports of pets failing to open.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "hint": "Setting up your desktop companion. This usually takes around 1 to 2 minutes."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying progress and a real wait time estimate on the waiting screen is explicitly allowed under Rule 5."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.035,
+   "score": 5.8,
+   "score_note": "Both funnel wait times and support emails confirm user confusion during initialization."
+  },
+  {
+   "title": "Explicit Path Selection Guidance Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update the choose_path screen headline, body text, and button labels to clearly contrast standard companion selection versus photo-based custom pet creation.",
+   "why": "Users take an average of 514s on the choose_path screen due to ambiguity over path options.",
+   "config": {
+    "choose_path": {
+     "headline": "Choose How to Begin",
+     "body": "Select a ready-made digital companion or generate a unique pet from your photos.",
+     "button_label": "Continue with Path"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Asks for personal photos of the user"
+   }
+  },
+  {
+   "title": "Photo Quality & Lighting Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add an inline quality tip on the upload_photos screen specifying ideal lighting and pose for optimal pet generation.",
+   "why": "3 support emails reported custom pet generation failures or bad rendering results during adoption.",
+   "config": {
+    "upload_photos": {
+     "hint": "Upload well-lit, forward-facing photos for the crispest 3D pet generation."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Asks to upload personal photos of the user"
+   }
+  },
+  {
+   "title": "Starter Accessory Reward Banner",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Display a welcome badge and starter hat reward claim component on the home intro screen upon completing setup.",
+   "why": "Finish conversion drops to 64.8% with long completion times; immediate digital incentives motivate completion.",
+   "config": {
+    "home_intro": {
+     "headline": "Onboarding Complete! Here is Your Free Pet Accessory",
+     "body": "Your pet is now active on your desktop. Enjoy your exclusive starter hat accessory!",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Starter Pack Unlocked",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.headline' talks about price or money"
+   }
+  },
+  {
+   "title": "Pre-Choice Account Sign-In Step Order",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move the sign_in screen to occur immediately after the initial story screen, before pet path choice.",
+   "why": "Multiple support emails mention pets being reset or lost when account authentication happens late or fails.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In First to Protect Your Creation"
+    },
+    "_order": [
+     "story",
+     "sign_in",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "sign_in may move later, not before choose_path"
+   }
+  },
+  {
+   "title": "Desktop Ready System Notification Switch",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable desktop notification alerts on the waiting screen to inform users when pet initialization completes.",
+   "why": "Median wait time is 201s and mean is 2336s; users tab away during waiting and forget to return to the app.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "headline": "Preparing Desktop Pet",
+     "body": "You can use other apps while we prepare. We will notify you as soon as your pet arrives."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling notification alerts on the waiting screen is allowed inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.025,
+   "score": 8.3,
+   "score_note": "Low-cost notification toggle directly addresses tab-away drop-off during long wait times.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  }
+ ],
+ "picked": [
+  "Story Screen Card Stage Redesign",
+  "Desktop Ready System Notification Switch"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-5",
+   "title": "Story Screen Card Stage Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7587,
+     "treatment": 0.751,
+     "lift": -0.0101,
+     "lift_se": 0.0146,
+     "p": 0.490047
+    },
+    "finish": {
+     "control": 0.174,
+     "treatment": 0.1913,
+     "lift": 0.0996,
+     "lift_se": 0.0601,
+     "p": 0.082318
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 0.8,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": -0.0083,
+   "finishers_delta_hidden": -4.52
+  },
+  {
+   "test": "sim-6",
+   "title": "Desktop Ready System Notification Switch",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.807,
+     "treatment": 0.8139,
+     "lift": 0.0086,
+     "lift_se": 0.0217,
+     "p": 0.690149
+    },
+    "finish": {
+     "control": 0.1737,
+     "treatment": 0.183,
+     "lift": 0.0537,
+     "lift_se": 0.0584,
+     "p": 0.345007
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.3,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": 0.0229,
+   "finishers_delta_hidden": 12.47
+  }
+ ],
+ "shipped": [],
+ "ends_week": 2,
+ "weights_next": {
+  "impact": 0.203,
+  "evidence": 0.203,
+  "confidence": 0.424,
+  "cost": 3.17
+ },
+ "lessons_next": [
+  "Predictions were consistently too optimistic across all tests compared to measured outcomes.",
+  "Evidence remains thin for all specific change types (sign_in reorder, home redesign, finish layout, choose_path copy, choose_path redesign, home notification) as each has only been tested once.",
+  "No kinds of change have been proven helpful yet, as no tests have won."
+ ]
+}

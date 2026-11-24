@@ -1,0 +1,485 @@
+{
+ "round": 10,
+ "starts_week": 10,
+ "funnel": {
+  "choose_path": 0.83508474588,
+  "sign_in": 0.7832376,
+  "adoption": 0.8468571615499638,
+  "home": 0.8638125,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 3.524,
+  "evidence": 0.256,
+  "confidence": 0.11,
+  "cost": 0.11
+ },
+ "lessons_used": [
+  "Helpful changes: Preset fast-track adoption flows, moving sign-in immediately after pet adoption, photo quality callouts, interactive progress tip carousels, split-view path layouts, custom pet style selector views, and pre-upload style inspection views consistently won.",
+  "Worse performance: Pre-adoption photo prep screens, path decision speed helper callouts, path choice flexibility copy, desktop dock guidance banners, desktop video cards/welcome redesigns, and interactive sound/visual wait progress led to significant losses.",
+  "No clear effect: Notifications, account sync/persistence banners and flows, subsequent sign-in reordering, diagnostic/archetype flows, waiting overlays/indicators, visibility prompts, and carousel or two-column path layouts showed no clear effect.",
+  "Predictions were too low for photo quality assistant callouts, interactive progress carousels, split-view path selection screens, custom pet style selectors, and pre-upload style inspection views.",
+  "Predictions were too high for preset fast-track adoption flows, sign-in reordering, split-view story intros, and all tests showing negative performance or no clear effect."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Spotlight Companion Style Stage Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the pet selection step into a visual spotlight layout highlighting companion presets with distinct aesthetic cards.",
+   "why": "Adoption has a high mean time of 1017s; a spotlight layout simplifies visual comparison to speed up pet selection.",
+   "config": {
+    "pick_friend": {
+     "layout": "spotlight",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "label": "Select Pet Style Preset",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns pet selection screen while retaining the ability to choose a pet."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.06,
+   "score": 6.5,
+   "score_note": "Custom pet style selector layouts consistently won and address long adoption times.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 176.0
+  },
+  {
+   "title": "Pet Naming and Identity Pass Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Adds a dedicated companion naming screen right before adoption certificate signing to deepen user connection with their pet.",
+   "why": "Finish conversion drops to 64.8%; establishing personal pet attachment early boosts overall completion.",
+   "config": {
+    "new_pet_naming": {
+     "headline": "Give Your Companion a Name",
+     "body": "Choose a unique name for your desktop pet to complete its registration.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "name_input",
+       "label": "Pet Name",
+       "style": "rounded"
+      },
+      {
+       "type": "button",
+       "label": "Confirm Name",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "new_pet_naming",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new pet naming step inside onboarding without removing any required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 6.22,
+   "score_note": "New adoption screens previously yielded +5.2%, though adding screens needs a release."
+  },
+  {
+   "title": "Fast-Track Companion Setup Flow",
+   "target_step": "choose_path",
+   "type": "new_flow",
+   "change": "Introduces a compact fast-track path setup flow directly on the story intro screen to accelerate initial user onboarding.",
+   "why": "Choose path takes a mean time of 514s; providing a fast-track workflow helps users enter adoption without delay.",
+   "config": {
+    "story": {
+     "layout": "compact",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "button",
+        "label": "Fast-Track Companion Setup",
+        "style": "emphasis",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'story.intro_story' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'video'] with an asset:story/ asset"
+   }
+  },
+  {
+   "title": "Onboarding Completion Sign-In Gate",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves account sign-in to the very end of onboarding after the final home desktop welcome preview.",
+   "why": "Sign-in has an 8s median / 567s mean time and 8 users reported lost pets after re-authenticating; placing auth at the end secures fully configured pets.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "sign_in"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "home_intro must come after every existing screen, sign_in included"
+   }
+  },
+  {
+   "title": "Starter Cosmetic Companion Perk Incentive",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Displays an exclusive starter pet accessory badge on the path selection screen as a reward for completing setup.",
+   "why": "Overall completion rate is low at 31.0%; an early unlock incentive motivates users to finish onboarding.",
+   "config": {
+    "choose_path": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Unlocks Exclusive Starter Accessory Pass",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions an exclusive starter accessory perk/gift, violating Rule 3."
+   }
+  },
+  {
+   "title": "Desktop Wake-Up Gesture Guidance Copy",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Updates the home welcome text to explicitly explain desktop controls, hotkeys, and how to summon or hide the pet.",
+   "why": "3 support tickets reported confusion over controlling, hiding, or talking to the pet post-onboarding.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Desktop Companion is Ready!",
+     "body": "Press Option+Pet to open companion controls, or click the tray icon anytime to summon or hide your pet on desktop."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates home intro text with clear desktop guidance without violating any rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.04,
+   "score": 6.79,
+   "score_note": "Strong support and funnel evidence, but desktop guidance copy historically caused drop-offs."
+  },
+  {
+   "title": "Background Processing Desktop Readiness Hint",
+   "target_step": "home",
+   "type": "hint",
+   "change": "Adds reassurance hint copy explaining that companion rendering finishes safely in the background.",
+   "why": "3 support emails reported pets not rendering on desktop or app stalls, while waiting step mean time is 2336s.",
+   "config": {
+    "waiting": {
+     "hint": "Preparing desktop graphics layer... Your pet will appear automatically once engine setup finishes.",
+     "components": [
+      {
+       "type": "text",
+       "text": "Safe background rendering in progress.",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds informational progress hint to the waiting screen as allowed by Rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 3.99,
+   "score_note": "Addresses 3 support tickets and high home mean time with low-cost config copy.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 176.0
+  },
+  {
+   "title": "Centered Minimalist Auth Layout",
+   "target_step": "sign_in",
+   "type": "layout",
+   "change": "Reconfigures the sign-in screen into a centered minimalist layout focused strictly on primary authentication options.",
+   "why": "Sign-in conversion drops to 78.3% with a high 567s mean time; a clean centered structure reduces cognitive friction.",
+   "config": {
+    "sign_in": {
+     "layout": "centered",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Continue with Account",
+        "style": "rounded",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Desktop Pet Setup Checklist Wait Summary",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Presents a live setup checklist component on the waiting screen detailing background setup stages.",
+   "why": "Waiting step takes 201s median and 2336s mean time; explicit phase tracking keeps users informed during generation.",
+   "config": {
+    "waiting": {
+     "layout": "checklist",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "checklist",
+       "label": "Setup Milestones",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates waiting screen with setup checklist information as permitted by Rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.0,
+   "score": 3.29,
+   "score_note": "Wait progress overlays and checklists showed no clear effect or negative results historically."
+  },
+  {
+   "title": "Stage-Based Desktop Welcome Showcase",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesigns the final welcome view into a stage layout featuring live pet animation and launch button.",
+   "why": "Finish step conversion drops to 64.8% with 5815s mean time; an engaging stage redesign creates a smooth transition to desktop use.",
+   "config": {
+    "home_intro": {
+     "layout": "stage",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:pet_welcome_dance",
+       "style": "playful"
+      },
+      {
+       "type": "button",
+       "label": "Launch Pet onto Desktop",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns home intro layout within onboarding without violating any base rules."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.07,
+   "score": 9.02,
+   "score_note": "Finish step loses 35%, but welcome redesigns previously caused significant losses (-8.4%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 120.9
+  }
+ ],
+ "picked": [
+  "Stage-Based Desktop Welcome Showcase",
+  "Spotlight Companion Style Stage Redesign",
+  "Background Processing Desktop Readiness Hint"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 472.9,
+ "decisions": [
+  {
+   "test": "sim-34",
+   "title": "Stage-Based Desktop Welcome Showcase",
+   "target_step": "finish",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 120.9,
+   "result": {
+    "step": {
+     "control": 0.6391,
+     "treatment": 0.6152,
+     "lift": -0.0375,
+     "lift_se": 0.0288,
+     "p": 0.200886
+    },
+    "finish": {
+     "control": 0.281,
+     "treatment": 0.276,
+     "lift": -0.0178,
+     "lift_se": 0.0408,
+     "p": 0.665741
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 9.02,
+   "predicted_lift": -0.07,
+   "true_lift_hidden": -0.0309,
+   "finishers_delta_hidden": -26.49
+  },
+  {
+   "test": "sim-35",
+   "title": "Spotlight Companion Style Stage Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 176.0,
+   "result": {
+    "step": {
+     "control": 0.8394,
+     "treatment": 0.8756,
+     "lift": 0.0431,
+     "lift_se": 0.0138,
+     "p": 0.001425
+    },
+    "finish": {
+     "control": 0.2853,
+     "treatment": 0.3117,
+     "lift": 0.0923,
+     "lift_se": 0.0433,
+     "p": 0.025829
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 6.5,
+   "predicted_lift": 0.06,
+   "true_lift_hidden": 0.0406,
+   "finishers_delta_hidden": 34.8
+  },
+  {
+   "test": "sim-36",
+   "title": "Background Processing Desktop Readiness Hint",
+   "target_step": "home",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 176.0,
+   "result": {
+    "step": {
+     "control": 0.8335,
+     "treatment": 0.8656,
+     "lift": 0.0384,
+     "lift_se": 0.0156,
+     "p": 0.011918
+    },
+    "finish": {
+     "control": 0.2713,
+     "treatment": 0.297,
+     "lift": 0.0946,
+     "lift_se": 0.0449,
+     "p": 0.02752
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 3.99,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": 0.0369,
+   "finishers_delta_hidden": 31.63
+  }
+ ],
+ "shipped": [
+  "Spotlight Companion Style Stage Redesign",
+  "Background Processing Desktop Readiness Hint"
+ ],
+ "ends_week": 10,
+ "weights_next": {
+  "impact": 3.514,
+  "evidence": 0.246,
+  "confidence": 0.126,
+  "cost": 0.114
+ },
+ "lessons_next": [
+  "Helpful changes: Adoption visual style and photo quality enhancements (custom selectors, pre-upload inspection, spotlight stage redesign, photo quality callouts), split-view path layouts, preset fast-track flows, moving sign-in right after pet adoption, background readiness hints, and wait-time progress tip carousels.",
+  "Worse performance: Desktop finish redesigns and guidance banners, pre-adoption photo prep screens, path decision speed callouts and flexibility copy, and interactive sound/visual wait progress led to significant losses.",
+  "No clear effect: Notifications, account sync/persistence flows and subsequent sign-in reorderings, diagnostic/archetype flows, waiting overlays/time indicators, visibility prompts, and carousel or two-column path layouts showed no clear effect.",
+  "Predictions were too low: Photo quality callouts, interactive progress tip carousels, split-view path selection screens, custom pet style selectors, background readiness hints, and pre-upload style inspection views.",
+  "Predictions were too high: Preset fast-track adoption flows, post-adoption sign-in reordering, split-view story intros, and all tests that resulted in no clear effect or negative performance."
+ ]
+}

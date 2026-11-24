@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_flow] Desktop Pet Shortcut and Interaction Quick Start Flow: Adds an interactive quick start checklist component on home_intro that demonstrates how to drag, move, and summon the pet on the desktop before completing onboarding.\n   config: {\"home_intro\": {\"headline\": \"Quick Desktop Pet Controls\", \"body\": \"Learn how to move, summon, and interact with your new desktop pet in seconds.\", \"components\": [{\"type\": \"animation\", \"text\": \"Drag & Drop Pet Action\", \"style\": \"playful\"}, {\"type\": \"checklist\", \"text\": \"Try dragging your pet to the corner of your desktop\", \"style\": \"emphasis\"}]}}\n1: [choose_path, redesign] Story Intro Card Deck Redesign: Redesigns the story screen using a card layout with interactive mascot teasers to engage users prior to path selection.\n   config: {\"story\": {\"layout\": \"card\", \"headline\": \"Welcome to Your Desktop Companion Journey\", \"body\": \"Explore companion stories and choose the perfect path for your desktop friend.\", \"replace\": {\"intro_story\": [{\"role\": \"intro_story\", \"type\": \"mascot\", \"style\": \"playful\", \"text\": \"Preview Companion World\"}, {\"role\": \"intro_story\", \"type\": \"choice_cards\", \"style\": \"rounded\", \"action\": \"choose\", \"label\": \"Explore Story Paths\"}]}}}\n2: [adoption, new_screen] Companion Naming and Bio Creation Screen: Inserts a dedicated companion naming step directly after friend selection so users name their pet before photo uploading.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_pet_naming\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"pick_friend\": {\"headline\": \"Choose & Name Your Desktop Companion\", \"hint\": \"Pick your companion species and give them a nickname to proceed.\"}}\n3: [sign_in, redesign] Account Benefits Split Screen Redesign: Redesigns the sign-in screen into a split layout clearly highlighting persistent cloud saves and multi-device pet access.\n   config: {\"sign_in\": {\"layout\": \"split\", \"headline\": \"Secure Your Companion & Sync Progress\", \"body\": \"Sign in to keep your pet saved safely to your account across all your desktop devices.\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"badge\", \"style\": \"highlight\", \"text\": \"Cloud Account Protection Active\"}, {\"role\": \"sign_in_options\", \"type\": \"button\", \"style\": \"emphasis\", \"action\": \"next\", \"label\": \"Continue with Account\"}]}}}\n4: [home, wait_info] Generation Stage Time Remaining Counter: Displays an active estimated countdown timer and render stage progress breakdown on the waiting screen during pet rendering.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"show_progress\": true, \"headline\": \"Creating Your Custom Companion...\", \"body\": \"Estimated completion time: under 2 minutes. Your pet is rendering in the background.\"}}\n5: [adoption, hint] Photo Upload Verification Checklist Hint: Adds a clear photo quality checklist hint on upload_photos specifying lighting, angle, and face visibility requirements.\n   config: {\"upload_photos\": {\"hint\": \"For best generation quality: use 1 well-lit, front-facing photo without hats or heavy shadows.\", \"components\": [{\"type\": \"checklist\", \"text\": \"Clear front angle | Bright lighting | Single face\", \"style\": \"calm\"}]}}\n6: [home, notification] Completion Ready Audio Visual Prompt: Enables an optional completion notification trigger and audio chime when pet generation finishes while minimized.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"sound\", \"text\": \"Play completion chime when pet is ready\", \"style\": \"subtle\", \"action\": \"play\"}]}}\n7: [choose_path, copy] Path Decision Confidence Headline: Updates choose_path copy to explicitly reassure users that their chosen companion path can be modified or changed anytime.\n   config: {\"choose_path\": {\"headline\": \"Choose Your Starting Companion Path\", \"body\": \"Select your initial playstyle. Don't worry—you can unlock and switch paths anytime later!\"}}\n8: [finish, incentive] Welcome Accessory Unlock Milestone: Displays a starter pet accessory unlock badge on home_intro as an immediate reward upon completing onboarding.\n   config: {\"home_intro\": {\"headline\": \"Your Companion is Ready + Starter Collar Unlocked!\", \"components\": [{\"type\": \"badge\", \"text\": \"Unlocked: Cozy Starter Ribbon Collar\", \"style\": \"playful\"}, {\"type\": \"button\", \"text\": \"Meet Companion on Desktop\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n9: [sign_in, hint] Existing Account Recovery Guidance Hint: Adds explicit hint text on the sign_in screen detailing how returning users can sign into their original account to restore lost pets.\n   config: {\"sign_in\": {\"hint\": \"Returning user? Sign in with your original account email to automatically restore your existing pet.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds interactive quick-start controls to home_intro within allowed onboarding modifications."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the story screen layout while preserving its job of introducing the pet."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a pet naming screen while preserving all required onboarding flow steps."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the sign-in layout while preserving the ability to sign in."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a countdown estimate during a real generation wait process."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful photo upload quality guidance."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an optional chime notification for when pet generation finishes."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Reassures users about path flexibility without breaking screen jobs or rules."
+   },
+   {
+    "index": 8,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions free extras or unlocked rewards (Cozy Starter Ribbon Collar)."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds account recovery guidance text on the sign-in screen."
+   }
+  ]
+ }
+}

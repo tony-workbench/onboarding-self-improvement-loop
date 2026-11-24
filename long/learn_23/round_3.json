@@ -1,0 +1,516 @@
+{
+ "round": 3,
+ "starts_week": 3,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7595451,
+  "adoption": 0.6978530999999999,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.392,
+  "evidence": 1.282,
+  "confidence": 0.869,
+  "cost": 0.456
+ },
+ "lessons_used": [
+  "Evidence is still thin for specific change types because no change type has at least two tests agreeing after noise correction.",
+  "Redesigning friend selection (adoption, redesign) and moving sign-in (sign_in, reorder) were helpful, winning their tests.",
+  "Updating onboarding intro story copy (choose_path, copy) made performance worse.",
+  "No clear effect was seen for waiting step info (home, wait_info), notification toggles (home, notification), or layout changes (finish, layout).",
+  "Predictions were consistently too high compared to noise-corrected measured outcomes."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Pet interaction visual tips screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a dedicated visual guide screen before finishing onboarding to demonstrate how to click, drag, and interact with the pet.",
+   "why": "Support mailbox received 3 complaints about confusion over controlling or hiding the pet, and finish step conversion is 64.8%.",
+   "config": {
+    "home_intro": {
+     "show_step_counter": true
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_pet_interaction_tips",
+     "home_intro"
+    ],
+    "new_pet_interaction_tips": {
+     "headline": "Interacting with Your Desktop Pet",
+     "body": "Drag to move your pet, right-click for quick actions, or double-click to chat.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "image",
+       "asset": "asset:pet_guide",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interaction guide screen inside onboarding is allowed and preserves all required steps."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.02,
+   "score": 6.69,
+   "score_note": "Targeting largest funnel leak with support evidence, but adding a new screen requires release and risks friction.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 101.4
+  },
+  {
+   "title": "Account sync reassurance panel on sign-in",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign sign-in options panel with clear text confirming account progress and pet data persistence.",
+   "why": "8 support emails were received about missing or reset pets after signing in again.",
+   "config": {
+    "sign_in": {
+     "replace": {
+      "sign_in_options": [
+       {
+        "type": "text",
+        "text": "Sign in to save your pet and progress across sessions",
+        "style": "emphasis",
+        "role": "sign_in_options"
+       },
+       {
+        "type": "button",
+        "label": "Continue with Account",
+        "action": "next",
+        "style": "large",
+        "role": "sign_in_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[1]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Move sign-in after adoption certificate",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move sign-in screen to appear right after adoption certificate confirmation, before the setup waiting screen.",
+   "why": "Capitalizes on emotional investment after finalizing the pet adoption certificate before asking users to sign in.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in after adoption certificate is explicitly allowed in rule 4 and keeps all steps intact."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.035,
+   "score": 6.13,
+   "score_note": "Supported by prior positive test (+3.5%) for sign_in reordering, though support evidence is absent."
+  },
+  {
+   "title": "Photo validation check sub-flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Insert a dedicated photo verification screen to confirm quality and lighting before pet generation.",
+   "why": "3 support emails reported custom pet generation failing or rendering incorrectly during adoption.",
+   "config": {
+    "upload_photos": {
+     "hint": "Upload front-facing photos with clear lighting."
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "new_photo_check",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_photo_check": {
+     "headline": "Verifying Photo Quality",
+     "body": "Checking face alignment and resolution for optimal pet generation...",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Clear focus, front face visible, good lighting",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Inserting a photo verification sub-flow step during onboarding is permitted."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.025,
+   "score": 6.69,
+   "score_note": "Strong evidence from support and high dropoff, but high cost and low confidence for new sub-flows."
+  },
+  {
+   "title": "Checklist layout for photo upload screen",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch the photo upload screen layout to a checklist format highlighting recommended photo guidelines.",
+   "why": "Adoption conversion is 69.8% with 1017s mean time, and users reported custom pet image errors.",
+   "config": {
+    "upload_photos": {
+     "layout": "checklist",
+     "hint": "Follow requirements for best pet generation results."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the photo upload screen layout while maintaining its core job is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.045,
+   "score": 8.34,
+   "score_note": "High dropoff and clear support evidence with moderate confidence from adoption redesign wins.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 153.2
+  },
+  {
+   "title": "Desktop launch info on waiting screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add system launch updates and tips to the waiting screen detailing desktop overlay setup progress.",
+   "why": "Waiting stage mean time is 2336s, and 3 support tickets reported pets failing to appear on the desktop view.",
+   "config": {
+    "waiting": {
+     "headline": "Initializing Desktop Pet Overlay",
+     "body": "Preparing graphics rendering engine and desktop overlay settings...",
+     "tip_delay_seconds": 8
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating waiting screen copy to show setup progress preserves its job of showing the pet is being made."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 6.59,
+   "score_note": "Low-cost config update supported by tickets, but prior wait_info test showed minimal lift (+1.7%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 153.2
+  },
+  {
+   "title": "Clear path option copy revision",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update headline and body on the choose_path screen to succinctly differentiate preset selection from custom pet creation.",
+   "why": "choose_path has a high mean duration of 514s and 23.8% dropoff, indicating user confusion when choosing.",
+   "config": {
+    "choose_path": {
+     "headline": "Select Your Setup Style",
+     "body": "Pick an existing pet companion for instant fun, or build a custom pet using your own photos."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating copy on choose_path screen clearly retains both adoption and custom pet options."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.01,
+   "score": 4.53,
+   "score_note": "Low cost, but copy changes on choose_path previously hurt conversion (-3.3%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 153.2
+  },
+  {
+   "title": "Desktop shortcut hint on home intro",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Display a helpful hint on the home_intro screen explaining key shortcuts to bring hidden pets to the foreground.",
+   "why": "Finish step dropoff is 35.2% and support received reports of pets missing on screen or app failing to open.",
+   "config": {
+    "home_intro": {
+     "hint": "Press Ctrl+Shift+P to reveal your pet if it gets obscured by other applications."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding shortcut hints to home_intro inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 8.91,
+   "score_note": "Addresses high finish dropoff and support complaints at low implementation cost."
+  },
+  {
+   "title": "Free toy item unlock incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Add an incentive text callout on the adoption certificate screen offering a free starter accessory item upon completion.",
+   "why": "Adoption completion rate is 69.8%, and providing an immediate reward motivates users to complete certificate creation.",
+   "config": {
+    "adoption_certificate": {
+     "components": [
+      {
+       "type": "text",
+       "text": "Bonus: Claim a free pet accessory upon certificate completion!",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'adoption_certificate.components[0].text' talks about price or money"
+   }
+  },
+  {
+   "title": "Spotlight layout redesign for choose path",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign choose_path using a spotlight layout with large choice cards for path selection.",
+   "why": "choose_path mean time of 514s shows significant hesitation; a spotlight layout makes path choices clear and focused.",
+   "config": {
+    "choose_path": {
+     "layout": "spotlight",
+     "replace": {
+      "path_options": [
+       {
+        "type": "choice_cards",
+        "text": "Choose standard pet or custom avatar",
+        "style": "large",
+        "role": "path_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  }
+ ],
+ "picked": [
+  "Pet interaction visual tips screen",
+  "Checklist layout for photo upload screen",
+  "Desktop launch info on waiting screen",
+  "Clear path option copy revision"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 561.0,
+ "decisions": [
+  {
+   "test": "sim-10",
+   "title": "Clear path option copy revision",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": 88,
+   "share": 1.0,
+   "planned_harm": 153.2,
+   "result": {
+    "step": {
+     "control": 0.7842,
+     "treatment": 0.7341,
+     "lift": -0.0638,
+     "lift_se": 0.0173,
+     "p": 0.00036
+    },
+    "finish": {
+     "control": 0.218,
+     "treatment": 0.2277,
+     "lift": 0.0444,
+     "lift_se": 0.064,
+     "p": 0.477969
+    },
+    "users_per_group": 1858
+   },
+   "outcome": "stopped early: choose_path worse",
+   "score": 4.53,
+   "predicted_lift": -0.01,
+   "true_lift_hidden": -0.0342,
+   "finishers_delta_hidden": -14.35
+  },
+  {
+   "test": "sim-7",
+   "title": "Pet interaction visual tips screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 101.4,
+   "result": {
+    "step": {
+     "control": 0.6484,
+     "treatment": 0.6148,
+     "lift": -0.0518,
+     "lift_se": 0.0324,
+     "p": 0.119583
+    },
+    "finish": {
+     "control": 0.2127,
+     "treatment": 0.208,
+     "lift": -0.0219,
+     "lift_se": 0.0489,
+     "p": 0.657417
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.69,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": -0.1105,
+   "finishers_delta_hidden": -72.56
+  },
+  {
+   "test": "sim-8",
+   "title": "Checklist layout for photo upload screen",
+   "target_step": "adoption",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 153.2,
+   "result": {
+    "step": {
+     "control": 0.6989,
+     "treatment": 0.6903,
+     "lift": -0.0124,
+     "lift_se": 0.0221,
+     "p": 0.578892
+    },
+    "finish": {
+     "control": 0.2163,
+     "treatment": 0.2107,
+     "lift": -0.0262,
+     "lift_se": 0.0483,
+     "p": 0.592248
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.34,
+   "predicted_lift": 0.045,
+   "true_lift_hidden": -0.0251,
+   "finishers_delta_hidden": -16.48
+  },
+  {
+   "test": "sim-9",
+   "title": "Desktop launch info on waiting screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 153.2,
+   "result": {
+    "step": {
+     "control": 0.8235,
+     "treatment": 0.82,
+     "lift": -0.0043,
+     "lift_se": 0.0187,
+     "p": 0.81981
+    },
+    "finish": {
+     "control": 0.215,
+     "treatment": 0.2217,
+     "lift": 0.031,
+     "lift_se": 0.0504,
+     "p": 0.531968
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.59,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": -0.0027,
+   "finishers_delta_hidden": -1.77
+  }
+ ],
+ "shipped": [],
+ "ends_week": 3,
+ "weights_next": {
+  "impact": 1.384,
+  "evidence": 1.401,
+  "confidence": 1.005,
+  "cost": 0.21
+ },
+ "lessons_next": [
+  "Evidence is still thin for most specific change types because only choose_path copy and home wait_info have at least two tests.",
+  "Copy changes in choose_path (choose_path, copy) consistently made performance worse across multiple tests.",
+  "Waiting step info (home, wait_info) showed no clear effect across multiple tests.",
+  "Redesigning friend selection (adoption, redesign) and reordering sign-in (sign_in, reorder) were helpful, winning their tests.",
+  "Layout changes, notification toggles, and new visual tip screens had no clear effect.",
+  "Predictions were consistently too high compared to noise-corrected measured outcomes."
+ ]
+}

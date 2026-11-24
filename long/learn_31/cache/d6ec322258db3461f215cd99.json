@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_screen] Interactive Pet Controls Practice Playground Screen: Adds a dedicated hands-on interactive screen at the end of onboarding where users practice hiding, moving, and talking to their companion before entering the desktop.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_controls_playground\"], \"home_intro\": {\"button_label\": \"Practice Pet Controls\"}, \"new_controls_playground\": {\"headline\": \"Try Your Pet Controls\", \"body\": \"Practice hiding, dragging, and speaking with your companion so you are ready on your desktop.\", \"button_label\": \"Start Desktop Pet\", \"layout\": \"stage\", \"components\": [{\"type\": \"mascot\", \"label\": \"Interactive Pet Simulator\", \"style\": \"playful\", \"action\": \"play\"}, {\"type\": \"checklist\", \"text\": \"Drag pet to move | Double-click to open chat | Press Esc to hide\", \"style\": \"rounded\"}]}}\n1: [adoption, redesign] Adoption Character Stage Full Bleed Redesign: Redesigns the friend selection screen into a full-bleed interactive stage highlighting high-detail pet previews.\n   config: {\"pick_friend\": {\"headline\": \"Choose Your Companion\", \"body\": \"Select a desktop pet character to accompany your daily workflow.\", \"layout\": \"full_bleed\", \"replace\": {\"pet_choices\": [{\"role\": \"pet_choices\", \"type\": \"choice_cards\", \"label\": \"Select Companion Character\", \"style\": \"highlight\", \"action\": \"choose\"}]}}}\n2: [home, new_flow] Pet Care Activity mini-flow during Wait: Introduces an interactive companion setup activity screen during pet generation waiting period.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_care_activity_flow\", \"home_intro\"], \"waiting\": {\"notify_when_ready\": true}, \"new_care_activity_flow\": {\"headline\": \"Customize Pet Habits While Waiting\", \"body\": \"Set sleep hours and desktop movement preferences while your pet is generated.\", \"button_label\": \"Save Habits\", \"layout\": \"card\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Pet Desk Activity Level\", \"style\": \"rounded\", \"action\": \"choose\"}]}}\n3: [sign_in, reorder] Pick Friend Before Sign-In Sequence Shift: Moves the sign-in step after initial pet pick so users build emotional commitment before authentication.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"sign_in\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"sign_in\": {\"headline\": \"Save Your Companion Choice\", \"body\": \"Sign in to bind your chosen pet to your account and prevent progress loss.\"}}\n4: [home, notification] Desktop Audio Alert When Generation Completes: Adds an optional sound notification trigger on the waiting screen when companion generation finishes.\n   config: {\"waiting\": {\"headline\": \"Generating Your Pet\", \"body\": \"We will play a pleasant sound when your companion is ready for your desktop.\", \"notify_when_ready\": true, \"components\": [{\"type\": \"sound\", \"label\": \"Enable Ready Chime\", \"style\": \"calm\", \"action\": \"play\"}]}}\n5: [sign_in, hint] Existing Account Restore Callout Hint: Adds a explicit hint explaining that signing in with the original account restores previously created pets.\n   config: {\"sign_in\": {\"hint\": \"Returning user? Sign in with your original email to keep your existing desktop pet.\"}}\n6: [choose_path, incentive] Companion Path Starter Toy Incentive: Displays a bonus starter pet item badge on path selection cards to increase choice engagement.\n   config: {\"choose_path\": {\"headline\": \"Choose Your Pet Experience\", \"body\": \"Select a path to unlock a free starter accessory for your desktop companion.\", \"components\": [{\"type\": \"badge\", \"text\": \"Includes Free Starter Toy Pack\", \"style\": \"playful\"}]}}\n7: [sign_in, copy] Account Protection Clear Benefit Copy: Updates headline and body to emphasize cloud backup and pet state preservation.\n   config: {\"sign_in\": {\"headline\": \"Protect Your Pet's Memory\", \"body\": \"Sign in to securely sync your companion's level, accessories, and personality to the cloud.\"}}\n8: [home, wait_info] Generation Process Time Estimator Timer Display: Displays live estimated completion timer and progress bar on the companion generation screen.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"show_progress\": true, \"hint\": \"Estimated creation time: ~2 minutes. Feel free to minimize the window.\", \"components\": [{\"type\": \"timer\", \"label\": \"Estimated Time Remaining\", \"style\": \"calm\"}]}}\n9: [choose_path, new_screen] Path Trait Exploration Screen: Inserts a feature exploration screen right after choose_path detailing companion abilities.\n   config: {\"_order\": [\"story\", \"choose_path\", \"new_trait_explorer\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_trait_explorer\": {\"headline\": \"Explore Companion Capabilities\", \"body\": \"Discover how your pet will assist you on screen while working or studying.\", \"button_label\": \"Continue Setup\", \"layout\": \"two_column\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:companion_preview\", \"style\": \"rounded\"}, {\"type\": \"text\", \"text\": \"Desk Companion Features: Break Reminders, Interactive Reactions, Desktop Widgets\", \"style\": \"plain\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a practice screen after home_intro is allowed under rule 4 and keeps all required onboarding steps."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the pick_friend screen into a full-bleed interactive stage retains its core job of choosing a companion pet."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interactive activity screen during the waiting sequence is permitted under rule 4 and retains all required steps."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign_in to take place after picking a pet is explicitly permitted by rule 4."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an optional audio completion alert to the waiting screen is permitted under rule 4."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding account restoration copy to the sign-in screen is valid and does not violate any base rules."
+   },
+   {
+    "index": 6,
+    "pass": false,
+    "rule": 3,
+    "reason": "Rule 3 forbids onboarding copy from mentioning prices, discounts, gifts, or free extras; the copy includes 'free starter accessory' and 'Free Starter Toy Pack'."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating sign-in copy to highlight cloud backup benefits does not violate any base rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying a progress bar and estimated completion time during a real wait operation is permitted under rules 4 and 5."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a trait exploration screen inside onboarding is allowed under rule 4 and preserves all required steps."
+   }
+  ]
+ }
+}

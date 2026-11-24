@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_screen] Desktop Pet Direct Controls Tutorial Screen: Adds a dedicated interactive controls screen right before completion to teach users how to summon, move, and hide their desktop pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_controls_tutorial\", \"home_intro\"], \"new_controls_tutorial\": {\"headline\": \"Master Your Desktop Pet Controls\", \"body\": \"Quick key shortcuts to easily summon, move, and hide your pet anytime on your screen.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"text\": \"Press Alt+P to show or hide your desktop pet\", \"style\": \"plain\"}, {\"type\": \"checklist\", \"text\": \"Right-click pet anytime for interaction menu & settings\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Got It!\", \"action\": \"next\", \"style\": \"highlight\"}]}}\n1: [choose_path, redesign] Interactive Choice Grid Path Selection: Redesigns the path selection screen into a visual choice card grid to help users quickly decide between template and custom pets.\n   config: {\"choose_path\": {\"headline\": \"How Would You Like to Create Your Companion?\", \"body\": \"Choose a pre-made pet companion or craft a custom friend from your own photos.\", \"layout\": \"grid\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"text\": \"Pick Ready Friend\", \"style\": \"playful\", \"action\": \"choose\"}, {\"role\": \"path_options\", \"type\": \"choice_cards\", \"text\": \"Upload Custom Photo\", \"style\": \"playful\", \"action\": \"choose\"}]}}}\n2: [adoption, new_flow] Multi-Photo Mascot Verification Flow: Replaces standard photo upload with a guided multi-photo picker with mascot quality feedback before generating the pet.\n   config: {\"upload_photos\": {\"headline\": \"Upload Clear Pet Photos\", \"body\": \"Provide 1-3 well-lit photos facing forward so we can render your pet accurately.\", \"layout\": \"stage\", \"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"photo_picker\", \"style\": \"rounded\", \"action\": \"choose\"}, {\"role\": \"photo_upload\", \"type\": \"mascot\", \"asset\": \"asset:mascot_inspector\", \"style\": \"playful\"}, {\"role\": \"photo_upload\", \"type\": \"text\", \"text\": \"Photos uploaded will be checked for clear faces and lighting.\", \"style\": \"subtle\"}]}}}\n3: [sign_in, redesign] Split Layout Sign-In with Existing Account Safeguard: Redesigns sign-in screen into a split layout separating existing pet account recovery from new account creation.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Keep Your Pet Safe\", \"body\": \"Log in with your existing account to restore saved pets or create a new account.\", \"layout\": \"split\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"badge\", \"text\": \"Existing user? Sign in with original method to recover pets.\", \"style\": \"highlight\"}, {\"role\": \"sign_in_options\", \"type\": \"button\", \"label\": \"Continue with Google\", \"action\": \"next\", \"style\": \"rounded\"}, {\"role\": \"sign_in_options\", \"type\": \"button\", \"label\": \"Continue with Email\", \"action\": \"next\", \"style\": \"plain\"}]}}}\n4: [home, wait_info] Estimated Render Progress Timer Screen: Displays an explicit completion time estimate and live progress indicator on the waiting screen while rendering pet assets.\n   config: {\"waiting\": {\"headline\": \"Bringing Your Pet to Life\", \"body\": \"We are compiling 3D models and desktop animations for your companion.\", \"show_time_estimate\": true, \"show_progress\": true, \"components\": [{\"type\": \"timer\", \"text\": \"Estimated wait time: ~2 minutes\", \"style\": \"calm\"}, {\"type\": \"progress\", \"text\": \"Preparing desktop shaders...\", \"style\": \"highlight\"}]}}\n5: [finish, hint] Desktop Display Diagnostic Hint Callout: Adds a persistent diagnostic tip callout on the home intro screen explaining what to do if the pet is hidden or off-screen.\n   config: {\"home_intro\": {\"hint\": \"Can't see your pet on screen? Check your taskbar overflow tray or press Alt+P.\", \"components\": [{\"type\": \"text\", \"text\": \"Tip: If your pet isn't visible on desktop, click its tray icon to bring it to the front.\", \"style\": \"subtle\"}]}}\n6: [finish, incentive] Welcome Bonus Accessory Badge Prompt: Offers an immediate unlockable starter accessory badge on the final onboarding screen to increase completion motivation.\n   config: {\"home_intro\": {\"headline\": \"Your Pet Brought a Welcome Gift!\", \"body\": \"Finish setup now to unlock a free starter toy accessory for your desktop companion.\", \"components\": [{\"type\": \"badge\", \"text\": \"🎁 Starter Accessory Unlocked!\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Claim Gift & Launch Pet\", \"action\": \"next\", \"style\": \"playful\"}]}}\n7: [choose_path, copy] Interactive Story Screen Onboarding Preview: Updates story screen copy and button labels to clearly state that full onboarding takes under 2 minutes.\n   config: {\"story\": {\"headline\": \"Meet Your New Desktop Companion in 2 Minutes\", \"body\": \"Bring a charming virtual pet directly onto your desktop to keep you company while working or gaming.\", \"button_label\": \"Start Quick Setup\"}}\n8: [adoption, hint] Certificate Naming and Identity Guidance: Adds an explicit hint and styled pet name input on the adoption certificate screen to make pet naming fun and memorable.\n   config: {\"adoption_certificate\": {\"hint\": \"Choose a memorable name! You can edit your pet's name anytime in settings.\", \"components\": [{\"type\": \"name_input\", \"text\": \"Enter pet name\", \"style\": \"large\"}]}}\n9: [sign_in, reorder] Reorder Sign-In After Friend Selection: Moves the sign-in screen to occur right after pet selection instead of before choosing a path.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid tutorial screen inside onboarding without skipping required steps."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns choose_path while retaining both adopting and custom photo options."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns photo upload flow while retaining photo picking functionality."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns sign-in screen layout while preserving account authentication functionality."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an estimated timer and progress bar for a real wait during pet rendering."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a diagnostic hint callout on the home intro screen within onboarding."
+   },
+   {
+    "index": 6,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy explicitly mentions gifts and free extras."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates story screen copy while continuing to introduce the pet."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds naming guidance input to the adoption certificate screen."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in step to occur after pet selection, which is allowed under Rule 4."
+   }
+  ]
+ }
+}

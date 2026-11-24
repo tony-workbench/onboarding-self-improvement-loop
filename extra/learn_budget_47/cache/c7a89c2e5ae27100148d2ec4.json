@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [choose_path, redesign] Story Intro Carousel Redesign: Redesign the story screen into an interactive carousel layout highlighting different pet personalities before path selection.\n   config: {\"story\": {\"layout\": \"carousel\", \"headline\": \"Welcome to Your Desktop Companion World\", \"body\": \"Swipe to explore how your pet stays by your side while you work, relax, or study.\"}}\n1: [adoption, new_screen] Pet Personality Quiz Screen: Insert a short personality quiz screen before pick_friend to guide users toward their ideal companion choice.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"new_personality_quiz\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_personality_quiz\": {\"headline\": \"Find Your Ideal Companion\", \"body\": \"Answer a few questions so we can match you with the pet personality that fits your day.\", \"layout\": \"card\"}}\n2: [sign_in, reorder] Sign In After Photo Upload Reorder: Move sign_in to occur after photo upload, right before the adoption certificate is finalized.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n3: [finish, redesign] Home Intro Spotlight Redesign: Redesign home_intro with a spotlight layout highlighting key desktop control locations and shortcuts.\n   config: {\"home_intro\": {\"layout\": \"spotlight\", \"headline\": \"Your Desktop Companion is Ready!\", \"body\": \"See how to interact, hide, or talk to your pet anytime from your screen.\", \"components\": [{\"type\": \"badge\", \"label\": \"Quick Controls Guide\", \"style\": \"highlight\"}]}}\n4: [sign_in, hint] Account Persistence Sign In Hint: Add an explicit hint on the sign-in screen assuring users that logging in restores their existing pets and data.\n   config: {\"sign_in\": {\"hint\": \"Signing into your registered account automatically recovers your existing pets and preferences.\"}}\n5: [home, wait_info] Desktop Visibility Status Info: Display real-time desktop overlay status indicators and system tray instructions during the waiting screen.\n   config: {\"waiting\": {\"show_progress\": true, \"notify_when_ready\": true, \"hint\": \"Initializing desktop overlay. If your pet isn't visible on completion, check your system tray icon.\"}}\n6: [adoption, layout] Pick Friend Two Column Layout: Reformat the pick_friend screen layout to a two-column grid separating standard presets from custom photo generation.\n   config: {\"pick_friend\": {\"layout\": \"two_column\", \"headline\": \"Select a Preset Pet or Create Your Own\"}}\n7: [finish, incentive] First Day Treat Pack Incentive: Display a starter treat reward badge on the final completion screen upon completing onboarding.\n   config: {\"home_intro\": {\"components\": [{\"type\": \"badge\", \"label\": \"Reward Unlocked: Starter Accessory & Treat Pack\", \"style\": \"playful\"}]}}\n8: [adoption, hint] Photo Upload Lighting Guidance Hint: Add a visual photo quality hint explaining clear lighting and background rules for custom pet generation.\n   config: {\"upload_photos\": {\"hint\": \"Use well-lit photos with clear subject outlines for accurate custom pet creation.\"}}\n9: [home, new_flow] Desktop Overlay Permission Flow: Add a new setup step in home to guide users through desktop overlay and system tray permissions.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_permissions\", \"home_intro\"], \"new_desktop_permissions\": {\"headline\": \"Configure Desktop Display Permissions\", \"body\": \"Allow system tray access so your desktop pet can move freely across your screens.\", \"layout\": \"checklist\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the story screen into an interactive carousel is allowed within onboarding as long as it introduces the pet."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a personality quiz sub-flow inside onboarding without skipping any required steps is allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to appear after photo upload is explicitly permitted by Rule 4."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro overlay is permitted as home_intro is part of onboarding."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a helpful sign-in persistence hint is allowed and does not violate any rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding technical overlay setup details to the waiting screen preserves its function and rules."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the pick_friend layout while preserving its selection function is allowed."
+   },
+   {
+    "index": 7,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy may not mention gifts, rewards, or free extras."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding helpful visual photo upload quality guidance is allowed within onboarding."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new setup screen for desktop permissions inside onboarding is allowed."
+   }
+  ]
+ }
+}

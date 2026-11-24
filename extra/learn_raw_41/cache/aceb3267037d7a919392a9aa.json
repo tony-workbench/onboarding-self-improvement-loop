@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Redesign Pet Selection Grid with Animated Previews: Redesign the friend selection screen into an interactive stage layout with animated pet previews and sound effects so users can sample pets before committing.\n   config: {\"pick_friend\": {\"layout\": \"stage\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:pet_animated_preview\", \"style\": \"playful\", \"action\": \"choose\"}, {\"type\": \"sound\", \"asset\": \"asset:pet_sounds\", \"style\": \"plain\", \"action\": \"play\"}]}}\n1: [sign_in, reorder] Defer Account Sign-In After Pet Selection: Reorder the flow to move sign_in after pet adoption so users pick their desktop pet before creating an account.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"], \"sign_in\": {\"headline\": \"Save Your New Desktop Pet\", \"body\": \"Sign in now to link your newly adopted companion to your cloud profile.\"}}\n2: [home, new_screen] Interactive Desktop Controls Guide Screen: Add a new interactive controls tutorial screen right after waiting to teach users how to summon, move, and hide their desktop pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_pet_controls_guide\", \"home_intro\"], \"waiting\": {\"tip_delay_seconds\": 5, \"notify_when_ready\": true}}\n3: [finish, redesign] Redesign Home Intro with Interactive Desktop Checklist: Rebuild the home intro screen into a checklist layout with action buttons testing desktop visibility and hotkeys.\n   config: {\"home_intro\": {\"layout\": \"checklist\", \"headline\": \"Meet Your Desktop Companion!\", \"body\": \"Complete these quick steps to test your pet controls before placing them on your desktop.\", \"components\": [{\"type\": \"checklist\", \"text\": \"Try hotkey Alt+P to show or hide pet\", \"style\": \"rounded\", \"action\": \"next\"}, {\"type\": \"button\", \"label\": \"Test Pet Desktop Overlay\", \"style\": \"highlight\", \"action\": \"next\"}]}}\n4: [choose_path, new_flow] Fast-Track Preset Companion Flow: Introduce a fast-track quickstart path option on choose_path that bypasses photo uploading for instant pet generation.\n   config: {\"_order\": [\"story\", \"choose_path\", \"new_quickstart_choice\", \"sign_in\", \"pick_friend\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"choose_path\": {\"layout\": \"split\", \"headline\": \"How Would You Like to Create Your Pet?\", \"body\": \"Select Quickstart for immediate setup or Custom to build from photos.\"}}\n5: [adoption, wait_info] Custom Pet Generation Status Indicator: Display real-time generation progress and time estimates during photo upload and adoption certificate creation.\n   config: {\"upload_photos\": {\"show_progress\": true, \"show_time_estimate\": true, \"hint\": \"Generating companion mesh... Standard pets are available if custom creation fails.\"}}\n6: [sign_in, copy] Account Cloud Backups & Pet Loss Prevention Notice: Update sign-in copy to explicitly clarify that signing in protects pets from being lost or reset.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Safeguard Your Pet\", \"body\": \"Creating an account ensures your desktop pet data is synced and backed up across restarts.\", \"hint\": \"Use the same email as before to restore any existing desktop companions.\"}}\n7: [home, hint] Desktop Display Overlay Troubleshooter Hint: Add an explicit overlay hint and interactive test button on the waiting screen for multi-monitor display issues.\n   config: {\"waiting\": {\"hint\": \"Pet not appearing? Ensure desktop display permissions are enabled and screen overlay is active.\", \"components\": [{\"type\": \"button\", \"label\": \"Test Display Overlay\", \"style\": \"subtle\", \"action\": \"open_tip\"}]}}\n8: [choose_path, layout] Spotlight Layout for Path Selection: Switch choose_path layout to spotlight card style featuring prominent feature callouts and estimated setup times.\n   config: {\"choose_path\": {\"layout\": \"spotlight\", \"show_time_estimate\": true, \"components\": [{\"type\": \"choice_cards\", \"label\": \"Select Adoption Path\", \"style\": \"playful\", \"action\": \"choose\"}]}}\n9: [finish, incentive] Starter Pet Accessory Unlock Reward: Add a free starter hat accessory claim badge on the final home intro screen to motivate completion.\n   config: {\"home_intro\": {\"components\": [{\"type\": \"badge\", \"label\": \"Claim Free Starter Accessory\", \"style\": \"highlight\", \"action\": \"next\"}, {\"type\": \"mascot\", \"asset\": \"asset:starter_hat_preview\", \"style\": \"playful\", \"action\": \"play\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of the pick a friend screen inside onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign_in within onboarding is explicitly permitted by Rule 4."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new tutorial screen inside onboarding before home_intro is allowed by Rule 4."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro into a checklist layout is permitted within onboarding."
+   },
+   {
+    "index": 4,
+    "pass": false,
+    "rule": 1,
+    "reason": "Bypassing and removing the upload_photos onboarding step violates Rule 1."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding real-time generation progress and estimates during onboarding is permitted."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating sign-in copy to explain account backup features is allowed and fair."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding troubleshooting hints and display testing buttons to the waiting screen is allowed."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning choose_path with a spotlight layout and setup time estimates is allowed."
+   },
+   {
+    "index": 9,
+    "pass": false,
+    "rule": 3,
+    "reason": "Mentioning a 'Free Starter Accessory' in onboarding copy violates Rule 3."
+   }
+  ]
+ }
+}

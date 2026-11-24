@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Stage Layout for Adoption Certificate Screen: Redesign the adoption certificate screen using a stage layout with animated celebration components to reinforce pet ownership before proceeding.\n   config: {\"adoption_certificate\": {\"layout\": \"stage\", \"headline\": \"Make It Official!\", \"components\": [{\"type\": \"animation\", \"asset\": \"asset:cert_party\", \"style\": \"playful\"}]}}\n1: [sign_in, reorder] Reorder Sign In To Very First Screen: Move sign_in to the very beginning of the onboarding sequence before the story step so users log in or create an account upfront.\n   config: {\"_order\": [\"sign_in\", \"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n2: [home, new_screen] Desktop Visibility Check Screen Before Waiting: Add a new screen new_desktop_visibility right before waiting to confirm desktop render permissions and multi-monitor display compatibility.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"new_desktop_visibility\", \"waiting\", \"home_intro\"], \"new_desktop_visibility\": {\"headline\": \"Desktop Display Readiness\", \"body\": \"Ensure your desktop allows overlay windows so your companion can roam freely on screen.\", \"button_label\": \"Ready to Spawn\"}}\n3: [choose_path, new_flow] Choose Path Mascot Greeting Sub-Flow: Introduce a new mascot introduction screen new_path_intro before path selection that explains creation choices interactively.\n   config: {\"_order\": [\"story\", \"new_path_intro\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"], \"new_path_intro\": {\"headline\": \"Welcome to Your Pet Journey\", \"body\": \"Let us guide you through picking or creating your new desktop companion!\", \"components\": [{\"type\": \"mascot\", \"asset\": \"asset:guide_pet\", \"style\": \"playful\"}]}}\n4: [choose_path, layout] Two Column Layout for Choose Path Screen: Switch the choose path screen layout to two_column with choice cards side-by-side for direct comparison.\n   config: {\"choose_path\": {\"layout\": \"two_column\", \"headline\": \"Select Your Creation Path\"}}\n5: [sign_in, hint] Account Recovery & Existing Pet Account Hint: Add an explicit hint on the sign in screen reminding returning users to sign into their original account to preserve existing pets.\n   config: {\"sign_in\": {\"hint\": \"Already have pets? Log in with your original account to restore them automatically.\"}}\n6: [adoption, incentive] Starter Accessory Unlock Badge on Adoption Certificate: Display an exclusive companion starter badge component on the adoption certificate screen rewarding adoption completion.\n   config: {\"adoption_certificate\": {\"components\": [{\"type\": \"badge\", \"label\": \"Starter Accessory Unlocked\", \"style\": \"highlight\"}]}}\n7: [home, wait_info] Estimated Countdown Time Estimate on Waiting Screen: Enable time estimate and step counter on the waiting screen while pet assets are generated.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"show_step_counter\": true, \"hint\": \"Your pet is getting ready to land on your desktop!\"}}\n8: [finish, notification] Desktop Arrival Notification Toggle on Home Intro: Enable notify_when_ready on home_intro so users receive a desktop notification when setup finishes.\n   config: {\"home_intro\": {\"notify_when_ready\": true, \"hint\": \"We will notify you the moment your pet is ready to play on your desktop.\"}}\n9: [adoption, copy] Custom Pet Photo Requirements Clarification Headline: Update the headline and body of upload_photos to explicitly state clear lighting and single-subject photo requirements.\n   config: {\"upload_photos\": {\"headline\": \"Upload a Clear, Well-Lit Photo\", \"body\": \"For best generation results, use a high-resolution photo of your pet facing forward in bright light.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": false,
+    "rule": 2,
+    "reason": "Redesign removes the required official stamp from the adoption certificate screen."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to the start of onboarding is permitted under rule 4."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a desktop readiness screen inside onboarding is allowed under rule 4."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a mascot introduction screen within onboarding is allowed under rule 4."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Two-column layout redesign preserves the choice between adopting and making a pet."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding account recovery guidance on sign-in is allowed."
+   },
+   {
+    "index": 6,
+    "pass": false,
+    "rule": 3,
+    "reason": "Copy mentions an unlocked starter accessory, violating rule 3's ban on mentioning free extras/gifts in onboarding copy."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Time estimate and step counter on waiting screen are permitted for a real wait."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Notification settings during onboarding home intro are allowed under rule 4."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Clarifying photo requirements preserves screen job and adheres to base rules."
+   }
+  ]
+ }
+}

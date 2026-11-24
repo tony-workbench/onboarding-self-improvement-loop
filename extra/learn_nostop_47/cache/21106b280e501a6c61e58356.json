@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Interactive Custom Pet Photo Tips Stage: Redesign the custom pet photo upload screen into a stage layout with live framing tips and photo picker guidelines.\n   config: {\"upload_photos\": {\"layout\": \"stage\", \"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"photo_picker\", \"label\": \"Select Clear Pet Photo\"}, {\"role\": \"photo_upload\", \"type\": \"text\", \"text\": \"For best generation, use clear lighting and front-facing photos of your pet.\", \"style\": \"subtle\"}]}}}\n1: [home, redesign] Interactive Waiting Room Mini Activity: Redesign the pet generation wait screen into an interactive companion preview stage featuring pet idle animations and progress tracking.\n   config: {\"waiting\": {\"layout\": \"stage\", \"replace\": {\"wait_status\": [{\"role\": \"wait_status\", \"type\": \"animation\", \"asset\": \"asset:pet_idle_anim\", \"style\": \"playful\"}, {\"role\": \"wait_status\", \"type\": \"progress\", \"text\": \"Preparing your desktop pet companion...\", \"style\": \"highlight\"}]}}}\n2: [finish, new_screen] Interactive Desktop Controls Quick Start Screen: Add a dedicated interactive onboarding screen right before finishing that explains basic pet interaction controls (drag, right-click menu, double-click).\n   config: {\"home_intro\": {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_controls\", \"home_intro\"]}, \"new_desktop_controls\": {\"headline\": \"Quick Desktop Pet Controls\", \"body\": \"Learn how to interact with your new companion directly on your desktop.\", \"layout\": \"centered\", \"components\": [{\"type\": \"checklist\", \"text\": \"Drag to move pet, right-click for quick settings, double-click to chat.\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Got It!\", \"action\": \"next\", \"style\": \"playful\"}]}}\n3: [sign_in, hint] Existing Account Sync & Restore Banner: Add an explicit account sync hint on the sign-in screen explaining that signing in restores previous pets and settings.\n   config: {\"sign_in\": {\"hint\": \"Sign in with your existing account to automatically restore your saved pets and accessories.\"}}\n4: [choose_path, new_flow] Personality Quiz Path Discovery Flow: Insert a short interactive path quiz screen prior to path selection to recommend the best fit companion workflow.\n   config: {\"story\": {\"_order\": [\"story\", \"new_path_quiz\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}, \"new_path_quiz\": {\"headline\": \"Find Your Ideal Desktop Companion\", \"body\": \"Answer two quick questions to discover which pet path fits your daily routine best.\", \"layout\": \"card\", \"components\": [{\"type\": \"choice_cards\", \"text\": \"Work Buddy or Casual Companion?\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"See Recommended Path\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n5: [adoption, incentive] Adoption Certificate Badge Reward: Add an official adoption badge reward component to the adoption certificate screen to celebrate completing pet adoption.\n   config: {\"adoption_certificate\": {\"components\": [{\"type\": \"badge\", \"text\": \"Official Companion License Unlocked!\", \"style\": \"highlight\"}]}}\n6: [finish, redesign] Desktop Companion Welcome Spotlight Redesign: Redesign the home intro finish screen into a spotlight layout showcasing your companion's avatar with a direct desktop launch button.\n   config: {\"home_intro\": {\"layout\": \"spotlight\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"mascot\", \"asset\": \"asset:pet_welcome\", \"style\": \"playful\"}, {\"role\": \"home_welcome\", \"type\": \"button\", \"label\": \"Summon Pet to Desktop\", \"action\": \"next\", \"style\": \"emphasis\"}]}}}\n7: [home, notification] System Desktop Tray Status Notification: Enable desktop tray notifications to alert users when background pet processing is complete.\n   config: {\"waiting\": {\"notify_when_ready\": true}}\n8: [choose_path, layout] Story Intro Card Layout Switch: Switch the initial story screen layout to card view and add a companion video preview asset.\n   config: {\"story\": {\"layout\": \"card\", \"components\": [{\"type\": \"video\", \"asset\": \"asset:intro_preview_vid\", \"style\": \"rounded\"}]}}\n9: [sign_in, redesign] Visual Account Direct Reconnect Layout: Redesign the sign-in screen into a two-column layout highlighting quick sign-in options alongside data backup guarantees.\n   config: {\"sign_in\": {\"layout\": \"two_column\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"button\", \"label\": \"Continue with Google\", \"action\": \"next\", \"style\": \"emphasis\"}, {\"role\": \"sign_in_options\", \"type\": \"text\", \"text\": \"Signing in ensures your pet memory and customization are securely saved.\", \"style\": \"subtle\"}]}}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns photo upload layout while keeping the photo picker functional."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns waiting screen while maintaining pet generation progress status."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new desktop controls guide screen within onboarding before home intro."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds account sync hint copy to sign-in screen without violating pricing or fair design rules."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an interactive personality quiz screen into the onboarding sequence."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an official adoption badge to the certificate screen while retaining its core function."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the home intro finish screen spotlight layout within onboarding bounds."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Enables background wait completion notification within onboarding."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates story intro screen layout and adds video preview component."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns sign-in screen layout while preserving sign-in functionality."
+   }
+  ]
+ }
+}

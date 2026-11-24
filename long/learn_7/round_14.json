@@ -1,0 +1,503 @@
+{
+ "round": 14,
+ "starts_week": 14,
+ "funnel": {
+  "choose_path": 0.7883652,
+  "sign_in": 0.729,
+  "adoption": 0.8774950168381835,
+  "home": 0.9532464491152876,
+  "finish": 0.8475831233182081
+ },
+ "weights_used": {
+  "impact": 0.166,
+  "evidence": 1.716,
+  "confidence": 0.714,
+  "cost": 1.404
+ },
+ "lessons_used": [
+  "Reordering sign-in after adoption consistently performed poorly across 2 tests and was stopped early due to worsening sign-in rates.",
+  "Adding wait-time information on the home screen was helpful across 4 winning tests, while 3 tests showed no clear effect.",
+  "Adoption redesigns were helpful across 2 winning tests, with 1 test showing no clear effect.",
+  "Changes to sign-in copy, sign-in hints, choose-path copy, and finish new-flow flows consistently showed no clear effect across 2 tests each.",
+  "Evidence remains thin or mixed for categories with only 1 test or split outcomes, such as single-test changes or split adoption new-flow results.",
+  "Predictions consistently underestimated major winning tests while overestimating changes that yielded no clear effect or performed worse."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "choose_path_compact_list_redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the path selection screen into a compact list layout allowing users to compare setup paths instantly without long scrolling.",
+   "why": "The choose_path step has a high mean duration of 514s and a 78.8% conversion rate, indicating users spend significant time comparing options.",
+   "config": {
+    "choose_path": {
+     "layout": "compact",
+     "replace": {
+      "path_options": [
+       {
+        "type": "choice_cards",
+        "text": "Quick Preset Pet vs Custom Photo Creation",
+        "role": "path_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "new_screen_account_recovery_basics",
+   "target_step": "sign_in",
+   "type": "new_screen",
+   "change": "Add an introductory screen right before sign-in explaining how signing in restores previously created pets and saves.",
+   "why": "8 support emails complained about pets missing or being reset after signing in again.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "new_account_recovery_basics",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_account_recovery_basics": {
+     "headline": "Automatic Pet Restoration",
+     "body": "Signing into your account automatically retrieves your saved pets and desktop preferences.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Safe Cloud Save Active",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "screen 'new_account_recovery_basics' is not part of onboarding (new screens are named new_..., and may not look like payment, account, sign-up or settings screens)"
+   }
+  },
+  {
+   "title": "waiting_render_time_estimate_info",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add a prominent estimated render countdown timer badge on the waiting screen during pet rendering.",
+   "why": "Lessons learned show wait-time info on the home/waiting step was effective across multiple winning tests, addressing the high median wait time of 201s.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "timer",
+       "text": "Estimated render time remaining: 2 minutes",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.components[0]': timer text must read like 'About 4 min left' (at most 30 min)"
+   }
+  },
+  {
+   "title": "pick_friend_two_column_redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the companion selection screen into a side-by-side two-column view detailing pet personality traits clearly.",
+   "why": "Adoption redesigns proved effective in prior tests; simplifying pet selection improves progress into setup.",
+   "config": {
+    "pick_friend": {
+     "layout": "two_column",
+     "replace": {
+      "pet_choices": [
+       {
+        "type": "choice_cards",
+        "text": "Compare companion traits side by side",
+        "role": "pet_choices"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "home_intro_desktop_overlay_flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Rebuild the final home intro screen using a full-bleed visual layout guiding users on how to locate and activate their pet overlay.",
+   "why": "3 support emails reported pets not appearing on the desktop, and another 3 users were confused about controlling or hiding their pet after setup.",
+   "config": {
+    "home_intro": {
+     "layout": "full_bleed",
+     "replace": {
+      "home_welcome": [
+       {
+        "type": "image",
+        "asset": "asset:desktop_overlay_guide",
+        "role": "home_welcome"
+       },
+       {
+        "type": "text",
+        "text": "Your pet is active on your screen. Click the tray icon anytime to customize or hide.",
+        "role": "home_welcome"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating the home intro screen layout is allowed as part of onboarding redesigns."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.018,
+   "score": 3.14,
+   "score_note": "Target step finish drops 15.2% and emails confirm issues, but finish new_flow has a negative history (-1.8%)."
+  },
+  {
+   "title": "sign_in_account_restore_notification",
+   "target_step": "sign_in",
+   "type": "notification",
+   "change": "Display a prominent reassurance notification badge on the sign-in screen highlighting automatic account pet sync.",
+   "why": "8 support emails cited missing or reset pets upon logging in.",
+   "config": {
+    "sign_in": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "All existing pets sync automatically when you sign in.",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an informational sync badge on the sign-in screen is a permitted onboarding UI component addition."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.018,
+   "score": 6.46,
+   "score_note": "High drop-off (27.1%) and 8 support tickets, but sign-in notifications consistently underperformed (-1.8%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 183.7
+  },
+  {
+   "title": "upload_photos_format_guidelines_hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add clear guidance hints regarding lighting and facial framing on the photo upload screen.",
+   "why": "3 support tickets reported custom pet generation failing or rendering improperly.",
+   "config": {
+    "upload_photos": {
+     "hint": "Use a well-lit photo with clear contrast to ensure smooth pet rendering."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding lighting and photo formatting hints on the upload photo screen provides clear guidance without violating rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.031,
+   "score": 5.97,
+   "score_note": "Low step drop-off (12.3%) and moderate support evidence; adoption hint had +3.1% lift but only 1 prior test.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 183.7
+  },
+  {
+   "title": "new_screen_desktop_tray_guide",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a dedicated desktop tray controls onboarding screen at the end of the flow.",
+   "why": "Support emails highlighted post-onboarding confusion around hiding, interacting with, or controlling desktop pets.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_desktop_tray_guide"
+    ],
+    "new_desktop_tray_guide": {
+     "headline": "Desktop Tray & Shortcuts",
+     "body": "Control your pet directly from your system tray menu or use quick shortcuts to hide or summon them anytime.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "System tray icon controls pet visibility",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a desktop tray guide screen after the home intro step is explicitly allowed within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.045,
+   "score": 4.92,
+   "score_note": "Addresses drop-off (15.2%) and pet control confusion; finish new_screen has a strong historical lift (+4.5%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 97.8
+  },
+  {
+   "title": "choose_path_express_setup_copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update headline and body copy on the choose path screen to emphasize effortless 60-second companion creation.",
+   "why": "The choose_path step exhibits drop-off (78.8%) and a long mean time (514s), requiring clearer direction.",
+   "config": {
+    "choose_path": {
+     "headline": "Choose Your Setup Path",
+     "body": "Select your preferred pet creation path and meet your companion in under a minute.",
+     "button_label": "Continue"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating copy on the choose path screen preserves the core functionality without introducing dark patterns or price mentions."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.001,
+   "score": 5.22,
+   "score_note": "High step drop-off (21.2%), but choose_path copy changes consistently yield negligible effect (+0.1%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 183.7
+  },
+  {
+   "title": "adoption_certificate_badge_unlock_incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Include an unlocked 'Founding Parent' badge preview on the adoption certificate screen upon confirming your pet's name.",
+   "why": "Reinforces completion motivation right before entering the waiting phase.",
+   "config": {
+    "adoption_certificate": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Unlocked: Founding Parent Adoption Badge",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Mentions a membership status or free extra reward ('Founding Parent Adoption Badge')."
+   }
+  }
+ ],
+ "picked": [
+  "new_screen_desktop_tray_guide",
+  "sign_in_account_restore_notification",
+  "upload_photos_format_guidelines_hint",
+  "choose_path_express_setup_copy"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 648.9,
+ "decisions": [
+  {
+   "test": "sim-53",
+   "title": "new_screen_desktop_tray_guide",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 97.8,
+   "result": {
+    "step": {
+     "control": 0.8256,
+     "treatment": 0.8398,
+     "lift": 0.0171,
+     "lift_se": 0.0173,
+     "p": 0.317528
+    },
+    "finish": {
+     "control": 0.382,
+     "treatment": 0.3897,
+     "lift": 0.0201,
+     "lift_se": 0.0332,
+     "p": 0.541881
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.92,
+   "predicted_lift": 0.045,
+   "true_lift_hidden": -0.0202,
+   "finishers_delta_hidden": -23.62
+  },
+  {
+   "test": "sim-54",
+   "title": "sign_in_account_restore_notification",
+   "target_step": "sign_in",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 183.7,
+   "result": {
+    "step": {
+     "control": 0.7248,
+     "treatment": 0.7199,
+     "lift": -0.0068,
+     "lift_se": 0.0181,
+     "p": 0.707
+    },
+    "finish": {
+     "control": 0.385,
+     "treatment": 0.384,
+     "lift": -0.0026,
+     "lift_se": 0.0326,
+     "p": 0.936545
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.46,
+   "predicted_lift": -0.018,
+   "true_lift_hidden": -0.0273,
+   "finishers_delta_hidden": -31.92
+  },
+  {
+   "test": "sim-55",
+   "title": "upload_photos_format_guidelines_hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 183.7,
+   "result": {
+    "step": {
+     "control": 0.8715,
+     "treatment": 0.8733,
+     "lift": 0.002,
+     "lift_se": 0.0131,
+     "p": 0.875382
+    },
+    "finish": {
+     "control": 0.3967,
+     "treatment": 0.397,
+     "lift": 0.0008,
+     "lift_se": 0.0319,
+     "p": 0.978948
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.97,
+   "predicted_lift": 0.031,
+   "true_lift_hidden": -0.0139,
+   "finishers_delta_hidden": -16.25
+  },
+  {
+   "test": "sim-56",
+   "title": "choose_path_express_setup_copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 183.7,
+   "result": {
+    "step": {
+     "control": 0.784,
+     "treatment": 0.764,
+     "lift": -0.0255,
+     "lift_se": 0.0136,
+     "p": 0.06402
+    },
+    "finish": {
+     "control": 0.386,
+     "treatment": 0.3863,
+     "lift": 0.0009,
+     "lift_se": 0.0326,
+     "p": 0.978846
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.22,
+   "predicted_lift": 0.001,
+   "true_lift_hidden": -0.0148,
+   "finishers_delta_hidden": -17.3
+  }
+ ],
+ "shipped": [],
+ "ends_week": 14,
+ "weights_next": {
+  "impact": 0.164,
+  "evidence": 1.773,
+  "confidence": 0.783,
+  "cost": 1.28
+ },
+ "lessons_next": [
+  "Reordering sign-in after adoption consistently performed poorly across 2 tests and was stopped early due to worsening sign-in rates.",
+  "Adding wait-time information on the home screen was helpful across 4 winning tests, while 3 tests showed no clear effect.",
+  "Adoption redesigns were helpful across 2 winning tests, with 1 test showing no clear effect.",
+  "Changes to sign-in copy, sign-in hints, choose-path copy, finish new-flow flows, and sign-in notifications consistently showed no clear effect across 2 or more tests each.",
+  "Evidence remains thin or mixed for categories with only 1 test or split outcomes, such as single-test changes or split layout results.",
+  "Predictions consistently underestimated major winning tests while overestimating changes that yielded no clear effect or performed worse."
+ ]
+}

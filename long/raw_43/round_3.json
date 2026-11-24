@@ -1,0 +1,482 @@
+{
+ "round": 3,
+ "starts_week": 3,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7612218,
+  "adoption": 0.609,
+  "home": 0.8290974,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 2.175,
+  "evidence": 0.792,
+  "confidence": 0.717,
+  "cost": 0.316
+ },
+ "lessons_used": [
+  "Reordering the onboarding flow (moving sign-in after adoption selection) was helpful (+5.5%).",
+  "Adding desktop ready background notification prompts was helpful (+5.1%).",
+  "Copy updates and quick hints (spawning instructions, account recovery warnings, overlay hints) showed no clear effect.",
+  "Waiting screen updates (progress indicators and tip carousels) showed no clear effect.",
+  "Layout tweaks and narrative redesigns showed no clear effect and can trigger guardrail rollbacks.",
+  "Predictions were mostly over-optimistic, though the notification prompt was slightly under-predicted (+4.0% vs +5.1%)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop Mascot Control Cheat Sheet Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Introduce a dedicated visual reference screen showing hotkeys and controls before completing onboarding.",
+   "why": "Support received multiple tickets regarding confusion over controlling, hiding, or talking to the pet post-onboarding.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_desktop_controls_guide"
+    ],
+    "home_intro": {
+     "headline": "Your Pet is Ready!",
+     "body": "Learn how to interact with your pet on your desktop."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_desktop_controls_guide']"
+   }
+  },
+  {
+   "title": "Split Screen Pick Friend Experience",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the Pick Friend screen into a split layout displaying pet details side-by-side with choice cards.",
+   "why": "Adoption step conversion drops to 60.9% with long decision times (89s median).",
+   "config": {
+    "pick_friend": {
+     "layout": "split",
+     "headline": "Choose Your Desktop Companion",
+     "body": "Select a pet template to bring to life on your desktop."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning pick_friend to a split layout preserves its function under rule 2."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.022,
+   "score": 6.76,
+   "score_note": "Target step loses 39.1% of users, but layout redesigns historically show negative performance (-2.2%) and rollback risk.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 148.0
+  },
+  {
+   "title": "Quick Pet Naming and Personality Selector Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Add a pet personality choice component to the adoption certificate screen to customize your companion's behavior early.",
+   "why": "High drop-off at adoption (60.9%) and long time taken; adding immediate pet personalization boosts attachment.",
+   "config": {
+    "adoption_certificate": {
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Select Pet Personality: Playful, Calm, Energetic",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding personality choice components on the adoption certificate screen is allowed under rule 4."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.0,
+   "score": 6.76,
+   "score_note": "Adoption has high drop-off, but adding extra flow components increases friction and requires full app release."
+  },
+  {
+   "title": "Place Sign-In After Adoption Certificate",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder sign-in screen to take place right after completing the adoption certificate step, right before pet generation waiting.",
+   "why": "Placing sign-in right after pet customization provides higher intent to create an account to save the custom pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign_in after adoption certificate retains all required steps and is explicitly allowed under rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.055,
+   "score": 7.53,
+   "score_note": "Reordering sign-in after adoption leverages high user intent and is proven effective (+5.5% measured).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 148.0
+  },
+  {
+   "title": "Desktop Spawn Readiness Sound Cue",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable sound chime and audio cue on the waiting screen when pet rendering completes.",
+   "why": "Waiting screen has a high mean duration (2336s), showing users leave the desktop app in the background during render.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "label": "Play notification sound when pet ready",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding readiness audio notifications to the waiting screen is allowed under rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.051,
+   "score": 7.53,
+   "score_note": "High mean wait time (2336s) indicates app backgrounding; readiness notifications have proven +5.1% lift.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 148.0
+  },
+  {
+   "title": "Time Estimate and Generation Step Counter",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add a visual step counter and estimated time remaining timer to the waiting screen.",
+   "why": "Home waiting step mean time is over 38 minutes (2336s), creating uncertainty during pet generation.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_step_counter": true,
+     "headline": "Creating Your Companion"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding step counters and time estimates for a real rendering wait is allowed under rules 4 and 5."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 6.24,
+   "score_note": "Addresses high background wait duration; wait info updates previously measured +4.0% lift."
+  },
+  {
+   "title": "Value Proposition Headline on Path Selection",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update choose_path screen headline and body to emphasize lightweight instant desktop companion setup.",
+   "why": "Initial choose_path step loses 23.8% of users immediately.",
+   "config": {
+    "choose_path": {
+     "headline": "Adopt an AI Desktop Pet in Seconds",
+     "body": "Pick a premade friend or design a unique companion that lives on your screen."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating choose_path copy while retaining both adopt and design options fulfills rule 2."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.0,
+   "score": 3.26,
+   "score_note": "Config-only copy change, but past copy updates have shown no clear positive effect.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 148.0
+  },
+  {
+   "title": "Existing Pet Account Sync Guarantee Banner",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add a prominent account sync guarantee note to the sign_in screen clarifying that existing pets stay linked to the account.",
+   "why": "Support received 8 emails about pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in automatically syncs and recovers your saved desktop pets."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an account sync informational hint to sign_in is allowed under rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": -0.003,
+   "score": 5.48,
+   "score_note": "Strong evidence from 8 support emails, though hint banners historically show minimal to slightly negative lift."
+  },
+  {
+   "title": "Welcome Bonus Perk Badge on Home Intro",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Display a starter item reward badge on the final home intro screen to encourage completing setup.",
+   "why": "Finish step loses 35.2% of users right before completing onboarding.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Starter Snack Pack Unlocked!",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Promoting a starter snack pack unlocked badge violates rule 3 by mentioning free extras or gifts in onboarding copy."
+   }
+  },
+  {
+   "title": "Spotlight Card Layout on Story Screen",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Update the story screen layout to spotlight mode with high-contrast mascot visuals.",
+   "why": "23.8% of users drop off at the initial onboarding story step.",
+   "config": {
+    "story": {
+     "layout": "spotlight",
+     "headline": "Welcome to Desktop Pets",
+     "body": "Your dynamic AI companion living right on your desktop toolbar."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the story screen layout while still introducing the pet satisfies rules 2 and 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.001,
+   "score": 2.47,
+   "score_note": "Requires layout redesign effort, but layout tweaks measured only +0.1% lift previously."
+  }
+ ],
+ "picked": [
+  "Place Sign-In After Adoption Certificate",
+  "Split Screen Pick Friend Experience",
+  "Desktop Spawn Readiness Sound Cue",
+  "Value Proposition Headline on Path Selection"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 592.0,
+ "decisions": [
+  {
+   "test": "sim-9",
+   "title": "Place Sign-In After Adoption Certificate",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": 14,
+   "share": 1.0,
+   "planned_harm": 148.0,
+   "result": {
+    "step": {
+     "control": 0.7632,
+     "treatment": 0.5924,
+     "lift": -0.2237,
+     "lift_se": 0.0528,
+     "p": 0.000126
+    },
+    "finish": {
+     "control": 0.1731,
+     "treatment": 0.159,
+     "lift": -0.0816,
+     "lift_se": 0.1732,
+     "p": 0.651423
+    },
+    "users_per_group": 283
+   },
+   "outcome": "stopped early: sign_in worse",
+   "score": 7.53,
+   "predicted_lift": 0.055,
+   "true_lift_hidden": -0.1627,
+   "finishers_delta_hidden": -9.52
+  },
+  {
+   "test": "sim-10",
+   "title": "Split Screen Pick Friend Experience",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": 51,
+   "share": 1.0,
+   "planned_harm": 148.0,
+   "result": {
+    "step": {
+     "control": 0.6081,
+     "treatment": 0.5033,
+     "lift": -0.1722,
+     "lift_se": 0.0429,
+     "p": 0.000235
+    },
+    "finish": {
+     "control": 0.1972,
+     "treatment": 0.1583,
+     "lift": -0.1971,
+     "lift_se": 0.0757,
+     "p": 0.019551
+    },
+    "users_per_group": 1055
+   },
+   "outcome": "stopped early: adoption worse",
+   "score": 6.76,
+   "predicted_lift": -0.022,
+   "true_lift_hidden": -0.1457,
+   "finishers_delta_hidden": -30.36
+  },
+  {
+   "test": "sim-11",
+   "title": "Desktop Spawn Readiness Sound Cue",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 148.0,
+   "result": {
+    "step": {
+     "control": 0.8229,
+     "treatment": 0.8336,
+     "lift": 0.0131,
+     "lift_se": 0.0202,
+     "p": 0.514279
+    },
+    "finish": {
+     "control": 0.1787,
+     "treatment": 0.184,
+     "lift": 0.0299,
+     "lift_se": 0.0565,
+     "p": 0.591884
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.53,
+   "predicted_lift": 0.051,
+   "true_lift_hidden": -0.0001,
+   "finishers_delta_hidden": -0.06
+  },
+  {
+   "test": "sim-12",
+   "title": "Value Proposition Headline on Path Selection",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 148.0,
+   "result": {
+    "step": {
+     "control": 0.754,
+     "treatment": 0.7573,
+     "lift": 0.0044,
+     "lift_se": 0.0147,
+     "p": 0.763836
+    },
+    "finish": {
+     "control": 0.1913,
+     "treatment": 0.198,
+     "lift": 0.0348,
+     "lift_se": 0.0544,
+     "p": 0.51433
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.26,
+   "predicted_lift": 0.0,
+   "true_lift_hidden": -0.0144,
+   "finishers_delta_hidden": -8.21
+  }
+ ],
+ "shipped": [],
+ "ends_week": 3,
+ "weights_next": {
+  "impact": 2.204,
+  "evidence": 0.718,
+  "confidence": 0.744,
+  "cost": 0.333
+ },
+ "lessons_next": [
+  "Moving sign-in after adoption selection was helpful (+5.5%), but reordering sign-in after the adoption certificate severely hurt performance (-22.4%).",
+  "Desktop ready background notification prompts were helpful (+5.1%), but sound cue notifications showed no clear effect.",
+  "Copy updates, overlay hints, and headline changes showed no clear effect.",
+  "Waiting screen progress indicators and tip carousels showed no clear effect.",
+  "Layout tweaks and visual redesigns showed no clear effect and risk severe negative drops or guardrail rollbacks.",
+  "Predictions were mostly over-optimistic, though the background notification prompt was slightly under-predicted (+4.0% predicted vs +5.1% measured)."
+ ]
+}

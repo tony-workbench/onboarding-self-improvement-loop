@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [home, new_flow] Desktop Dock Placement Assistant Flow: Adds an interactive screen positioning flow during generation that lets users test desktop window boundaries and anchor their pet dock position before launch.\n   config: {\"new_dock_assistant\": {\"headline\": \"Position Your Pet's Desktop Home\", \"body\": \"Select which monitor edge and desktop layer your companion will live on.\", \"layout\": \"centered\", \"components\": [{\"type\": \"choice_cards\", \"style\": \"playful\", \"text\": \"Desktop Dock Anchors\"}]}, \"waiting\": {\"hint\": \"Setting up desktop display bounds...\"}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_dock_assistant\", \"home_intro\"]}\n1: [sign_in, notification] Cloud Sync Account Persistence Notification: Displays an active cloud persistence status notification badge on sign-in clarifying that logging in links desktop pets to the account across reinstalls.\n   config: {\"sign_in\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"badge\", \"text\": \"Cloud Account Protection Active\", \"style\": \"emphasis\"}]}}\n2: [adoption, redesign] Pet Customization Companion Studio Redesign: Redesigns the friend selection step into a stage workspace layout with visual validation markers.\n   config: {\"pick_friend\": {\"layout\": \"stage\", \"headline\": \"Companion Creation Studio\", \"replace\": {\"pet_choices\": [{\"role\": \"pet_choices\", \"type\": \"choice_cards\", \"style\": \"playful\"}]}}}\n3: [sign_in, redesign] Sign-In Cloud Anchor Redesign: Redesigns sign-in into a split layout focused on permanent pet account saving and multi-device cloud backup.\n   config: {\"sign_in\": {\"layout\": \"split\", \"headline\": \"Save Your Companion to Cloud\", \"body\": \"Creating an account binds your pet data so your desktop friend is never lost on restart.\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"button\", \"label\": \"Sign In to Save Pet\", \"style\": \"emphasis\", \"action\": \"next\"}]}}}\n4: [finish, new_flow] Desktop Companion Interaction Mastery Flow: Adds an interactive practice sub-flow right after welcome to try out desktop pet commands like summoning, hiding, and chatting.\n   config: {\"new_control_practice\": {\"headline\": \"Try Your Desktop Controls\", \"body\": \"Practice hiding, summoning, and interacting with your pet before finishing setup.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"text\": \"Desktop Shortcuts Practice\", \"style\": \"playful\"}]}, \"home_intro\": {\"button_label\": \"Start Practice\"}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_control_practice\"]}\n5: [home, notification] Desktop Ready System Chime Notification: Triggers a audio chime notification when background rendering finishes during the waiting step.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"sound\", \"asset\": \"asset:ready_chime\", \"style\": \"plain\"}]}}\n6: [choose_path, redesign] Path Selection Explorer Redesign: Redesigns choose_path into a full-bleed interactive path selector.\n   config: {\"choose_path\": {\"layout\": \"full_bleed\", \"headline\": \"Select Your Companion Journey\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"style\": \"large\"}]}}}\n7: [adoption, new_screen] Photo Source Validation Screen: Inserts a photo validation checklist screen prior to photo processing to verify lighting and pet photo clarity.\n   config: {\"new_photo_check\": {\"headline\": \"Verify Photo Quality\", \"body\": \"Checking lighting and angle to ensure smooth 3D pet generation.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"text\": \"Clear subject lighting and sharp focus\", \"style\": \"plain\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_photo_check\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n8: [sign_in, incentive] Sign-In Exclusive Accessory Incentive: Displays an account creation bonus item badge on the sign-in screen granting an exclusive gold pet collar.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Unlock Gold Pet Collar\", \"components\": [{\"type\": \"badge\", \"text\": \"Exclusive Reward: Gold Companion Collar\", \"style\": \"highlight\"}]}}\n9: [finish, layout] Desktop Controls Dual-Pane Overview: Switches home_intro to a two-column layout presenting desktop overlay shortcuts next to the welcome message.\n   config: {\"home_intro\": {\"layout\": \"two_column\", \"headline\": \"Your Companion is Ready on Desktop!\", \"hint\": \"Access pet controls anytime from your system tray or top screen bar.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid onboarding additions and bounds configuration without violating rules."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Informational sign-in status badge stays within allowed onboarding modifications."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns pet selection step while keeping its functional purpose intact."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns sign-in screen without changing pricing or losing sign-in functionality."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid practice sub-flow following home_intro within onboarding."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds audio chime notification to waiting step without breaking rules."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns path selection screen while retaining path choices."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a photo verification screen into onboarding while preserving all required steps."
+   },
+   {
+    "index": 8,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions exclusive pet collar reward/gift, violating rule 3."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Modifies home_intro layout and copy within onboarding limits."
+   }
+  ]
+ }
+}

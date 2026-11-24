@@ -1,0 +1,500 @@
+{
+ "round": 5,
+ "starts_week": 5,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.6270873,
+  "home": 0.850398,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.418,
+  "evidence": 0.429,
+  "confidence": 1.577,
+  "cost": 0.576
+ },
+ "lessons_used": [
+  "Preset customization fallback flow during adoption was helpful (+8.0%), though a carousel fallback flow later showed no clear effect.",
+  "Interactive wait screen tips and status was helpful (+5.1%), but other wait screen updates (progress bars, notification alerts, status screens) showed no clear effect.",
+  "Desktop pet control callout card during the finish step significantly hurt performance (-13.9%), while other finish step changes (copy, verification screens, layout) showed no clear effect.",
+  "Sign-in changes (hints, step reordering, single-column layout) and redesigns during path selection or adoption showed no clear effect.",
+  "Predictions consistently overestimate measured impact, particularly for expected positive changes."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Account Persistence Info Screen",
+   "target_step": "sign_in",
+   "type": "new_screen",
+   "change": "Insert a dedicated account persistence notice screen immediately following sign_in explaining account synchronization.",
+   "why": "8 support emails complained about pets missing or reset after signing in again using secondary accounts or different methods.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "new_account_persistence",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_account_persistence": {
+     "headline": "Keep Your Pet Safe Across Logins",
+     "body": "Your pet progress and profile are linked directly to your primary login email.",
+     "hint": "Use this same login on any device to keep your pet status intact.",
+     "button_label": "Continue Adoption",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Account Protected",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "screen 'new_account_persistence' is not part of onboarding (new screens are named new_..., and may not look like payment, account, sign-up or settings screens)"
+   }
+  },
+  {
+   "title": "Pick Friend Full Bleed Visual Selector",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the pick_friend screen using a full_bleed layout with high-visibility choice cards.",
+   "why": "Adoption conversion drops to 62.7% with long median time (89s), indicating friction when choosing a pet profile.",
+   "config": {
+    "pick_friend": {
+     "layout": "full_bleed",
+     "headline": "Choose Your Desktop Companion",
+     "body": "Select a companion base to start customizing your pet.",
+     "button_label": "Select Pet",
+     "replace": {
+      "pet_choices": [
+       {
+        "type": "choice_cards",
+        "label": "Companion Options",
+        "style": "playful",
+        "role": "pet_choices"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Custom Pet Fallback Choice Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Add an embedded preset choice component on the photo upload screen as an instant alternative fallback.",
+   "why": "3 support emails reported custom pet creation failing or looking incorrect during adoption.",
+   "config": {
+    "upload_photos": {
+     "headline": "Upload Photo or Choose Instant Starter",
+     "body": "Upload a photo for custom pet generation or choose a starter template below.",
+     "hint": "Preset choices generate instantly if photo processing is slow.",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Instant Presets",
+       "style": "rounded",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Asks the user to upload a personal photo"
+   }
+  },
+  {
+   "title": "Story Screen Pre-Path Sequence Reorder",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Reorder the onboarding sequence so story precedes choose_path to provide context before choosing a setup path.",
+   "why": "choose_path has a 76.2% conversion rate with high mean duration (514s), suggesting users lack context when choosing.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "story": {
+     "headline": "Welcome to Your Desktop Companion Experience",
+     "body": "Discover how your pet lives on your desktop before choosing your customization path."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering onboarding screens is allowed and story screen retains its introductory job."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.01,
+   "score": 2.26,
+   "score_note": "Choose_path dropoff is 23.8%, but sequence reordering historically yields neutral or negative results.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 147.9
+  },
+  {
+   "title": "Sign-In Multi-Account Protection Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit safeguard hint below sign-in options reminding users to sign in with their main account to prevent account duplication.",
+   "why": "Support received 8 emails regarding pet profile resets caused by logging in via secondary auth methods.",
+   "config": {
+    "sign_in": {
+     "hint": "Please sign in with your primary email to avoid duplicate accounts and missing pet progress."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Waiting Screen Background Rendering Timer Info",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display an active render timer and estimated setup duration component on the waiting screen.",
+   "why": "The waiting step has a long mean time of 2336s and median of 201s, leading to user dropoff or confusion.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "timer",
+       "label": "Desktop Initialization",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Timer on waiting screen is permitted as it represents an actual generation wait time."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 4.95,
+   "score_note": "Wait screen info updates have consistently shown modest positive lift (+2.2% historical average).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 147.9
+  },
+  {
+   "title": "Adoption Certificate Name Ownership Copy",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Update adoption certificate headline and body text to emphasize pet ownership confirmation and desktop readiness.",
+   "why": "Adoption is a high-dropoff step (62.7% conversion), requiring clearer reassurance before transitioning to waiting.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Finalize Your Pet's Official Profile",
+     "body": "Your pet configuration is set and ready to be loaded onto your desktop screen.",
+     "button_label": "Complete Adoption"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Copy update maintains adoption certificate functionality and official status."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.0,
+   "score": 5.34,
+   "score_note": "Adoption has high dropoff (37.3%), but simple copy updates rarely drive conversion improvements.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 147.9
+  },
+  {
+   "title": "Path Selection Completion Badge Incentive",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Add a visual milestone badge to the choose_path screen acknowledging onboarding progress.",
+   "why": "23.8% of users abandon the funnel at choose_path.",
+   "config": {
+    "choose_path": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Step 1 of 3 Completed",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a progress indicator badge to path selection is allowed within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.01,
+   "score": 3.44,
+   "score_note": "Choose_path redesigns and visual badges have not proven effective in historical tests."
+  },
+  {
+   "title": "Home Intro Desktop Launch Notification Badge",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Add a desktop launcher ready notification component to home_intro indicating where the pet resides on the screen.",
+   "why": "3 support emails reported users unable to find their pet on desktop after setup.",
+   "config": {
+    "home_intro": {
+     "hint": "Your companion is now active in your desktop system tray.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Active on Desktop",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding desktop launch status notifications on home_intro is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.05,
+   "score": 5.34,
+   "score_note": "Both funnel data and support emails identify the issue, but desktop callout badges at finish step previously hurt performance (-13.9%)."
+  },
+  {
+   "title": "Home Intro Two Column Layout",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Switch home_intro to a two_column layout presenting pet status alongside simple finishing instructions.",
+   "why": "Finish step conversion drops to 64.8% with median time 395s.",
+   "config": {
+    "home_intro": {
+     "layout": "two_column",
+     "headline": "Your Companion is Ready",
+     "body": "Your desktop pet is setup and running in your desktop background."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Layout redesign of home_intro screen within onboarding is permitted."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 8.56,
+   "score_note": "Finish step has major dropoff (35.2%), and previous finish layout tests showed strong positive lift (+6.3%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 95.3
+  }
+ ],
+ "picked": [
+  "Story Screen Pre-Path Sequence Reorder",
+  "Home Intro Two Column Layout",
+  "Adoption Certificate Name Ownership Copy",
+  "Waiting Screen Background Rendering Timer Info"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 539.0,
+ "decisions": [
+  {
+   "test": "sim-16",
+   "title": "Story Screen Pre-Path Sequence Reorder",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 147.9,
+   "result": {
+    "step": {
+     "control": 0.7763,
+     "treatment": 0.799,
+     "lift": 0.0292,
+     "lift_se": 0.0138,
+     "p": 0.031824
+    },
+    "finish": {
+     "control": 0.2137,
+     "treatment": 0.211,
+     "lift": -0.0125,
+     "lift_se": 0.0491,
+     "p": 0.800622
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 2.26,
+   "predicted_lift": -0.01,
+   "true_lift_hidden": 0.0378,
+   "finishers_delta_hidden": 23.63
+  },
+  {
+   "test": "sim-17",
+   "title": "Home Intro Two Column Layout",
+   "target_step": "finish",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 95.3,
+   "result": {
+    "step": {
+     "control": 0.666,
+     "treatment": 0.6426,
+     "lift": -0.035,
+     "lift_se": 0.0323,
+     "p": 0.2868
+    },
+    "finish": {
+     "control": 0.212,
+     "treatment": 0.199,
+     "lift": -0.0613,
+     "lift_se": 0.0477,
+     "p": 0.212745
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.56,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.0286,
+   "finishers_delta_hidden": 17.88
+  },
+  {
+   "test": "sim-18",
+   "title": "Adoption Certificate Name Ownership Copy",
+   "target_step": "adoption",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 147.9,
+   "result": {
+    "step": {
+     "control": 0.6307,
+     "treatment": 0.5821,
+     "lift": -0.077,
+     "lift_se": 0.0257,
+     "p": 0.003903
+    },
+    "finish": {
+     "control": 0.1977,
+     "treatment": 0.182,
+     "lift": -0.0793,
+     "lift_se": 0.0492,
+     "p": 0.121813
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 5.34,
+   "predicted_lift": 0.0,
+   "true_lift_hidden": -0.0641,
+   "finishers_delta_hidden": -40.07
+  },
+  {
+   "test": "sim-19",
+   "title": "Waiting Screen Background Rendering Timer Info",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 147.9,
+   "result": {
+    "step": {
+     "control": 0.8767,
+     "treatment": 0.8862,
+     "lift": 0.0109,
+     "lift_se": 0.0158,
+     "p": 0.48964
+    },
+    "finish": {
+     "control": 0.2163,
+     "treatment": 0.213,
+     "lift": -0.0154,
+     "lift_se": 0.0486,
+     "p": 0.753199
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.95,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": 0.0166,
+   "finishers_delta_hidden": 10.38
+  }
+ ],
+ "shipped": [
+  "Story Screen Pre-Path Sequence Reorder"
+ ],
+ "ends_week": 5,
+ "weights_next": {
+  "impact": 1.221,
+  "evidence": 0.509,
+  "confidence": 1.744,
+  "cost": 0.526
+ },
+ "lessons_next": [
+  "Preset customization fallback flow during adoption was helpful (+8.0%), though another fallback flow later showed no clear effect.",
+  "Interactive wait screen tips & status was helpful (+5.1%), but other wait screen updates (progress bars, alerts, status screens, timers) showed no clear effect.",
+  "Story screen sequence reordering before path selection was helpful (+2.9%), though sign-in reordering showed no clear effect.",
+  "Specific copy changes can significantly hurt performance (desktop pet callout card -13.9%, adoption certificate ownership copy -7.7%), while other copy and layout changes showed no clear effect.",
+  "Sign-in changes (hints, layout, step order) and visual redesigns during adoption or path selection showed no clear effect.",
+  "Predictions consistently overestimate positive impact, but underestimated the story screen sequence reorder (predicted -1.0%, measured +2.9%)."
+ ]
+}

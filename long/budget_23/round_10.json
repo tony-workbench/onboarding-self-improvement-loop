@@ -1,0 +1,367 @@
+{
+ "round": 10,
+ "starts_week": 10,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.8154476193599999,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.7097544
+ },
+ "weights_used": {
+  "impact": 0.119,
+  "evidence": 0.211,
+  "confidence": 2.541,
+  "cost": 1.129
+ },
+ "lessons_used": [
+  "Sign-in reordering (sign_in, reorder) is helpful, averaging +3.0% after noise correction across 3 tests with 2 winning tests, though 1 test showed no clear effect.",
+  "Finish redesigns (finish, redesign) are helpful, averaging +2.5% after noise correction across 2 tests with 1 winning test, though 1 test showed no clear effect.",
+  "Evidence is still thin for adding new adoption screens (adoption, new_screen) with only 1 test, which showed no clear effect.",
+  "Evidence is still thin for path choice redesigns (choose_path, redesign) with only 1 test, which showed no clear effect.",
+  "Predictions are often too high, overestimating actual noise-corrected impact in most tests.",
+  "Predictions can sometimes underestimate actual impact, as in round 6 (+1.5% predicted vs +3.1% noise-corrected) and round 7 (+2.2% predicted vs +4.6% noise-corrected)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Post-adoption certificate account sign in",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move the sign-in step to immediately follow adoption certificate creation and precede pet generation waiting.",
+   "why": "Moving sign-in after users have chosen and named their pet leverages emotional investment before account creation, while sign_in evidence shows +3.0% improvement when reordered.",
+   "config": {
+    "sign_in": {
+     "_order": [
+      "story",
+      "choose_path",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "sign_in",
+      "waiting",
+      "home_intro"
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "field 'sign_in._order' is not adjustable"
+   }
+  },
+  {
+   "title": "Interactive tip carousel waiting screen redesign",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesign the waiting screen with a centered interactive tip carousel showing pet care advice while generation completes.",
+   "why": "The waiting step has a long mean time of 2336s; active engagement reduces drop-off during background generation.",
+   "config": {
+    "waiting": {
+     "layout": "centered",
+     "headline": "Creating Your Desktop Pet",
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "tip_carousel",
+        "text": "Tip: Right-click your pet on the desktop anytime to open quick interactions.",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'waiting.wait_status' does not do the job: needs 1 of ['preview', 'progress', 'timer']"
+   }
+  },
+  {
+   "title": "Desktop launch readiness check screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a new desktop readiness check screen before home intro to ensure the pet window opens correctly.",
+   "why": "Support logs received 3 emails reporting pets not appearing on desktop or the app failing to open upon setup completion.",
+   "config": {
+    "home_intro": {
+     "_order": [
+      "story",
+      "choose_path",
+      "sign_in",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "waiting",
+      "new_desktop_check",
+      "home_intro"
+     ]
+    },
+    "new_desktop_check": {
+     "headline": "Desktop Display Readiness",
+     "body": "Checking screen permissions so your pet can roam freely on your desktop.",
+     "button_label": "Launch Desktop Pet",
+     "layout": "centered"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Pet companion sound and preview customizer flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Add an interactive sound and greeting preview step within friend selection so users sample pet sounds before finalizing.",
+   "why": "Adoption step has the biggest drop-off (60.9% conversion); richer interactive preview builds excitement and commitment.",
+   "config": {
+    "pick_friend": {
+     "components": [
+      {
+       "type": "sound",
+       "label": "Listen to Pet Voice",
+       "style": "playful",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interactive sound preview component to friend selection is allowed within onboarding."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 0.65,
+   "score_note": "Targeting biggest drop-off (adoption at 60.9%), but new adoption screens have weak historical performance and high implementation cost.",
+   "slot": "big move",
+   "share": 0.7,
+   "planned_harm": 129.4
+  },
+  {
+   "title": "Account pet recovery explicit banner",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit note on the sign-in screen confirming that signing in retrieves existing pets.",
+   "why": "Support received 8 emails regarding missing or reset pets after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in with your existing account automatically restores all your previously adopted desktop pets."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding account pet recovery hints on sign-in is allowed and does not violate any restrictions."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.035,
+   "score": 9.8,
+   "score_note": "Strong evidence from support emails and strong history of success with sign_in optimizations at minimal cost.",
+   "slot": "best score"
+  },
+  {
+   "title": "Photo source clarity guidance hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Display a helpful photo requirement tip on the photo upload screen recommending clear front-facing lighting.",
+   "why": "Support received 3 emails about custom pet generation failing or rendering unexpected visual results.",
+   "config": {
+    "upload_photos": {
+     "hint": "For best 3D pet accuracy, use a clear front-facing photo with good lighting and no background clutter."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "asks for personal information (photo of user)"
+   }
+  },
+  {
+   "title": "Background generation completion notification prompt",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Enable desktop notification options and progress status so users can minimize the app while waiting.",
+   "why": "Mean wait time is 2336 seconds; allowing background notification reduces drop-off from active waiting fatigue.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "notify_when_ready": true,
+     "hint": "Feel free to work on other tasks. We will alert you the moment your pet is ready!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling desktop notifications and progress updates on the waiting screen is explicitly allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.025,
+   "score": 5.14,
+   "score_note": "Addresses extreme wait times (2336s mean) at home step; moderate cost and reasonable confidence.",
+   "slot": "best score"
+  },
+  {
+   "title": "Split layout path selection screen",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Change path selection layout to split-view for side-by-side comparison of quick adoption versus custom creation.",
+   "why": "Choose path step takes a mean of 514s; clear side-by-side structural comparison speeds up decision making.",
+   "config": {
+    "choose_path": {
+     "layout": "split",
+     "headline": "How Would You Like to Meet Your Pet?"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Changing choose_path to a split layout for path comparison is valid and maintains the core screen job."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.015,
+   "score": 0.37,
+   "score_note": "Addresses 514s mean decision time on path choice, but path choice redesigns have thin historical evidence and require a new layout."
+  },
+  {
+   "title": "Desktop pet behavior preview story copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update initial story screen copy to clearly explain how desktop pets live on screen bars.",
+   "why": "Setting clear expectations early improves initial conversion and reduces post-onboarding confusion.",
+   "config": {
+    "story": {
+     "headline": "Welcome to Desktop Pets",
+     "body": "Adopt an animated pet companion that walks along your taskbar, reacts to your day, and keeps you company."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating story copy to introduce desktop pet behavior is allowed and contains no pricing mentions."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 3.1,
+   "score_note": "Low cost text update, but path choice copy changes have weak historical evidence and modest expected impact.",
+   "slot": "best score"
+  },
+  {
+   "title": "Desktop control quick guide home intro redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign final home intro screen using a stage layout with a interactive controls checklist.",
+   "why": "Support had 3 complaints regarding how to control, hide, or talk to the pet after completing setup.",
+   "config": {
+    "home_intro": {
+     "layout": "stage",
+     "headline": "Your Pet is Live on Your Desktop!",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "checklist",
+        "text": "Quick Tips: Click and drag to move your pet, right-click to open options, or double-click to interact.",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  }
+ ],
+ "picked": [
+  "Pet companion sound and preview customizer flow"
+ ],
+ "held_by_harm_budget": [
+  "Account pet recovery explicit banner",
+  "Background generation completion notification prompt",
+  "Desktop pet behavior preview story copy"
+ ],
+ "harm_budget": 131.0,
+ "planned_harm": 129.4,
+ "decisions": [
+  {
+   "test": "sim-8",
+   "title": "Pet companion sound and preview customizer flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.7,
+   "planned_harm": 129.4,
+   "result": {
+    "step": {
+     "control": 0.5998,
+     "treatment": 0.609,
+     "lift": 0.0152,
+     "lift_se": 0.0325,
+     "p": 0.637494
+    },
+    "finish": {
+     "control": 0.2171,
+     "treatment": 0.2176,
+     "lift": 0.0022,
+     "lift_se": 0.0587,
+     "p": 0.970158
+    },
+    "users_per_group": 2100
+   },
+   "outcome": "lost: no clear effect",
+   "score": 0.65,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": 0.0161,
+   "finishers_delta_hidden": 7.49
+  }
+ ],
+ "shipped": [],
+ "ends_week": 10,
+ "weights_next": {
+  "impact": 0.069,
+  "evidence": 0.146,
+  "confidence": 2.746,
+  "cost": 1.038
+ },
+ "lessons_next": [
+  "Sign-in reordering (sign_in, reorder) is helpful, averaging +3.0% after noise correction across 3 tests with 2 wins, though 1 test showed no clear effect.",
+  "Finish redesigns (finish, redesign) are helpful, averaging +2.5% after noise correction across 2 tests with 1 win, though 1 test showed no clear effect.",
+  "Evidence is still thin for new adoption screens and flows (adoption, new_screen and adoption, new_flow) with only 1 test each, both showing no clear effect.",
+  "Evidence is still thin for path choice redesigns (choose_path, redesign) with only 1 test, which showed no clear effect.",
+  "Predictions are often too high, overestimating actual noise-corrected impact in most tests.",
+  "Predictions can sometimes underestimate actual impact, as in round 6 (+1.5% predicted vs +3.1% noise-corrected) and round 7 (+2.2% predicted vs +4.6% noise-corrected)."
+ ]
+}

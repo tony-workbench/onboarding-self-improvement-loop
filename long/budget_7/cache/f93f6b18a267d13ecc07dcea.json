@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, reorder] defer_sign_in_after_adoption: Move account sign-in until after the pet adoption and customization flow is completed so users personalize their pet before registering.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n1: [finish, new_screen] pet_controls_quick_guide: Add an interactive desktop pet quick-start guide screen explaining key shortcuts, menu controls, and pet interaction modes before finishing onboarding.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_controls_guide\"], \"new_controls_guide\": {\"headline\": \"How to Control & Talk to Your Pet\", \"body\": \"Press Alt+P anytime to show or hide your pet. Right-click your pet on desktop for actions and chat.\", \"layout\": \"centered\", \"components\": [{\"type\": \"checklist\", \"text\": \"Press Alt+P to show/hide pet | Right-click pet for menu | Drag to move\", \"style\": \"playful\"}]}}\n2: [adoption, redesign] live_pet_preview_adoption: Redesign the pet selection screen into a split view showcasing dynamic animated previews alongside pet selection cards.\n   config: {\"pick_friend\": {\"layout\": \"split\", \"headline\": \"Meet Your Future Desktop Companion\", \"replace\": {\"pet_choices\": [{\"type\": \"preview\", \"role\": \"pet_choices\", \"style\": \"large\"}, {\"type\": \"choice_cards\", \"role\": \"pet_choices\", \"style\": \"playful\"}]}}}\n3: [home, new_flow] interactive_wait_minigame: Transform the pet preparation waiting screen into an interactive preview stage with animated pet interactions and time estimates.\n   config: {\"waiting\": {\"headline\": \"Your Pet is Waking Up!\", \"layout\": \"stage\", \"show_time_estimate\": true, \"notify_when_ready\": true, \"components\": [{\"type\": \"animation\", \"asset\": \"asset:pet_idle_play\", \"style\": \"playful\"}, {\"type\": \"tip_carousel\", \"text\": \"Tip: Your pet will wander around active desktop windows!\", \"style\": \"calm\"}]}}\n4: [sign_in, hint] account_pet_persistence_warning: Display explicit account reassurance messaging clarifying that signing in saves and syncs your pet permanently to prevent pet loss.\n   config: {\"sign_in\": {\"hint\": \"Sign in to safely lock in your pet's adoption progress and sync across all your desktop devices.\", \"show_progress\": true}}\n5: [home, wait_info] desktop_launch_troubleshooter_tip: Add desktop rendering tips and system tray indicators on the waiting screen so users know where to look when setup completes.\n   config: {\"waiting\": {\"hint\": \"Once ready, your pet will appear on your screen. Check your system tray if hidden.\", \"show_time_estimate\": true, \"show_progress\": true}}\n6: [choose_path, incentive] welcome_pet_bonus_badge: Display a free welcome starter kit badge on the initial onboarding path choice screen.\n   config: {\"choose_path\": {\"headline\": \"Choose Your Path & Claim Free Starter Items!\", \"hint\": \"Every path comes with an exclusive pet accessory pack.\", \"components\": [{\"type\": \"badge\", \"text\": \"Includes Free Starter Accessory Pack\", \"style\": \"highlight\"}]}}\n7: [adoption, copy] custom_photo_guidelines: Add explicit photo quality recommendations and clear formatting hints on the pet photo upload step.\n   config: {\"upload_photos\": {\"headline\": \"Upload Clear Photos for Best Pet Generation\", \"body\": \"Use front-facing photos with bright lighting for the most accurate 3D desktop pet creation.\", \"hint\": \"Supported formats: JPG, PNG. Clear lighting yields the best results!\", \"show_step_counter\": true}}\n8: [finish, notification] desktop_pet_summon_shortcut_banner: Highlight pet summon shortcut key (Alt+P) and desktop tray notification controls on the home introduction screen.\n   config: {\"home_intro\": {\"headline\": \"Your Pet is Live on Your Desktop!\", \"body\": \"Use Alt+P anytime to summon or hide your pet, or right-click your pet to chat and play.\", \"button_label\": \"Meet My Pet Now\"}}\n9: [choose_path, layout] choose_path_grid_cards: Reorganize the path selection screen into a clean grid card layout with interactive preview badges.\n   config: {\"choose_path\": {\"layout\": \"grid\", \"show_step_counter\": true, \"replace\": {\"path_options\": [{\"type\": \"choice_cards\", \"role\": \"path_options\", \"style\": \"playful\"}]}}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Moving sign-in after adoption within onboarding is explicitly allowed under Rule 4."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new guide screen after home_intro is permitted under Rule 4."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the pick_friend screen while retaining pet selection preserves screen function under Rules 2 and 4."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Enhancing the waiting screen while keeping the pet creation wait notice is allowed under Rules 2 and 4."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding reassurance messaging on the sign-in screen is compliant with Rules 4 and 5."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding desktop tips and progress indicators to the waiting screen is permitted under Rule 4."
+   },
+   {
+    "index": 6,
+    "pass": false,
+    "rule": 3,
+    "reason": "Mentions 'Free Starter Items' and 'Free Starter Accessory Pack', violating Rule 3's prohibition on mentioning free extras in onboarding copy."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding photo formatting guidelines to upload_photos is allowed under Rule 4."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating home_intro copy with desktop shortcuts is allowed under Rule 4."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorganizing choose_path into grid cards preserves the path choice job under Rules 2 and 4."
+   }
+  ]
+ }
+}

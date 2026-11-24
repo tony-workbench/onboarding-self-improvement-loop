@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, redesign] Clear Account Sync Warning on Sign In: Redesign the sign-in screen to feature account synchronization assurances and auto-recovery options for previous pet profiles.\n   config: {\"sign_in\": {\"headline\": \"Sign In & Sync Your Pets\", \"body\": \"Log in to link your desktop pet securely to your account and keep your progress safe.\", \"hint\": \"Signing in ensures your pet won't disappear when re-launching the app.\", \"layout\": \"card\", \"components\": [{\"type\": \"badge\", \"text\": \"Cloud Sync Enabled\", \"style\": \"highlight\"}, {\"type\": \"text\", \"text\": \"Existing pet state will be restored automatically upon login.\", \"style\": \"subtle\"}]}}\n1: [sign_in, reorder] Defer Sign In After Adoption Step: Move the sign-in screen after pet creation and adoption certificate generation, so users build emotional attachment before creating an account.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"], \"sign_in\": {\"headline\": \"Save Your New Desktop Pet\", \"body\": \"Sign in now to claim your adoption certificate and save your companion to the cloud.\", \"button_label\": \"Save & Continue\"}}\n2: [finish, new_screen] Interactive Desktop Control Guide Screen: Insert a dedicated desktop control tutorial screen right before finishing onboarding that demonstrates how to drag, summon, hide, and talk to the pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_controls\", \"home_intro\"], \"new_desktop_controls\": {\"headline\": \"How to Interact with Your Pet\", \"body\": \"Click and drag your pet on your desktop. Right-click the system tray icon to hide or open settings anytime.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"text\": \"Right-click tray icon to open menu\", \"style\": \"playful\"}, {\"type\": \"checklist\", \"text\": \"Press spacebar to bring pet to foreground\", \"style\": \"playful\"}]}, \"home_intro\": {\"headline\": \"Your Companion is Ready!\", \"body\": \"Your pet is now active on your desktop screen.\"}}\n3: [adoption, new_flow] Real-Time Photo Quality Feedback Flow: Rebuild the photo upload screen to include live quality feedback and instant visual previews before submission.\n   config: {\"upload_photos\": {\"headline\": \"Upload Photo for Custom Pet\", \"body\": \"Choose a clear, well-lit photo of your pet for best custom generation results.\", \"layout\": \"split\", \"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"photo_picker\", \"style\": \"rounded\", \"action\": \"choose\"}, {\"role\": \"photo_upload\", \"type\": \"preview\", \"style\": \"highlight\", \"action\": \"open_tip\"}]}}}\n4: [choose_path, redesign] Split View Path Selection Redesign: Redesign the choose path screen into side-by-side comparative cards with time estimates and clear feature descriptions.\n   config: {\"choose_path\": {\"headline\": \"Choose Your Adoption Journey\", \"body\": \"Pick a ready-made companion in 1 minute, or upload photos to create a custom pet.\", \"layout\": \"two_column\", \"show_time_estimate\": true, \"components\": [{\"type\": \"choice_cards\", \"text\": \"Quick Pick (1 min) vs Custom Pet (3 min)\", \"style\": \"emphasis\"}]}}\n5: [home, wait_info] Interactive Desktop Spawn Tips on Waiting Screen: Add an engaging carousel of desktop placement tips and expected behavior notices to the generation waiting screen.\n   config: {\"waiting\": {\"headline\": \"Hatching Your Pet...\", \"body\": \"Your companion will appear floating directly on your desktop screen momentarily.\", \"tip_delay_seconds\": 5, \"show_progress\": true, \"components\": [{\"type\": \"tip_carousel\", \"text\": \"Tip: Make sure desktop overlay permissions are allowed if prompted.\", \"style\": \"playful\"}]}}\n6: [adoption, hint] Photo Upload Guidelines and Sample Hints: Add visible guidelines and bad/good photo examples below the upload box to assist custom pet generation.\n   config: {\"upload_photos\": {\"hint\": \"Use clear, front-facing photos with good lighting. Avoid blurry or group shots.\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:sample_good_photo\", \"style\": \"small\"}, {\"type\": \"text\", \"text\": \"Best results come from single-subject pet photos.\", \"style\": \"subtle\"}]}}\n7: [finish, copy] Home Intro Desktop Controls Summary Copy: Update the home intro text to prominently detail hotkeys and desktop tray controls.\n   config: {\"home_intro\": {\"headline\": \"Meet Your New Desktop Companion!\", \"body\": \"Your pet is now active on your screen. Right-click the system tray icon to hide, customize, or open settings anytime.\", \"button_label\": \"Start Playing\"}}\n8: [choose_path, layout] Spotlight Story Layout with Quick Skip: Switch the story screen layout to spotlight view with a direct action button to move quickly to path selection.\n   config: {\"story\": {\"layout\": \"spotlight\", \"button_label\": \"Choose My Pet\", \"components\": [{\"type\": \"button\", \"label\": \"Skip Intro Story\", \"action\": \"next\", \"style\": \"plain\"}]}}\n9: [sign_in, notification] Sign In Connection Status & Diagnostic Banner: Display an active connection status badge and retry trigger on the sign in screen to prevent blank screen stalls.\n   config: {\"sign_in\": {\"hint\": \"Having trouble connecting? Click retry to refresh authentication.\", \"components\": [{\"type\": \"badge\", \"text\": \"Server Status: Online\", \"style\": \"calm\"}, {\"type\": \"button\", \"label\": \"Retry Connection\", \"action\": \"replay\", \"style\": \"small\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the sign-in screen with cloud sync assurances while maintaining all base rules and functional requirements."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering the sign-in step after adoption certificate generation is explicitly allowed by rule 4."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new desktop controls guide screen before home intro is permitted under rule 4."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the photo upload screen with preview feedback while maintaining the custom pet upload job."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Two-column layout redesign retains both adoption paths (ready-made and custom) without violating fair design rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds desktop placement tips to the waiting screen while preserving the pet creation waiting indicator."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful photo guidelines and sample assets to the upload screen without altering rules or pricing."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates home intro copy with desktop control instructions, which is part of onboarding under rule 4."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the story screen while preserving the allowed skip functionality to the path selection screen."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds connection status and retry option to the sign-in screen without modifying required functionality."
+   }
+  ]
+ }
+}

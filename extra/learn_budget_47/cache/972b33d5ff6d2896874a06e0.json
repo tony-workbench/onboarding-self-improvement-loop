@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, redesign] Desktop Interaction Modes Spotlight: Redesign the home introduction screen into a spotlight layout featuring interactive preview cards that explain desktop pet actions like hiding, summoning, and voice commands.\n   config: {\"home_intro\": {\"layout\": \"spotlight\", \"headline\": \"Meet Your Desktop Companion\", \"body\": \"Your pet lives on your desktop screen. Click to summon, right-click for quick actions, or drag to re-position anytime.\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"choice_cards\", \"label\": \"Interaction Guide\", \"style\": \"playful\"}]}}}\n1: [adoption, new_screen] Custom Pet Generation Preview Modal: Add a dedicated pet verification screen after photo upload so users can inspect and tweak their pet render before completing adoption.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_pet_preview\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_pet_preview\": {\"headline\": \"Review Your Companion Render\", \"body\": \"Here is how your companion will appear on your desktop. Confirm if everything looks great!\", \"layout\": \"centered\", \"components\": [{\"type\": \"preview\", \"label\": \"Render Preview\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Looks Great\", \"action\": \"next\", \"style\": \"playful\"}]}}\n2: [sign_in, hint] Account Progress Persistence Warning: Display explicit security and data retention hints on the sign-in screen informing users how logging in preserves their adopted pets.\n   config: {\"sign_in\": {\"hint\": \"Sign in with your primary account to keep all adopted pets safely synced to this device.\", \"body\": \"Connecting your existing account restores all saved companions and custom pet settings automatically.\"}}\n3: [home, wait_info] Background Desktop Initialization Status: Enhance the waiting screen with real-time status messages, animated progress indicators, and time estimates while desktop assets load.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"headline\": \"Initializing Desktop Companion Environment\", \"body\": \"Preparing screen overlay and graphics drivers for seamless desktop pet rendering.\", \"components\": [{\"type\": \"progress\", \"label\": \"Preparing Desktop Overlay\", \"style\": \"highlight\"}, {\"type\": \"tip_carousel\", \"label\": \"Desktop Tips\", \"style\": \"calm\"}]}}\n4: [choose_path, layout] Path Selection Story Scroll Stage: Transform the path selection screen into a dynamic story-scroll layout showcasing companion archetypes with video clips.\n   config: {\"choose_path\": {\"layout\": \"story_scroll\", \"headline\": \"Choose How You Want to Meet Your Companion\", \"body\": \"Select whether to pick from existing species or create a one-of-a-kind custom pet.\", \"components\": [{\"type\": \"video\", \"label\": \"Path Teaser\", \"style\": \"playful\"}]}}\n5: [adoption, redesign] Certificate Signing Interactive Stage: Redesign the adoption certificate screen into an interactive stage layout with an official seal animation and custom name confirmation.\n   config: {\"adoption_certificate\": {\"layout\": \"stage\", \"headline\": \"Make It Official\", \"body\": \"Sign the official adoption record to bring your companion home to your desktop screen.\", \"replace\": {\"certificate\": [{\"role\": \"certificate\", \"type\": \"animation\", \"label\": \"Official Stamp Animation\", \"style\": \"emphasis\"}]}}}\n6: [finish, new_screen] Desktop Overlay Calibration Screen: Insert a desktop overlay calibration step right before completing onboarding to test graphics rendering and screen position.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_calibration\", \"home_intro\"], \"new_desktop_calibration\": {\"headline\": \"Testing Desktop Display Layer\", \"body\": \"We are verifying your display settings to make sure your pet floats smoothly over your windows.\", \"layout\": \"centered\", \"components\": [{\"type\": \"animation\", \"label\": \"Screen Overlay Test\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Pet Is Visible!\", \"action\": \"next\", \"style\": \"playful\"}]}}\n7: [choose_path, hint] Path Choice Comfort Tip Carousel: Add a delayed tip carousel on the path choice screen comforting users that their choice can be changed later.\n   config: {\"choose_path\": {\"tip_delay_seconds\": 10, \"hint\": \"Don't worry! You can add more companions or switch styles anytime after setup.\", \"components\": [{\"type\": \"tip_carousel\", \"label\": \"Path Guidance\", \"style\": \"subtle\"}]}}\n8: [sign_in, notification] Account Login Assistance Alert: Add a background notification status banner to sign-in screen to assist users if authentication window stalls.\n   config: {\"sign_in\": {\"notify_when_ready\": true, \"hint\": \"If the sign-in popup does not open automatically, click below to refresh authentication.\", \"components\": [{\"type\": \"badge\", \"text\": \"Secure Authentication System Active\", \"style\": \"calm\"}]}}\n9: [home, new_flow] Desktop Environment Readiness Check Flow: Add a diagnostic check screen during the waiting step that verifies display permissions and background process execution.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_diagnostic\", \"home_intro\"], \"new_desktop_diagnostic\": {\"headline\": \"Verifying System Compatibility\", \"body\": \"Checking system permissions to make sure your companion can move freely around your desktop.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"label\": \"System Requirements\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Continue to Desktop\", \"action\": \"next\", \"style\": \"playful\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the home intro overlay while retaining its functionality within onboarding limits."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new pet render preview screen into the onboarding flow without removing required steps."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds persistent sign-in guidance and hints on the sign-in screen without violating onboarding rules."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Enhances the waiting screen with progress details and real wait estimations as permitted."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns path selection screen layout while maintaining both adopt and create choices."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns adoption certificate stage while keeping the official stamp requirement intact."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new desktop calibration step before home intro without dropping any standard onboarding steps."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a helpful delayed tip carousel to the path choice screen without violating design rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds sign-in status and login assistance components to the existing sign-in screen."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a diagnostic check screen after waiting while preserving all base onboarding steps."
+   }
+  ]
+ }
+}

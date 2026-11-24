@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, redesign] Interactive Desktop Control Guide on Finish: Replaces the home intro text with an interactive desktop control cheatsheet showing hotkeys and right-click menus for pet interaction.\n   config: {\"home_intro\": {\"headline\": \"Master Your Desktop Pet Controls\", \"body\": \"Here is a quick cheat sheet for interacting with your new companion on your screen.\", \"layout\": \"checklist\", \"replace\": {\"home_welcome\": [{\"type\": \"checklist\", \"text\": \"Right-click pet for main menu & settings\", \"style\": \"highlight\", \"role\": \"home_welcome\"}, {\"type\": \"checklist\", \"text\": \"Double-click pet to open chat window\", \"style\": \"playful\", \"role\": \"home_welcome\"}, {\"type\": \"checklist\", \"text\": \"Drag and drop pet anywhere on screen\", \"style\": \"plain\", \"role\": \"home_welcome\"}]}}}\n1: [home, new_screen] Screen Visibility Diagnostic New Screen: Adds a desktop visibility diagnostic sub-screen before completing waiting to verify the pet asset can draw on the user's monitor.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_screen_visibility_check\", \"home_intro\"], \"waiting\": {\"headline\": \"Preparing Desktop Companion\", \"show_time_estimate\": true}, \"new_screen_visibility_check\": {\"headline\": \"Confirm Desktop Visibility\", \"body\": \"Can you see your new pet floating near the bottom-right of your screen?\", \"layout\": \"centered\", \"components\": [{\"type\": \"button\", \"label\": \"Yes, I see my pet!\", \"style\": \"emphasis\", \"action\": \"next\"}, {\"type\": \"button\", \"label\": \"No, run display fix\", \"style\": \"plain\", \"action\": \"open_tip\"}]}}\n2: [adoption, new_flow] Pet Trait Tuner Quiz Sub-Flow: Inserts a 3-question pet personality quiz screen into the adoption flow before picking or generating a friend.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"new_personality_quiz\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_personality_quiz\": {\"headline\": \"What is your companion's vibe?\", \"body\": \"Select traits to customize your desktop pet's behavior and aesthetic.\", \"layout\": \"card\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Playful & Energetic\", \"style\": \"playful\", \"action\": \"choose\"}, {\"type\": \"choice_cards\", \"label\": \"Calm & Focused\", \"style\": \"calm\", \"action\": \"choose\"}, {\"type\": \"button\", \"label\": \"Continue to Selection\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n3: [choose_path, redesign] Path Selection Visual Cards Redesign: Redesigns the choose_path screen into side-by-side spotlight choice cards comparing pre-made adoption vs custom creation.\n   config: {\"choose_path\": {\"headline\": \"Choose How You Want to Adopt\", \"body\": \"Pick a ready-made companion or design your own custom pet from scratch.\", \"layout\": \"spotlight\", \"replace\": {\"path_options\": [{\"type\": \"choice_cards\", \"label\": \"Instant Adoption (Ready Pets)\", \"style\": \"emphasis\", \"action\": \"choose\", \"role\": \"path_options\"}, {\"type\": \"choice_cards\", \"label\": \"Custom Creator (Photos & AI)\", \"style\": \"playful\", \"action\": \"choose\", \"role\": \"path_options\"}]}}}\n4: [sign_in, reorder] Post-Path Sign-In Step Reorder: Moves the sign_in step directly after pick_friend so users establish their path before signing in.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"sign_in\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"sign_in\": {\"headline\": \"Save Your New Companion\", \"body\": \"Sign in to keep your selected pet synchronized across your devices.\", \"hint\": \"Your pet selection will be preserved upon sign-in.\"}}\n5: [adoption, redesign] Interactive Adoption Certificate Signing: Redesigns adoption_certificate with an interactive official stamp component and pet naming input card.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Adoption Certificate\", \"body\": \"Give your new pet a name to finalize the adoption papers.\", \"layout\": \"stage\", \"replace\": {\"certificate\": [{\"type\": \"name_input\", \"label\": \"Enter Pet Name\", \"style\": \"emphasis\", \"role\": \"certificate\"}, {\"type\": \"badge\", \"text\": \"Official Desktop Companion\", \"style\": \"highlight\", \"role\": \"certificate\"}], \"official_stamp\": [{\"type\": \"button\", \"label\": \"Stamp & Finalize\", \"style\": \"playful\", \"action\": \"next\", \"role\": \"official_stamp\"}]}}}\n6: [sign_in, hint] Sign-In Screen Troubleshooting Quick-Link: Adds an alternative connection tip and fallback sign-in button on the sign_in screen.\n   config: {\"sign_in\": {\"hint\": \"Having trouble signing in? Click below to open web authentication fallback.\", \"components\": [{\"type\": \"tip_carousel\", \"text\": \"Stuck on loading? Ensure your browser permits desktop app authentication tokens.\", \"style\": \"subtle\"}]}}\n7: [home, wait_info] Waiting Screen Desktop Interaction Tips: Adds a tip carousel with mini animations on the waiting screen explaining how to interact with the pet once loaded.\n   config: {\"waiting\": {\"headline\": \"Hatching Your Desktop Pet...\", \"show_progress\": true, \"show_time_estimate\": true, \"tip_delay_seconds\": 5, \"replace\": {\"wait_status\": [{\"type\": \"tip_carousel\", \"text\": \"Tip: You can move your pet anytime by holding Shift and dragging with your mouse.\", \"style\": \"highlight\", \"role\": \"wait_status\"}, {\"type\": \"animation\", \"asset\": \"asset:pet_wake_up\", \"style\": \"playful\", \"role\": \"wait_status\"}]}}}\n8: [adoption, redesign] Photo Upload Instant Sample Selector: Redesigns upload_photos screen to include starter sample photos alongside the file uploader for fast previewing.\n   config: {\"upload_photos\": {\"headline\": \"Provide Photo for Custom Pet\", \"body\": \"Upload a clear photo of your pet or pick a sample template for instant generation.\", \"layout\": \"two_column\", \"replace\": {\"photo_upload\": [{\"type\": \"photo_picker\", \"label\": \"Upload Your Own Photo\", \"style\": \"emphasis\", \"role\": \"photo_upload\"}, {\"type\": \"preview\", \"asset\": \"asset:sample_pet_preview\", \"style\": \"rounded\", \"role\": \"photo_upload\"}]}}}\n9: [finish, hint] Quick Start Companion Hotkey Banner: Adds a high-visibility hotkey summary banner and sound button on the final home_intro screen.\n   config: {\"home_intro\": {\"hint\": \"Shortcut: Press Ctrl+Shift+P anytime to summon or hide your pet.\", \"components\": [{\"type\": \"badge\", \"text\": \"Hotkey: Ctrl + Shift + P\", \"style\": \"highlight\"}, {\"type\": \"sound\", \"label\": \"Test Pet Sound\", \"action\": \"play\", \"style\": \"playful\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns home_intro content within onboarding rules without violating any constraints."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a diagnostic screen before home_intro while keeping all required onboarding steps and jobs intact."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a personality quiz sub-flow within onboarding without skipping or removing required steps."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns choose_path into spotlight cards while continuing to offer both adopting and creating options."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign_in to occur after pet selection, which is explicitly permitted under Rule 4."
+   },
+   {
+    "index": 5,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replaces the official stamp component with an action button, failing the requirement that the certificate must show an official stamp."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful sign-in hints and web authentication token tips without altering base rules or pricing."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds tips and animation to the waiting screen while preserving its core job of showing the pet being made."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns photo upload layout with templates while preserving the option to upload a custom pet photo."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds hotkey banner and preview sound button to home_intro within allowed onboarding customization rules."
+   }
+  ]
+ }
+}

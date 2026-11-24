@@ -1,0 +1,499 @@
+{
+ "round": 5,
+ "starts_week": 5,
+ "funnel": {
+  "choose_path": 0.7956804000000001,
+  "sign_in": 0.7733232,
+  "adoption": 0.6621657,
+  "home": 0.8936865101999999,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.287,
+  "evidence": 0.229,
+  "confidence": 0.785,
+  "cost": 1.699
+ },
+ "lessons_used": [
+  "Predictions tended to overestimate positive impact in early rounds, but underestimated gains in winning tests in rounds 3 and 4.",
+  "home wait_info changes are helpful, backed by 2 agreeing winning tests in rounds 3 and 4.",
+  "sign_in hint changes showed no clear effect across 2 agreeing early tests, though round 4 yielded a winning test.",
+  "Evidence remains thin for adoption redesign as its 3 tests do not agree (one won, one showed no clear effect, and one performed worse).",
+  "Evidence remains thin for finish new_screen as its 2 tests do not agree (one was rolled back due to guardrail limits, one showed no clear effect).",
+  "Evidence is still thin for choose_path copy, choose_path layout, choose_path new_flow, finish copy, finish new_flow, home notification, and sign_in reorder, as each has only one test so far."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop Render Interactive Activity Stream",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays real-time animated status updates and cycling companion tips during desktop render waiting time.",
+   "why": "Home step has a median duration of 201s and mean of 2336s. Home wait_info improvements have proven effective in past rounds.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "tip_delay_seconds": 15
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress and time estimate to the waiting screen during a real wait is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.032,
+   "score": 4.49,
+   "score_note": "Home step has extreme wait times; home wait_info changes have strong historical evidence (+2.8%), but full animated UI requires release work."
+  },
+  {
+   "title": "Desktop Companion Orientation Welcome Screen",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesigns the home_intro screen into a spotlight view highlighting pet controls, tray shortcuts, and desktop interaction toggles.",
+   "why": "Finish completion drops to 64.8%, and 3 support tickets reported confusion over how to control, hide, or talk to the pet.",
+   "config": {
+    "home_intro": {
+     "layout": "spotlight",
+     "headline": "Welcome to Your Desktop Companion",
+     "body": "Learn how to interact, minimize, and chat with your desktop pet before starting.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Click pet to chat | Drag to move | Right-click to hide",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Custom Pet Crafting Interactive Studio",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Rebuilds the pick_friend screen using a stage layout featuring live animated pet previews and custom trait options.",
+   "why": "Adoption conversion drops to 66.2% with an 89s median time, and 3 support tickets noted custom pet generation errors or visual glitches.",
+   "config": {
+    "pick_friend": {
+     "layout": "stage",
+     "headline": "Craft Your Desktop Pet",
+     "body": "Select traits and preview your companion in real time before finalizing adoption.",
+     "components": [
+      {
+       "type": "preview",
+       "asset": "asset:pet_preview_stage",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning pick_friend to craft/choose a pet preserves the screen's core job."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.008,
+   "score": 3.79,
+   "score_note": "Adoption has a high drop rate (33.8%) and support tickets, but adoption redesigns have conflicting results and thin confidence.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Existing Account Pet Sync Reminder Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Adds an explicit sync reminder hint on the sign-in screen informing users how existing pets are restored upon authentication.",
+   "why": "8 support emails complained about missing or reset pets after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing into your existing account automatically restores all previously created pets and companion settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an informative hint to the sign-in screen is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.026,
+   "score": 8.93,
+   "score_note": "Strong alignment between support complaints (8 emails) and funnel drop; hint changes are low-cost config with recent winning tests.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Pet Archetype Orientation Screen",
+   "target_step": "choose_path",
+   "type": "new_screen",
+   "change": "Inserts an archetype overview screen prior to path selection to explain the difference between instant adoption and custom photo generation.",
+   "why": "Choose path drops 20.4% of users with a high mean duration of 514s, indicating confusion between pathways.",
+   "config": {
+    "_order": [
+     "story",
+     "new_archetype_intro",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_archetype_intro": {
+     "layout": "two_column",
+     "headline": "Choose How You Want to Meet Your Pet",
+     "body": "Pick a ready-to-play standard companion or create a custom pet from your photos."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Inserting a new onboarding screen before path selection is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.03,
+   "score": 2.34,
+   "score_note": "Choose path drops 20.4%, but adding new intermediate screens historically reduces conversion across test flow variants."
+  },
+  {
+   "title": "Desktop Render Progress Notification Banner",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Updates the waiting screen to show step-by-step rendering progress notifications and setup completion readiness cues.",
+   "why": "Home wait times are very high (mean 2336s), and wait_info changes have strong historical test evidence.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "show_progress": true,
+     "hint": "Preparing desktop environment and placing your companion on screen..."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress and completion notifications to the waiting screen is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 6.61,
+   "score_note": "Addresses long render wait times using a proven home wait_info pattern with two prior winning tests.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Desktop Control Master Class Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Adds a secondary controls walkthrough step after home_intro demonstrating shortcut keys, system tray hiding, and audio controls.",
+   "why": "Support emails show post-onboarding confusion regarding pet controls, and finish conversion is low (64.8%).",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_controls_walkthrough"
+    ],
+    "new_controls_walkthrough": {
+     "layout": "checklist",
+     "headline": "Desktop Pet Controls Walkthrough",
+     "body": "Learn how to trigger actions, hide the pet to your system tray, and adjust companion audio settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding new screens after home_intro inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.015,
+   "score": 3.6,
+   "score_note": "Finish step loses 35.2% of users and has support complaints, but new flow changes in finish step previously regressed conversion.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Account Recovery and Authentication Hub Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesigns sign_in into a split layout clearly separating new account creation from existing pet account recovery.",
+   "why": "8 emails reported missing/reset pets on sign-in and 2 reported sign-in stalls or missing screens.",
+   "config": {
+    "sign_in": {
+     "layout": "split",
+     "headline": "Sign In to Keep Your Pet Safe",
+     "body": "Log in with your existing account to restore previous pets, or create a new account to sync across devices."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the sign-in screen layout preserves its functionality."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.02,
+   "score": 2.72,
+   "score_note": "High evidence from support emails, but major layout redesigns/reorders on sign_in have performed poorly in past tests."
+  },
+  {
+   "title": "Dual Column Path Choice Grid",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Reformats choose_path into a two_column layout contrasting pet selection options, render expectations, and customization choices.",
+   "why": "Choose path takes 514s mean time, suggesting users struggle to compare options in the standard layout.",
+   "config": {
+    "choose_path": {
+     "layout": "two_column",
+     "headline": "Select Your Adoption Journey",
+     "body": "Compare pre-built instant companions vs. custom AI-generated pets side by side."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reformatting choose_path still offers both adopting pre-built pets and creating custom pets."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.015,
+   "score": 5.44,
+   "score_note": "Addresses high median/mean duration on choose_path; single past layout test showed mild gain (+1.5%), though evidence is thin.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Pet Personality Customization Boost",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Adds a unlocked trait badge and companion personality badge to the adoption certificate screen to confirm pet readiness.",
+   "why": "Adoption stage has a 66.2% conversion rate and median 89s completion time, benefiting from progress feedback.",
+   "config": {
+    "adoption_certificate": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Personality Unlocked: Energetic Explorer",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "Replacing components on the adoption certificate removes the required official stamp."
+   }
+  }
+ ],
+ "picked": [
+  "Custom Pet Crafting Interactive Studio",
+  "Desktop Control Master Class Flow",
+  "Existing Account Pet Sync Reminder Hint",
+  "Desktop Render Progress Notification Banner",
+  "Dual Column Path Choice Grid"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-19",
+   "title": "Custom Pet Crafting Interactive Studio",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.6351,
+     "treatment": 0.5388,
+     "lift": -0.1515,
+     "lift_se": 0.0249,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.1937,
+     "treatment": 0.158,
+     "lift": -0.1842,
+     "lift_se": 0.0459,
+     "p": 0.000285
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "rolled back: guardrail",
+   "score": 3.79,
+   "predicted_lift": 0.008,
+   "true_lift_hidden": -0.1152,
+   "finishers_delta_hidden": -65.54
+  },
+  {
+   "test": "sim-21",
+   "title": "Existing Account Pet Sync Reminder Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7611,
+     "treatment": 0.7581,
+     "lift": -0.0039,
+     "lift_se": 0.0166,
+     "p": 0.815643
+    },
+    "finish": {
+     "control": 0.1853,
+     "treatment": 0.1963,
+     "lift": 0.0594,
+     "lift_se": 0.0564,
+     "p": 0.278295
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.93,
+   "predicted_lift": 0.026,
+   "true_lift_hidden": 0.011,
+   "finishers_delta_hidden": 6.26
+  },
+  {
+   "test": "sim-22",
+   "title": "Desktop Render Progress Notification Banner",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.8743,
+     "treatment": 0.8517,
+     "lift": -0.0257,
+     "lift_se": 0.0171,
+     "p": 0.136938
+    },
+    "finish": {
+     "control": 0.1817,
+     "treatment": 0.1843,
+     "lift": 0.0147,
+     "lift_se": 0.0554,
+     "p": 0.78939
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.61,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": -0.007,
+   "finishers_delta_hidden": -3.98
+  },
+  {
+   "test": "sim-23",
+   "title": "Dual Column Path Choice Grid",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7597,
+     "treatment": 0.7543,
+     "lift": -0.007,
+     "lift_se": 0.0145,
+     "p": 0.630085
+    },
+    "finish": {
+     "control": 0.1873,
+     "treatment": 0.1833,
+     "lift": -0.0214,
+     "lift_se": 0.053,
+     "p": 0.690119
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.44,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": 0.0086,
+   "finishers_delta_hidden": 4.89
+  }
+ ],
+ "shipped": [],
+ "ends_week": 5,
+ "weights_next": {
+  "impact": 0.897,
+  "evidence": 0.205,
+  "confidence": 0.75,
+  "cost": 2.148
+ },
+ "lessons_next": [
+  "Predictions tended to overestimate positive impact overall (especially in rounds 1, 2, and 5), but underestimated gains in winning tests during rounds 3 and 4.",
+  "home wait_info changes can be helpful, backed by 2 agreeing winning tests in rounds 3 and 4.",
+  "sign_in hint changes mostly show no clear effect across 3 agreeing tests (rounds 1, 2, and 5), despite yielding one winning test in round 4.",
+  "choose_path layout changes showed no clear effect across 2 agreeing tests (rounds 1 and 5).",
+  "Evidence remains thin for adoption redesign and finish new_screen because their respective tests do not agree.",
+  "Evidence is still thin for choose_path copy, choose_path new_flow, finish copy, finish new_flow, home notification, and sign_in reorder, as each has only one test so far."
+ ]
+}

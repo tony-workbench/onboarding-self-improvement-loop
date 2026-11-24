@@ -1,0 +1,353 @@
+{
+ "round": 5,
+ "starts_week": 5,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.344,
+  "evidence": 1.047,
+  "confidence": 1.47,
+  "cost": 1.139
+ },
+ "lessons_used": [
+  "Evidence is still thin across all change types; at least 2 tests of a kind are required to establish a rule.",
+  "Evidence is still thin for adoption new_screen changes (only 1 test, which performed worse at -4.8% after noise correction).",
+  "Evidence is still thin for finish new_screen changes (only 1 test, which showed no clear effect at +1.7% after noise correction).",
+  "Evidence is still thin for sign_in reorder changes (only 1 test, which showed no clear effect at -0.5% after noise correction).",
+  "Evidence is still thin for finish redesign changes (only 1 test, which performed worse at -6.3% after noise correction).",
+  "Predictions were consistently too high across all change types compared to noise-corrected measurements."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Sign-In Account Pet Persistence Banner",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign sign-in options layout to prominently feature account persistence and pet sync status badges.",
+   "why": "Support received 8 emails regarding missing or reset pets after signing in with different credentials.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Link & Save Your Pet",
+     "body": "Your pets and settings are tied directly to your selected sign-in account.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "badge",
+        "text": "Permanent Pet Cloud Sync Enabled",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Custom Pet Safety & Validation Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Add an inline validation and tip carousel flow to photo uploads and pet pick screens to prevent corrupt custom pets.",
+   "why": "3 support emails reported custom pet generation failing or looking incorrect, while adoption conversion is low at 60.9%.",
+   "config": {
+    "pick_friend": {
+     "headline": "Choose & Verify Your Companion",
+     "layout": "stage",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Ensure bright lighting and clear faces for best custom pet results.",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "asks for personal information (user face image)"
+   }
+  },
+  {
+   "title": "Desktop Prep Progress and Status Updates",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add visible progress bar and time estimate with periodic tips on the waiting screen while background processes render the pet.",
+   "why": "The home step has a long mean duration of 2336s and median of 201s, leaving users uncertain if generation stalled.",
+   "config": {
+    "waiting": {
+     "headline": "Preparing Your Pet Workspace",
+     "body": "Rendering your pet background asset and assembling desktop overlay components.",
+     "show_progress": true,
+     "show_time_estimate": true,
+     "tip_delay_seconds": 15
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid waiting screen progress updates during pet rendering."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 4.71,
+   "score_note": "Long mean duration on home wait step indicates user drop-off during rendering, but lack of support emails keeps evidence moderate.",
+   "slot": "best score"
+  },
+  {
+   "title": "Desktop Controls Welcome Screen Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign the home intro screen into a two-column card layout displaying key interaction shortcuts and tray options.",
+   "why": "3 support emails reported confusion on how to control or hide pets, and finish step conversion drops to 64.8%.",
+   "config": {
+    "home_intro": {
+     "headline": "Welcome Your Desktop Companion!",
+     "body": "Quick key combinations and system tray options keep your pet responsive.",
+     "layout": "two_column",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "checklist",
+        "text": "Right-click pet to open actions; System tray icon hides pet",
+        "style": "plain"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  },
+  {
+   "title": "Compact Path Selection Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Switch path selection screen to a compact centered layout with progress indicator.",
+   "why": "Choose path stage has a high mean time of 514s, showing users hesitate when selecting an onboarding route.",
+   "config": {
+    "choose_path": {
+     "layout": "centered",
+     "headline": "Select Your Desktop Pet Journey",
+     "body": "Choose a pre-made pet or start custom pet creation.",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout change that retains both path options."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.02,
+   "score": 4.42,
+   "score_note": "Path selection shows high mean duration in funnel, though evidence relies solely on funnel data.",
+   "slot": "best score"
+  },
+  {
+   "title": "Adoption Completion Reward Incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Display starter pet reward badges on the adoption certificate screen to encourage finishing setup.",
+   "why": "Adoption step conversion is 60.9% with median duration of 89s.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Official Pet Adoption Certificate",
+     "body": "Complete your adoption to unlock starter desktop treats!",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Starter Desktop Treats Included",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions free extras/treats, violating pricing copy rules."
+   }
+  },
+  {
+   "title": "Sign-In Stalling Fallback Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Display a helpful fallback hint if the sign-in modal load takes longer than expected.",
+   "why": "Support logs highlight 2 users encountering screen stalling or non-responsive sign-in screens.",
+   "config": {
+    "sign_in": {
+     "hint": "Taking longer than usual? Click here to reload login providers.",
+     "tip_delay_seconds": 10
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid fallback hint on sign-in screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.03,
+   "score": 7.0,
+   "score_note": "Both funnel drop-off (72.9%) and support logs (2 stalling complaints) point to sign-in friction; easy config/hint change.",
+   "slot": "best score"
+  },
+  {
+   "title": "Desktop Readiness Notification Alert",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Enable system notification trigger on home intro to notify users when the pet is ready on desktop.",
+   "why": "Finish step mean time is 5815s, indicating users minimize or leave the desktop app unattended while waiting.",
+   "config": {
+    "home_intro": {
+     "notify_when_ready": true,
+     "body": "We will pop up a desktop notification when your pet arrives on screen."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid notification option added to home intro."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 4.71,
+   "score_note": "Finish step mean time of 5815s shows users leave the app unattended; notifications can re-engage them."
+  },
+  {
+   "title": "Reorder Sign-In After Pet Choice",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move sign-in step to occur after pet pick and photo upload steps, right before certificate finalization.",
+   "why": "Sign-in conversion is 72.9% and overall onboarding is 17.8%; building pet commitment first reduces drop-off.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "sign_in",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in step after pet selection is explicitly allowed under rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.005,
+   "score": 1.45,
+   "score_note": "Prior test for sign_in reorder yielded -0.5% lift, giving low confidence despite funnel motivation."
+  },
+  {
+   "title": "New System Tray & Desktop Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a dedicated guide screen right before home intro explaining desktop placement and tray icon actions.",
+   "why": "Support received multiple issues regarding desktop feature misbehavior (4 emails) and control confusion (3 emails).",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_guide",
+     "home_intro"
+    ],
+    "new_desktop_guide": {
+     "headline": "Desktop Pet Controls & System Tray",
+     "body": "Your pet lives on your desktop screen! Control visibility and interaction via the system tray icon.",
+     "layout": "checklist"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new guide screen within onboarding is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.015,
+   "score": 3.19,
+   "score_note": "Strong evidence from funnel and multiple support emails (7 total), but requires a new screen (cost 0) where historical tests performed poorly.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 66.8
+  }
+ ],
+ "picked": [
+  "New System Tray & Desktop Guide Screen"
+ ],
+ "held_by_harm_budget": [
+  "Sign-In Stalling Fallback Hint",
+  "Desktop Prep Progress and Status Updates",
+  "Compact Path Selection Layout"
+ ],
+ "harm_budget": 106.9,
+ "planned_harm": 66.8,
+ "decisions": [],
+ "shipped": [],
+ "ends_week": 5,
+ "weights_next": {
+  "impact": 0.125,
+  "evidence": 0.932,
+  "confidence": 1.839,
+  "cost": 1.104
+ },
+ "lessons_next": [
+  "Evidence is still thin across all change types; at least 2 tests of a kind are required to establish a rule.",
+  "Predictions were consistently too high across all change types compared to noise-corrected measurements.",
+  "Evidence is still thin for adoption new_screen changes (only 1 test, which performed worse at -4.8% after noise correction).",
+  "Evidence is still thin for finish new_screen changes (only 1 test, which showed no clear effect at +1.7% after noise correction).",
+  "Evidence is still thin for sign_in reorder changes (only 1 test, which showed no clear effect at -0.5% after noise correction).",
+  "Evidence is still thin for finish redesign changes (only 1 test, which performed worse at -6.3% after noise correction)."
+ ]
+}

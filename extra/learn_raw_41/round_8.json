@@ -1,0 +1,476 @@
+{
+ "round": 8,
+ "starts_week": 8,
+ "funnel": {
+  "choose_path": 0.8003286000000001,
+  "sign_in": 0.7709175,
+  "adoption": 0.68208,
+  "home": 0.8695847999999998,
+  "finish": 0.7318512
+ },
+ "weights_used": {
+  "impact": 2.226,
+  "evidence": 1.486,
+  "confidence": 0.193,
+  "cost": 0.094
+ },
+ "lessons_used": [
+  "Specific wait-step status indicators (+14.7% measured) and diagnostic screens (+6.1% measured) were helpful, with predictions (+14.0% and +3.5%) slightly too low, though other wait-info additions and new screens showed no clear effect.",
+  "Specific callout tips (+9.2% and +9.6% measured) and path discovery layout redesigns (+9.5% measured) were helpful, and predictions (+4.5%, +2.0%, -1.0%) were significantly too low; other hints showed no clear effect.",
+  "Certain intro redesigns can significantly harm performance (Compact Card Home Intro Redesign: -17.5% measured), while most other redesigns and layout changes showed no clear effect, making positive predictions (+1.0% to +12.0%) too optimistic.",
+  "Deferring account sign-in (-7.3% measured) and path outcome copy optimization (-6.6% measured) significantly harmed performance; predictions (+15.0% and +1.5%) were far too high.",
+  "Copy refinements and banners showed no clear effect or significantly harmed performance, and predictions were consistently too optimistic."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop Pet Render Preview Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Adds a dedicated companion render preview screen during the generation wait process, allowing users to preview animations and desktop pose previews.",
+   "why": "The home wait step takes a median of 201s (mean 2336s), and support tickets show user confusion when pets fail to render or appear on the desktop.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_render_preview",
+     "home_intro"
+    ],
+    "waiting": {
+     "show_progress": true,
+     "components": [
+      {
+       "type": "preview",
+       "asset": "asset:pet_render_preview",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_render_preview']"
+   }
+  },
+  {
+   "title": "Centered Layout Custom Photo Generation Screen",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the photo upload screen into a centered layout with interactive asset preview cards showing expected generation quality.",
+   "why": "Adoption has the lowest conversion rate in the funnel at 68.2%, and 3 support emails reported custom pet creation failures or unexpected visual output.",
+   "config": {
+    "upload_photos": {
+     "layout": "centered",
+     "headline": "Create Your Custom Desktop Pet",
+     "replace": {
+      "photo_upload": [
+       {
+        "type": "photo_picker",
+        "label": "Upload Photo",
+        "style": "highlight",
+        "role": "photo_upload"
+       },
+       {
+        "type": "preview",
+        "asset": "asset:custom_pet_sample",
+        "style": "playful",
+        "role": "photo_upload"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[1]': a preview cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Live Wait Step Generation Progress Timer",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays a live dynamic countdown timer and detailed status updates on the waiting screen during companion asset generation.",
+   "why": "The waiting step has a long mean time of 2336s (median 201s), where users drop off without clear expectations on remaining time.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "hint": "Preparing desktop asset files and setting up companion animations...",
+     "components": [
+      {
+       "type": "timer",
+       "label": "Estimated Time Remaining",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Countdowns are permitted during real wait steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.12,
+   "score": 6.79,
+   "score_note": "Wait step dynamic timers and status indicators have strong historical success and address severe funnel duration drop-off.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 118.7
+  },
+  {
+   "title": "Card Layout Sign In Sync Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesigns the sign-in screen into a card-based layout featuring account cloud sync badges to reassure returning users about data retention.",
+   "why": "8 support emails (the single largest complaint category) reported missing or reset pets after signing back into their account.",
+   "config": {
+    "sign_in": {
+     "layout": "card",
+     "headline": "Sign In & Restore Your Desktop Companions",
+     "body": "Log in to sync your saved pets, custom outfits, and progress safely across devices.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "type": "button",
+        "label": "Sign In with Account",
+        "style": "emphasis",
+        "role": "sign_in_options"
+       },
+       {
+        "type": "badge",
+        "label": "Cloud Backup Enabled",
+        "style": "subtle",
+        "role": "sign_in_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[1]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Mascot Controls Briefing Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Inserts a dedicated pet controls briefing screen after home_intro demonstrating system tray actions and desktop interaction shortcuts.",
+   "why": "Finish completion drops to 73.2% with a median time of 395s, and 3 support emails highlighted confusion over how to control, hide, or talk to the pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_controls_briefing"
+    ],
+    "home_intro": {
+     "button_label": "Next: Learn Controls"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_controls_briefing']"
+   }
+  },
+  {
+   "title": "Companion Path Choice Callout Tip",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Adds an inline hint on the path selection screen clarifying that pet traits and behaviors can be customized later in app settings.",
+   "why": "Choose path step mean time is 514s (median 8s), indicating high drop-off and hesitation when users decide on their onboarding path.",
+   "config": {
+    "choose_path": {
+     "hint": "Tip: You can change your companion's path and personality traits anytime in settings later.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Flexible Choice",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds non-coercive informational hint on choose path screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.09,
+   "score": 6.91,
+   "score_note": "Inline callout tips clarifying path choices directly target drop-off hesitation and historically yield strong positive lift.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 118.7
+  },
+  {
+   "title": "Background Pet Render Notification Toggle",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Adds an opt-in system notification toggle on the waiting screen so users get notified when their desktop pet finishes rendering.",
+   "why": "The waiting step has a mean duration of 2336s, causing user frustration and abandonment while waiting for companion generation.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "hint": "We will send a system desktop notification as soon as your pet is ready to join your desktop.",
+     "components": [
+      {
+       "type": "button",
+       "label": "Notify Me When Ready",
+       "action": "next",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 1,
+    "reason": "Button action allows skipping the mandatory waiting step."
+   }
+  },
+  {
+   "title": "Adoption Certificate Name Customization Bonus",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Displays a personalized companion badge callout on the adoption certificate screen when users name their new desktop companion.",
+   "why": "Adoption stage has the lowest step conversion rate in the onboarding funnel (68.2%).",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Welcome Your New Companion Home",
+     "body": "Give your pet a unique name to receive a personalized adoption badge on your desktop.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Personalized Companion Badge",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions a bonus/free extra reward."
+   }
+  },
+  {
+   "title": "Interactive Story Introduction Subflow",
+   "target_step": "choose_path",
+   "type": "new_flow",
+   "change": "Adds an interactive story introduction screen before path selection featuring pet preview animations and audio greeting teasers.",
+   "why": "Path selection drop-off is 20% with a long mean duration of 514s, showing users need engaging upfront context on pet paths.",
+   "config": {
+    "_order": [
+     "new_story_intro",
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "story": {
+     "headline": "Discover Your Desktop Companion's World",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:companion_intro_animation",
+       "style": "playful"
+      },
+      {
+       "type": "sound",
+       "asset": "asset:companion_greeting_sound",
+       "action": "play",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_story_intro']"
+   }
+  },
+  {
+   "title": "System Tray Quick Control Desktop Guidance Copy",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Updates the home_intro screen headline and body text with clear guidance on system tray access and quick pet controls.",
+   "why": "Multiple support tickets report confusion post-onboarding regarding how to interact with, talk to, or hide their pet from the screen.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Desktop Pet is Active!",
+     "body": "Look for the pet icon in your system tray to access quick settings, talk options, or hide your companion anytime.",
+     "hint": "Right-click the tray icon to open controls or adjust desktop overlay settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates home_intro copy to explain pet controls without violating any rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.0,
+   "score": 3.33,
+   "score_note": "Copy refinements consistently show neutral or negative performance across historical onboarding tests.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 72.3
+  }
+ ],
+ "picked": [
+  "Companion Path Choice Callout Tip",
+  "Live Wait Step Generation Progress Timer",
+  "System Tray Quick Control Desktop Guidance Copy"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 309.7,
+ "decisions": [
+  {
+   "test": "sim-26",
+   "title": "Companion Path Choice Callout Tip",
+   "target_step": "choose_path",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 118.7,
+   "result": {
+    "step": {
+     "control": 0.8067,
+     "treatment": 0.798,
+     "lift": -0.0107,
+     "lift_se": 0.0179,
+     "p": 0.551182
+    },
+    "finish": {
+     "control": 0.2627,
+     "treatment": 0.266,
+     "lift": 0.0127,
+     "lift_se": 0.0617,
+     "p": 0.836001
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.91,
+   "predicted_lift": 0.09,
+   "true_lift_hidden": -0.0151,
+   "finishers_delta_hidden": -6.0
+  },
+  {
+   "test": "sim-27",
+   "title": "Live Wait Step Generation Progress Timer",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 118.7,
+   "result": {
+    "step": {
+     "control": 0.8834,
+     "treatment": 0.8975,
+     "lift": 0.0159,
+     "lift_se": 0.0201,
+     "p": 0.423289
+    },
+    "finish": {
+     "control": 0.2653,
+     "treatment": 0.2793,
+     "lift": 0.0528,
+     "lift_se": 0.0629,
+     "p": 0.389086
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.79,
+   "predicted_lift": 0.12,
+   "true_lift_hidden": 0.0355,
+   "finishers_delta_hidden": 14.1
+  },
+  {
+   "test": "sim-28",
+   "title": "System Tray Quick Control Desktop Guidance Copy",
+   "target_step": "finish",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 72.3,
+   "result": {
+    "step": {
+     "control": 0.7495,
+     "treatment": 0.7883,
+     "lift": 0.0518,
+     "lift_se": 0.0352,
+     "p": 0.130534
+    },
+    "finish": {
+     "control": 0.2653,
+     "treatment": 0.288,
+     "lift": 0.0854,
+     "lift_se": 0.0642,
+     "p": 0.165253
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.33,
+   "predicted_lift": 0.0,
+   "true_lift_hidden": 0.0648,
+   "finishers_delta_hidden": 25.74
+  }
+ ],
+ "shipped": [],
+ "ends_week": 8,
+ "weights_next": {
+  "impact": 2.292,
+  "evidence": 1.449,
+  "confidence": 0.163,
+  "cost": 0.097
+ },
+ "lessons_next": [
+  "Specific callout tips (+9.2% and +9.6% measured) and path discovery layout redesigns (+9.5% measured) were helpful, with predictions (+4.5%, +2.0%, -1.0%) significantly too low; other hints showed no clear effect.",
+  "Custom generation status indicators (+14.7% measured) and diagnostic screens (+6.1% measured) were helpful, with predictions (+14.0% and +3.5%) slightly too low, though other wait-info changes and new screens showed no clear effect.",
+  "Certain intro redesigns can significantly harm performance (Compact Card Home Intro Redesign: -17.5% measured), while most other redesigns, layout changes, and new screens showed no clear effect, making positive predictions (+1.0% to +12.0%) too optimistic.",
+  "Deferring account sign-in (-7.3% measured) and path outcome copy optimization (-6.6% measured) significantly harmed performance; predictions (+15.0% and +1.5%) were far too high.",
+  "Copy refinements, banners, and reordering adjustments showed no clear effect or significantly harmed performance, and predictions were consistently too optimistic."
+ ]
+}

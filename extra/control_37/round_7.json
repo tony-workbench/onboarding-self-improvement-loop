@@ -1,0 +1,471 @@
+{
+ "round": 7,
+ "starts_week": 7,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7886322,
+  "adoption": 0.609,
+  "home": 0.8703977999999999,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Story Scroll Path Choice Experience",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the onboarding intro screen into a story scroll layout with interactive path teaser cards.",
+   "why": "The choose_path step has a high 514s mean duration despite an 8s median, indicating a large tail of users get stuck or confused during initial path selection.",
+   "config": {
+    "story": {
+     "layout": "story_scroll",
+     "headline": "Meet Your New Desktop Companion",
+     "body": "Scroll to discover adoption paths and find the perfect virtual companion for your workspace.",
+     "replace": {
+      "intro_story": [
+       {
+        "type": "choice_cards",
+        "label": "Select your companion style",
+        "style": "playful",
+        "action": "choose",
+        "role": "intro_story"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'story.replace.intro_story[0]': a choice_cards cannot do the intro_story job (use ['animation', 'button', 'image', 'mascot', 'text', 'video'])"
+   }
+  },
+  {
+   "title": "Account Persistence & Provider Safety Sign-In Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in screen into a split layout emphasizing single-sign-on providers and account safety reminders.",
+   "why": "Support received 8 emails regarding lost or reset pets when logging in again, showing sign-in identity matching is unclear.",
+   "config": {
+    "sign_in": {
+     "layout": "split",
+     "headline": "Secure Your Companion & Sync Progress",
+     "body": "Use your primary email or social login to ensure your desktop pet and customizations are permanently saved.",
+     "hint": "Always use the same login provider to prevent creating a duplicate blank account.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "type": "button",
+        "label": "Continue with Saved Identity",
+        "style": "emphasis",
+        "action": "next",
+        "role": "sign_in_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.body' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Pet Companion Personality Matcher Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Add a new pet personality quiz screen before pet selection to help users pick a pet that fits their desktop workflow.",
+   "why": "Adoption conversion drops significantly to 60.9% with an 89s median time as users hesitate when choosing or customizing pets.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "new_pet_quiz",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "pick_friend": {
+     "headline": "Your Matched Desktop Companions",
+     "body": "Based on your preferences, here are the pets ready to join your desktop."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_pet_quiz']"
+   }
+  },
+  {
+   "title": "Interactive Desktop Pet Controls Tutorial Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Introduce a interactive desktop tutorial screen right after home intro showing how to summon, move, hide, and talk to the pet.",
+   "why": "Support received 3 emails from users confused about controlling, hiding, or talking to the pet post-onboarding, and finish step conversion is only 64.8%.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_pet_controls_tutorial"
+    ],
+    "home_intro": {
+     "headline": "Welcome Your Companion Home!",
+     "body": "Let's take 30 seconds to learn how to hide, summon, and interact with your pet on your desktop.",
+     "button_label": "Start Quick Tutorial"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_pet_controls_tutorial']"
+   }
+  },
+  {
+   "title": "Grid Layout Pet Selector",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch the friend selection screen to a clean grid layout showcasing pet traits and desktop behaviors side-by-side.",
+   "why": "Adoption conversion is low at 60.9% and takes an 89s median time; a side-by-side grid makes comparing options faster.",
+   "config": {
+    "pick_friend": {
+     "layout": "grid",
+     "headline": "Choose Your Desktop Friend",
+     "body": "Compare companion personalities and pick the one that fits your workspace."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the pet choice screen into a grid layout while preserving its core function."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.1,
+   "score": 5.42,
+   "score_note": "Adoption has the largest drop-off (39.1%) in main onboarding; UI grid redesign requires significant effort.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 108.4
+  },
+  {
+   "title": "Desktop Engine Diagnostics Waiting Checklist",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add a real-time system loading checklist to the waiting screen so users know their desktop engine is launching properly.",
+   "why": "3 support emails reported the pet not showing on desktop or app not opening, while home step mean wait time is 2336s.",
+   "config": {
+    "waiting": {
+     "headline": "Preparing Your Companion on Desktop...",
+     "body": "Initializing graphics rendering and setting up your desktop overlay.",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Desktop Overlay Engine Initialized",
+       "style": "plain",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates waiting screen information with system diagnostic progress, permitted by rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 5.83,
+   "score_note": "Home step has high conversion (87%) but extreme mean wait (2336s) and 3 support emails.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 108.4
+  },
+  {
+   "title": "Account Session Recovery Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit safety hint below sign-in options reminding users how to recover existing pet data.",
+   "why": "8 emails reported pets missing or reset after signing in again, making account confusion the top support ticket theme.",
+   "config": {
+    "sign_in": {
+     "hint": "Already adopted a pet? Sign in with the exact same account provider to load your saved pet."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a helpful account recovery hint on the sign-in screen without violating rule policies."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.08,
+   "score": 9.17,
+   "score_note": "Directly resolves top support complaint (8 emails) via lightweight copy/hint update.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 108.4
+  },
+  {
+   "title": "Custom Pet Photo Generation Guarantee Incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Display a quality guarantee badge and instant retry promise on the photo upload screen.",
+   "why": "3 support emails noted custom pet creation failures or poor rendering results during adoption.",
+   "config": {
+    "upload_photos": {
+     "hint": "100% Generation Guarantee: You can fine-tune or re-generate your custom pet anytime free of charge.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Instant Quality Guarantee",
+       "style": "highlight",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'upload_photos.hint' talks about price or money"
+   }
+  },
+  {
+   "title": "Path Choice Time Expectation Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update the choose path headline and body to reassure users that path choice takes under 10 seconds and can be changed later.",
+   "why": "Choose path has an 8s median but 514s mean duration, indicating users stall when making a permanent choice.",
+   "config": {
+    "choose_path": {
+     "headline": "Quick Setup: Pick Your Pet's Path",
+     "body": "Choose how you'd like to get started. You can always change your pet's path later in Settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates headline and body text on choose path screen while retaining its function."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.05,
+   "score": 7.08,
+   "score_note": "Targeted copy tweak addresses extreme long-tail hesitation (514s mean vs 8s median).",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 108.4
+  },
+  {
+   "title": "Desktop Quick Controls Reference Banner",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Display a desktop hotkey and control quick-reference banner on the home introduction screen.",
+   "why": "Users report confusion around hiding, controlling, and talking to the pet post-onboarding.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Quick Keys: Double-click to talk • Right-click to hide/sleep",
+       "style": "rounded",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.components[0].text' has characters outside the allowed set: ['•']"
+   }
+  }
+ ],
+ "picked": [
+  "Account Session Recovery Hint",
+  "Path Choice Time Expectation Copy",
+  "Desktop Engine Diagnostics Waiting Checklist",
+  "Grid Layout Pet Selector"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 433.6,
+ "decisions": [
+  {
+   "test": "sim-20",
+   "title": "Account Session Recovery Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 108.4,
+   "result": {
+    "step": {
+     "control": 0.7778,
+     "treatment": 0.7769,
+     "lift": -0.0011,
+     "lift_se": 0.0223,
+     "p": 0.960061
+    },
+    "finish": {
+     "control": 0.2127,
+     "treatment": 0.2187,
+     "lift": 0.0282,
+     "lift_se": 0.0716,
+     "p": 0.689509
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 9.17,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": -0.0261,
+   "finishers_delta_hidden": -8.26
+  },
+  {
+   "test": "sim-21",
+   "title": "Path Choice Time Expectation Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 108.4,
+   "result": {
+    "step": {
+     "control": 0.7613,
+     "treatment": 0.7707,
+     "lift": 0.0123,
+     "lift_se": 0.0204,
+     "p": 0.546021
+    },
+    "finish": {
+     "control": 0.2173,
+     "treatment": 0.212,
+     "lift": -0.0245,
+     "lift_se": 0.0681,
+     "p": 0.722043
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.08,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": -0.0162,
+   "finishers_delta_hidden": -5.13
+  },
+  {
+   "test": "sim-22",
+   "title": "Desktop Engine Diagnostics Waiting Checklist",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 108.4,
+   "result": {
+    "step": {
+     "control": 0.9,
+     "treatment": 0.9221,
+     "lift": 0.0246,
+     "lift_se": 0.0191,
+     "p": 0.190896
+    },
+    "finish": {
+     "control": 0.218,
+     "treatment": 0.2427,
+     "lift": 0.1131,
+     "lift_se": 0.0744,
+     "p": 0.108627
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.83,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.0315,
+   "finishers_delta_hidden": 9.97
+  },
+  {
+   "test": "sim-23",
+   "title": "Grid Layout Pet Selector",
+   "target_step": "adoption",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 108.4,
+   "result": {
+    "step": {
+     "control": 0.6024,
+     "treatment": 0.6105,
+     "lift": 0.0134,
+     "lift_se": 0.0385,
+     "p": 0.7266
+    },
+    "finish": {
+     "control": 0.2107,
+     "treatment": 0.2,
+     "lift": -0.0506,
+     "lift_se": 0.0682,
+     "p": 0.469579
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.42,
+   "predicted_lift": 0.1,
+   "true_lift_hidden": 0.0166,
+   "finishers_delta_hidden": 5.26
+  }
+ ],
+ "shipped": [],
+ "ends_week": 7,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

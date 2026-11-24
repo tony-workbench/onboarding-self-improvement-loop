@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, reorder] Postpone account sign in after pet selection: Move the sign-in step after users pick their pet and create the adoption certificate, reducing initial drop-off.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n1: [home, new_screen] Desktop pet placement diagnostic screen: Insert a short desktop visibility verification screen right after the waiting stage to ensure the pet rendered on screen.\n   config: {\"waiting\": {\"show_progress\": true}, \"new_desktop_check\": {\"headline\": \"Confirm Desktop Visibility\", \"body\": \"Your pet should now appear floating on your desktop screen. Click to confirm.\", \"layout\": \"centered\"}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_check\", \"home_intro\"]}\n2: [sign_in, redesign] Split account sign in screen with account persistence guarantee: Redesign sign_in screen to split layout featuring a dedicated reminder about log-in account matching.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Save Your Companion\", \"body\": \"Use your primary account so your pet state and preferences stay synced safely.\", \"layout\": \"split\"}}\n3: [adoption, new_flow] Custom pet generation retry flow: Add an instant preset fallback option inside the pet selection flow if photo processing stalls or custom rendering fails.\n   config: {\"pick_friend\": {\"layout\": \"grid\", \"hint\": \"If custom generation takes too long, pick from standard pet presets at any time.\"}}\n4: [sign_in, hint] Account recovery notice on sign in screen: Add a prominent hint below the sign-in options reminding users to sign in with their existing account to restore pets.\n   config: {\"sign_in\": {\"hint\": \"Returning user? Sign in with your original account to instantly load your existing pet.\"}}\n5: [home, wait_info] Estimated wait time counter and status updates: Show dynamic time estimates and live status steps while waiting for pet generation to complete.\n   config: {\"waiting\": {\"headline\": \"Bringing Your Pet to Life...\", \"show_time_estimate\": true, \"show_progress\": true, \"tip_delay_seconds\": 10}}\n6: [finish, notification] Interactive control overview on home intro: Display an active desktop notification on home_intro explaining basic pet interactions.\n   config: {\"home_intro\": {\"notify_when_ready\": true, \"hint\": \"Click and drag your desktop pet to move it, or right-click to open pet controls.\"}}\n7: [choose_path, redesign] Story scroll overview redesign: Redesign the story intro screen into a story scroll layout highlighting core app capabilities before pathway selection.\n   config: {\"story\": {\"headline\": \"Meet Your New Virtual Desktop Buddy\", \"body\": \"Adopt, customize, and interact with an animated pet right on your computer screen.\", \"layout\": \"story_scroll\"}}\n8: [adoption, layout] Card layout for adoption certificate stage: Switch the adoption certificate screen to a card layout with step counters to emphasize creation progress.\n   config: {\"adoption_certificate\": {\"layout\": \"card\", \"show_step_counter\": true, \"headline\": \"Official Pet Adoption Certificate\"}}\n9: [adoption, hint] Photo formatting guidance hint: Add explicit photo lighting and framing guidance text on the photo upload screen.\n   config: {\"upload_photos\": {\"hint\": \"For best results, upload clear, well-lit photos facing forward with minimal background noise.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in within onboarding is explicitly allowed."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new verification screen inside onboarding is allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the sign-in screen layout within onboarding is allowed."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a preset fallback option during pet selection is allowed."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding account recovery guidance hints on the sign-in screen is allowed."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying progress and dynamic estimates during a real wait is allowed."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding control hints to the home intro overlay is allowed within onboarding."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the story screen layout while preserving its job is allowed."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Switching adoption certificate to a card layout while maintaining the official certificate function is allowed."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding photo framing and lighting guidance text is allowed."
+   }
+  ]
+ }
+}

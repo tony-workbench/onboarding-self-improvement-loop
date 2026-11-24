@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Full bleed adoption certificate screen redesign: Redesign the adoption certificate screen into a full-bleed stage layout with an official seal verification graphic.\n   config: {\"adoption_certificate\": {\"layout\": \"full_bleed\", \"headline\": \"Official Pet Adoption Certificate\", \"body\": \"Review and approve your new desktop pet's official credentials before activation.\", \"replace\": {\"certificate\": [{\"role\": \"certificate\", \"type\": \"image\", \"asset\": \"asset:certificate_full_seal\", \"style\": \"emphasis\"}]}}}\n1: [finish, new_screen] Desktop pet sound test step on onboarding completion: Add a new pet sound test screen after home intro to introduce voice interactions before desktop launch.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_pet_sound_test\"], \"new_pet_sound_test\": {\"headline\": \"Test Pet Voice & Sounds\", \"body\": \"Click the sound buttons to hear how your desktop pet will respond when clicked or summoned.\", \"button_label\": \"Launch to Desktop\", \"layout\": \"centered\", \"components\": [{\"type\": \"sound\", \"label\": \"Play Happy Meow\", \"asset\": \"asset:pet_sound_happy\", \"action\": \"play\", \"style\": \"playful\"}]}}\n2: [sign_in, new_flow] Account pet lookup and recovery option on sign in: Add an explicit account lookup choice card on sign-in screen for users restoring existing pet data.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Connect Your Pet\", \"body\": \"Sign in to save your adoption progress or restore pets previously saved to another account.\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Looking for a previously adopted pet?\", \"style\": \"highlight\", \"action\": \"choose\"}]}}\n3: [sign_in, reorder] Reorder sign in immediately after adoption certificate: Move sign-in to trigger immediately after signing the adoption certificate, right before background waiting initializes.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n4: [sign_in, copy] Existing account pet safety note on sign in screen: Update headline and body on the sign-in screen to emphasize that logging into an existing account recovers previously adopted pets.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Save or Recover Your Pet\", \"body\": \"Use your primary account email to ensure your pet progress and accessories remain restored and saved across devices.\"}}\n5: [finish, layout] Compact desktop launch checklist on home intro: Switch home intro screen layout to compact checklist mode highlighting key desktop shortcuts.\n   config: {\"home_intro\": {\"layout\": \"compact\", \"headline\": \"Ready for Desktop Launch\", \"body\": \"Review the desktop shortcuts below to control, hide, or talk with your pet anytime.\"}}\n6: [finish, incentive] Desktop companion badge on finish screen: Display an active desktop companion badge on the home intro screen as a reward for completing setup.\n   config: {\"home_intro\": {\"components\": [{\"type\": \"badge\", \"text\": \"Desktop Companion Verified\", \"style\": \"emphasis\"}]}}\n7: [home, hint] Desktop taskbar render troubleshooting hint: Add a hint on the waiting screen explaining how pet rendering overlays above system taskbar windows.\n   config: {\"waiting\": {\"hint\": \"Note: Your pet app initializes in the system tray / taskbar area. Check your taskbar if window is minimized.\"}}\n8: [home, wait_info] Audio chime progress indicator on waiting screen: Add a subtle sound component and progress update to the waiting screen as desktop pet engine initializes.\n   config: {\"waiting\": {\"headline\": \"Initializing Desktop Pet Engine\", \"body\": \"Setting up graphics renderers and background system hooks. Audio chime will play when complete.\", \"components\": [{\"type\": \"sound\", \"label\": \"Engine Startup Tone\", \"asset\": \"asset:startup_tone\", \"action\": \"play\", \"style\": \"calm\"}]}}\n9: [home, notification] Taskbar ready background notification prompt: Enable notify_when_ready on the waiting screen so users get a native notification when the pet finishes rendering.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"body\": \"Feel free to switch windows. We will send a desktop alert as soon as your pet is active.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of adoption certificate preserving screen job and official stamp."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a new onboarding screen after home intro."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid choice component addition to the sign in screen."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid reordering of sign in within onboarding."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update on the sign in screen."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout update to the home intro screen."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid component addition to the home intro screen."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid text hint added to the waiting screen."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid content and component update to the waiting screen."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid notification setting and text update to the waiting screen."
+   }
+  ]
+ }
+}

@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Interactive Adoption Personality Quiz Redesign: Redesign friend selection into a split-view interactive personality quiz that automatically selects the best pet companion based on user preferences.\n   config: {\"pick_friend\": {\"headline\": \"Find Your Ideal Pet Companion\", \"layout\": \"split\", \"replace\": {\"pet_choices\": [{\"type\": \"choice_cards\", \"text\": \"Quiz: What kind of companion fits your desktop workflow?\", \"role\": \"pet_choices\"}]}}}\n1: [finish, new_screen] Desktop Controls Interactive Walkthrough Screen: Insert a dedicated desktop controls sub-screen that teaches users how to summon, control, talk to, and hide their pet before completing onboarding.\n   config: {\"home_intro\": {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_pet_controls_guide\"]}}\n2: [choose_path, hint] Path Selection Time & Effort Transparency Hint: Display explicit duration estimates and hint copy under each creation path option so users know what to expect.\n   config: {\"choose_path\": {\"show_time_estimate\": true, \"hint\": \"Instant adoption takes ~30s; custom creation takes ~2m.\"}}\n3: [sign_in, layout] Account Sync Safeguard Sign-In Layout: Switch sign-in to a compact layout with explicit emphasis on recovering existing pet data to prevent account duplication.\n   config: {\"sign_in\": {\"layout\": \"compact\", \"headline\": \"Sign In to Sync & Protect Your Pet\", \"hint\": \"Signing in connects your pet cloud saves and prevents data loss.\"}}\n4: [adoption, new_flow] Photo Style Preset Selection Sub-Flow: Add a photo style preset step right after uploading photos to help users lock in their preferred aesthetic.\n   config: {\"upload_photos\": {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_photo_style_flow\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}}\n5: [home, wait_info] Desktop Display Health Check Status: Add automated desktop display diagnostics and progress status indicators during pet generation.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"headline\": \"Preparing Desktop Overlay...\", \"components\": [{\"type\": \"progress\", \"text\": \"Checking desktop display permissions...\"}]}}\n6: [finish, redesign] Interactive Desktop Pet Summon Stage Redesign: Rebuild the final home intro step into a hands-on stage layout where users practice clicking and interacting with the pet.\n   config: {\"home_intro\": {\"layout\": \"stage\", \"headline\": \"Test Your Pet Desktop Controls\", \"replace\": {\"home_welcome\": [{\"type\": \"mascot\", \"text\": \"Click me on your desktop to open controls!\", \"role\": \"home_welcome\"}]}}}\n7: [choose_path, reorder] Immediate Path Selection Reorder: Place the path selection screen first before showing the lore story intro.\n   config: {\"choose_path\": {\"_order\": [\"choose_path\", \"story\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}}\n8: [sign_in, incentive] Starter Pet Costume Sign-In Reward: Offer an exclusive starter accessory badge and item reward when signing in to create an account.\n   config: {\"sign_in\": {\"headline\": \"Sign In & Unlock Exclusive Starter Hat\", \"components\": [{\"type\": \"badge\", \"text\": \"Includes Free Gold Founder Crown\", \"style\": \"playful\"}]}}\n9: [home, new_screen] Pre-Flight Desktop Display Permission Check Screen: Insert a system compatibility and desktop overlay permission test screen right before generation.\n   config: {\"waiting\": {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_desktop_diagnostic\", \"waiting\", \"home_intro\"]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": false,
+    "rule": 2,
+    "reason": "Pick a friend must let the user choose a pet; automatically assigning one removes user choice."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a controls guide screen after home_intro inside onboarding is allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding time estimates and hints to choose_path is valid and preserves screen functionality."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning sign_in layout and copy without changing pricing or jobs is allowed."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a photo style preset sub-flow inside onboarding is permitted."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress and diagnostics to the waiting screen is explicitly allowed."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro into an interactive stage is permitted within onboarding."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering onboarding screens while retaining all required steps is allowed."
+   },
+   {
+    "index": 8,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy cannot mention free extras or gifts like 'Free Gold Founder Crown'."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a diagnostic screen within onboarding is allowed while keeping all steps."
+   }
+  ]
+ }
+}

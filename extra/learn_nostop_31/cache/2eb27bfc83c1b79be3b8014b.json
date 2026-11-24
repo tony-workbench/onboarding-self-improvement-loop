@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [choose_path, redesign] Choose Path Stage Overview Redesign: Redesign the choose_path screen into a stage layout featuring clear path summary cards and key feature badges.\n   config: {\"choose_path\": {\"layout\": \"stage\", \"headline\": \"Choose Your Pet Experience\", \"components\": [{\"type\": \"badge\", \"label\": \"Instant Play\", \"style\": \"highlight\"}]}}\n1: [sign_in, hint] Sign-In Account Persistence Warning Hint: Display a clear hint explaining that signing in links pets permanently to prevent profile resets.\n   config: {\"sign_in\": {\"hint\": \"Sign in to securely link your pet profile and prevent desktop progress loss.\"}}\n2: [sign_in, reorder] Sign-In Later Flow Reorder: Move sign-in after pick_friend and upload_photos directly before adoption certificate confirmation.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n3: [adoption, layout] Adoption Pet Customization Checklist Layout: Change adoption certificate layout to a checklist layout showing setup completion steps.\n   config: {\"adoption_certificate\": {\"layout\": \"checklist\", \"show_step_counter\": true}}\n4: [adoption, new_flow] Adoption Live Preview & Customization Flow: Introduce a step-by-step interactive adoption confirmation flow with live visual feedback before final adoption.\n   config: {\"adoption_certificate\": {\"headline\": \"Customize & Confirm Your Pet\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:pet_preview\", \"style\": \"rounded\"}]}}\n5: [adoption, hint] Adoption Photo Quality Verification Hint: Add a clear guidance hint on the upload_photos screen indicating optimal photo clarity for accurate rendering.\n   config: {\"upload_photos\": {\"hint\": \"Upload bright, well-lit photos with clear faces for the best 3D pet generation results.\"}}\n6: [home, wait_info] Home Wait Desktop Launch Status Info: Show dynamic background progress details and estimated seconds remaining on the waiting screen.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"show_progress\": true, \"hint\": \"Preparing desktop graphics assets and setting up pet animations...\"}}\n7: [finish, new_screen] Desktop Pet Quick Controls New Screen: Insert a new screen 'new_controls_guide' right before home_intro that highlights desktop tray docking and hide/show controls.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_controls_guide\", \"home_intro\"], \"new_controls_guide\": {\"headline\": \"Desktop Pet Controls\", \"body\": \"Access your pet anytime from the system tray or press hotkeys to interact.\", \"layout\": \"card\"}}\n8: [finish, redesign] Finish Command Center Split Layout Redesign: Redesign home_intro into a two-column split layout presenting desktop features and interaction commands.\n   config: {\"home_intro\": {\"layout\": \"split\", \"headline\": \"Your Desktop Companion is Ready!\", \"body\": \"Use desktop shortcuts to summon, pet, or dock your companion.\"}}\n9: [finish, notification] Finish Completion Desktop Notification Alert: Enable a system desktop notification sound and notification alert when the pet finish screen loads.\n   config: {\"home_intro\": {\"notify_when_ready\": true, \"hint\": \"Your pet is now active on your desktop screen!\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns choose_path into a stage layout while retaining summary cards for both path options."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an informative sign-in persistence hint without violating any restrictions."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in within onboarding, which is explicitly permitted by rule 4."
+   },
+   {
+    "index": 3,
+    "pass": false,
+    "rule": 2,
+    "reason": "Changing adoption certificate to a setup checklist loses the required job of showing the adoption with an official stamp."
+   },
+   {
+    "index": 4,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replacing the adoption certificate with an interactive preview flow loses the required adoption certificate and official stamp."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds photo clarity guidance on upload_photos without altering required screen jobs or steps."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Shows dynamic progress and time estimate during a real wait, allowed by rules 4 and 5."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new guidance screen within onboarding, permitted by rule 4."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns home_intro into a split layout while preserving its functionality."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds ready notification alert on home_intro, which is explicitly allowed by rule 4."
+   }
+  ]
+ }
+}

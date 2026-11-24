@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, redesign] Playful Pet Interaction Starter Hub: Redesign the final welcome screen into a centered interactive card featuring quick-start action buttons and mascot guide for basic pet controls.\n   config: {\"home_intro\": {\"headline\": \"Meet Your Desktop Companion!\", \"body\": \"Try feeding, talking, or minimizing your pet right from your desktop workspace.\", \"layout\": \"centered\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"mascot\", \"asset\": \"asset:pet_welcome_mascot\", \"style\": \"playful\"}, {\"role\": \"home_welcome\", \"type\": \"text\", \"text\": \"Quick Controls: Right-click pet to open settings or hide.\", \"style\": \"emphasis\"}]}}}\n1: [adoption, new_screen] Custom Pet Style Selector View: Insert a dedicated pet style choice screen prior to photo uploading to select artistic visual filters and pet archetypes.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_style_selector\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_style_selector\": {\"headline\": \"Choose Visual Style\", \"body\": \"Select how your pet should look rendered on your desktop screen.\", \"layout\": \"grid\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Select Style Preset\", \"style\": \"rounded\", \"action\": \"choose\"}, {\"type\": \"button\", \"label\": \"Continue to Photos\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n2: [sign_in, redesign] Single-Click Auth Account Link Interface: Redesign sign-in into a simplified provider card layout highlighting quick social auth buttons and automatic device sync confirmation.\n   config: {\"sign_in\": {\"headline\": \"Quick Account Link\", \"body\": \"Link your account in one click to sync your desktop pet seamlessly.\", \"layout\": \"centered\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"choice_cards\", \"label\": \"Choose Auth Provider\", \"style\": \"emphasis\", \"action\": \"choose\"}, {\"role\": \"sign_in_options\", \"type\": \"text\", \"text\": \"Automatic sync preserves your pet memory and settings.\", \"style\": \"subtle\"}]}}}\n3: [choose_path, new_flow] Persona Guided Companion Path Flow: Introduce an interactive quiz flow screen before path selection to recommend either a quick preset pet or custom creation based on user preferences.\n   config: {\"_order\": [\"story\", \"new_path_quiz\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"story\": {\"headline\": \"Welcome to Desktop Pets\", \"body\": \"Let us help you find the perfect companion for your desktop workspace.\", \"layout\": \"story_scroll\"}, \"new_path_quiz\": {\"headline\": \"What is your workspace style?\", \"body\": \"Answer 2 quick questions to get the ideal pet recommended for your workflow.\", \"layout\": \"card\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Workspace Vibe\", \"style\": \"playful\", \"action\": \"choose\"}, {\"type\": \"button\", \"label\": \"See Recommendation\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n4: [sign_in, hint] Account Sign-In Recovery Warning Hint: Display a highlighted warning hint on the sign-in screen emphasizing sign-in method consistency to preserve pet data.\n   config: {\"sign_in\": {\"hint\": \"Use the exact same email or provider to ensure your adopted pets remain linked.\", \"components\": [{\"type\": \"badge\", \"text\": \"Account Consistency Tip\", \"style\": \"highlight\"}]}}\n5: [home, wait_info] Generation Stage Live Updates Indicator: Update waiting screen with explicit rendering phase stages and detailed time remaining callouts.\n   config: {\"waiting\": {\"headline\": \"Crafting Your Desktop Pet...\", \"body\": \"We are generating high-res animations and desktop behaviors.\", \"show_time_estimate\": true, \"show_progress\": true, \"components\": [{\"type\": \"progress\", \"label\": \"Rendering 3D Sprite Sheets\", \"style\": \"rounded\"}, {\"type\": \"timer\", \"text\": \"Estimated 2 minutes remaining\", \"style\": \"subtle\"}]}}\n6: [choose_path, layout] Carousel Choice Card Path Layout: Switch path choice layout to an interactive horizontal card carousel displaying pet capabilities.\n   config: {\"choose_path\": {\"headline\": \"Select Your Adoption Journey\", \"layout\": \"carousel\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Browse Journeys\", \"style\": \"rounded\", \"action\": \"choose\"}]}}\n7: [adoption, copy] Custom Pet Generation Guidelines Copy: Update upload photos screen headline and hint text with clear formatting instructions for best image generation.\n   config: {\"upload_photos\": {\"headline\": \"Upload High-Contrast Pet Photos\", \"body\": \"Clear single-subject photos work best. Avoid dark lighting or cluttered backgrounds.\", \"hint\": \"Front-facing poses give your companion the crispest rendering.\"}}\n8: [finish, notification] First Desktop Interaction Callout Banner: Add an interactive callout banner on final intro screen demonstrating key combination shortcuts and menu access.\n   config: {\"home_intro\": {\"components\": [{\"type\": \"badge\", \"text\": \"Shortcut Tip: Ctrl+Shift+P toggles your pet on/off anytime!\", \"style\": \"highlight\"}, {\"type\": \"text\", \"text\": \"Double click your pet on desktop to open interaction menu.\", \"style\": \"emphasis\"}]}}\n9: [adoption, incentive] Pet Adoption Naming Ceremony Badge: Add a celebratory certificate badge and name input accent on adoption certificate to enhance emotional attachment.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Pet Adoption Certificate\", \"body\": \"Give your new desktop buddy an official name to receive your adoption badge!\", \"components\": [{\"type\": \"badge\", \"text\": \"Official Companion Certified\", \"style\": \"playful\"}, {\"type\": \"name_input\", \"label\": \"Companion Name\", \"style\": \"large\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of the home intro screen within onboarding rules."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a style selection step before photo upload is allowed under onboarding flow changes."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesign of sign-in interface retains required sign-in job."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a preference quiz sub-flow before path selection is permitted and does not collect sensitive personal data."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a helpful sign-in consistency hint is compliant."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating waiting screen with live progress and estimated time is allowed for real waits."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Carousel layout change for choose path retains the core adoption journey choices."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Copy updates on photo upload screen provide clear formatting instructions."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding desktop shortcut tips to home intro is compliant with onboarding overlay rules."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a name input and official badge maintains the adoption certificate function."
+   }
+  ]
+ }
+}

@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [choose_path, redesign] Story Screen Full Bleed Hero Redesign: Redesigns the story intro screen to a full-bleed visual layout with high-impact hero artwork introducing desktop pets.\n   config: {\"story\": {\"layout\": \"full_bleed\", \"headline\": \"Meet Your New Desktop Companion\", \"body\": \"Bring an interactive pet right onto your screen to keep you company while you work or play.\"}}\n1: [adoption, new_screen] Adoption Certificate Companion Audio Preview Screen: Adds a dedicated sound sample preview screen right after the adoption certificate stage where users hear their companion's voice.\n   config: {\"new_audio_preview\": {\"layout\": \"centered\", \"headline\": \"Listen to Your Companion\", \"body\": \"Listen to how your desktop pet sounds before meeting them live.\", \"components\": [{\"type\": \"sound\", \"label\": \"Play Sample Voice\", \"action\": \"play\", \"asset\": \"asset:companion_voice_sample\", \"style\": \"playful\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_audio_preview\", \"waiting\", \"home_intro\"]}\n2: [sign_in, reorder] Move Sign In After Adoption Certificate: Moves the sign-in step directly after the adoption certificate screen, delaying account creation until commitment is complete.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n3: [finish, redesign] Home Intro Full Bleed Launch Redesign: Redesigns the final home intro screen with a full bleed layout giving prominent clarity on how to interact with the pet.\n   config: {\"home_intro\": {\"layout\": \"full_bleed\", \"headline\": \"Your Companion Is Active\", \"body\": \"Your pet is now living on your desktop. Click and drag anytime to move them around or open settings.\"}}\n4: [home, hint] Waiting Screen Desktop Companion Loading Hint: Displays an explicit hint during generation explaining that the desktop companion app will pop up automatically when ready.\n   config: {\"waiting\": {\"hint\": \"Your desktop companion is building its workspace. It will automatically pop up on screen when generation finishes.\"}}\n5: [sign_in, layout] Sign In Screen Compact Card Layout: Converts the sign in screen to a compact layout that simplifies account registration options.\n   config: {\"sign_in\": {\"layout\": \"compact\", \"headline\": \"Save Your Companion Progress\", \"body\": \"Sign in to keep your pet settings safe and sync across your devices.\"}}\n6: [home, notification] Waiting Screen Desktop Notification Alert: Enables desktop readiness notification toggle on the waiting screen while background generation processes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"body\": \"Generating pet assets... We will notify you when your companion is ready to meet you.\"}}\n7: [choose_path, copy] Choose Path Journey Clarification Copy: Updates headline and body text on choose_path screen to clearly contrast preset pets against custom photo generation.\n   config: {\"choose_path\": {\"headline\": \"Select How to Create Your Pet\", \"body\": \"Pick a ready-made preset companion for instant setup, or craft a custom pet using your own photos.\"}}\n8: [adoption, new_flow] Pick Friend Compact Choice Card Flow: Rebuilds pet selection choices using rounded choice cards inside a compact layout.\n   config: {\"pick_friend\": {\"layout\": \"compact\", \"replace\": {\"pet_choices\": [{\"type\": \"choice_cards\", \"role\": \"pet_choices\", \"style\": \"rounded\", \"action\": \"choose\", \"label\": \"Select Companion\"}]}}}\n9: [home, wait_info] Waiting Screen Step Counter Indicator: Adds explicit step counter and progress display on the waiting screen during creation.\n   config: {\"waiting\": {\"show_step_counter\": true, \"show_progress\": true, \"headline\": \"Building Your Desktop Companion\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the story screen while maintaining its required job of introducing the pet."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new audio preview screen inside onboarding before home intro."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign in to occur after the adoption certificate, which is explicitly allowed by Rule 4."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the home intro screen, which is part of onboarding and allowed by Rule 4."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a helpful loading hint to the waiting screen within onboarding limits."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the sign-in screen into a compact layout while retaining its function."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds notification settings/info to the waiting screen as allowed by Rule 4."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates choose_path copy while retaining both options (preset adopting and custom photo creation)."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns pet selection UI on pick_friend screen while preserving pet choice functionality."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds step counter and progress indicator to the waiting screen as allowed by Rule 4."
+   }
+  ]
+ }
+}

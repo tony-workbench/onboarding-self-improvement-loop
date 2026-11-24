@@ -1,0 +1,549 @@
+{
+ "round": 2,
+ "starts_week": 2,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.8676335999999999,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.303,
+  "evidence": 0.319,
+  "confidence": 1.219,
+  "cost": 2.158
+ },
+ "lessons_used": [
+  "Predictions were consistently too high across all tests compared to noise-corrected results.",
+  "Evidence is still thin for all tested change types (adoption/redesign, choose_path/reorder, home/wait_info, sign_in/notification) as each has only a single test so far."
+ ],
+ "carried_retests": [
+  "Interactive Pet Controls Guided Flow"
+ ],
+ "candidates": [
+  {
+   "title": "Desktop Controls Interactive Guide",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a dedicated interactive desktop controls guide screen right after the welcome screen to teach users how to move, talk to, and hide their pet.",
+   "why": "3 support emails reported user confusion on how to control, hide, or talk to their pet after onboarding, while the finish step has a 64.8% completion rate.",
+   "config": {
+    "home_intro": {
+     "button_label": "Learn Desktop Controls"
+    },
+    "new_desktop_tutorial": {
+     "headline": "Mastering Your Desktop Pet",
+     "body": "Learn quick mouse gestures and keyboard shortcuts to interact with your pet anytime.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "mascot",
+       "asset": "asset:mascot_help",
+       "style": "playful"
+      },
+      {
+       "type": "checklist",
+       "text": "Right-click pet for control options menu",
+       "style": "plain"
+      },
+      {
+       "type": "button",
+       "label": "Finish Setup",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_desktop_tutorial"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interactive tutorial screen following home_intro is allowed inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 0.77,
+   "score_note": "Requires a new screen; only 3 support emails and past redesign/screen addition tests showed negative lift (-6.2%)."
+  },
+  {
+   "title": "Spotlight Adoption Certificate Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen into a spotlight view featuring animated pet previews and custom name input.",
+   "why": "Adoption conversion drops to 60.9% with long completion times (89s median, 1017s mean), and 3 support tickets reported issue with custom pet presentation.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "spotlight",
+     "headline": "Welcome Your New Companion",
+     "body": "Give your official adoption certificate a personalized pet name before finalizing.",
+     "replace": {
+      "certificate": [
+       {
+        "type": "preview",
+        "asset": "asset:pet_preview",
+        "style": "highlight",
+        "role": "certificate"
+       },
+       {
+        "type": "name_input",
+        "text": "Enter Pet Name",
+        "style": "rounded",
+        "role": "certificate"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[1]': a name_input cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Pet Render Verification Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Add an interactive display verification step in home_intro to confirm the pet successfully rendered on the desktop and troubleshoot missing pet issues.",
+   "why": "3 support emails reported that the pet does not show up on desktop or the app will not open after completing setup.",
+   "config": {
+    "home_intro": {
+     "layout": "split",
+     "headline": "Is your pet visible on your screen?",
+     "body": "Confirm that your pet has landed safely on your taskbar or desktop edge.",
+     "components": [
+      {
+       "type": "preview",
+       "asset": "asset:desktop_test",
+       "style": "large"
+      },
+      {
+       "type": "button",
+       "label": "Yes, I see my pet!",
+       "action": "next",
+       "style": "emphasis"
+      },
+      {
+       "type": "button",
+       "label": "Troubleshoot Display",
+       "action": "open_tip",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding display verification controls to home_intro is an allowed modification inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.005,
+   "score": 0.77,
+   "score_note": "High development cost for a new verification flow with limited evidence and low historical confidence for new flows."
+  },
+  {
+   "title": "Split Progress & Desktop Readiness Dashboard",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesign the waiting screen into a split dashboard displaying high-visibility progress bars, completion time estimates, and system readiness status.",
+   "why": "The waiting step (home target step) has high latency (201s median, 2336s mean), leading users to drop off while waiting for generation.",
+   "config": {
+    "waiting": {
+     "layout": "split",
+     "show_time_estimate": true,
+     "show_progress": true,
+     "headline": "Synthesizing Your Custom Pet",
+     "body": "We are generating 3D animations and behavioral scripts for your companion.",
+     "replace": {
+      "wait_status": [
+       {
+        "type": "progress",
+        "text": "Rendering pet assets...",
+        "style": "highlight",
+        "role": "wait_status"
+       },
+       {
+        "type": "timer",
+        "text": "Estimated completion: 2 mins",
+        "style": "calm",
+        "role": "wait_status"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.replace.wait_status[1]': timer text must read like 'About 4 min left' (at most 30 min)"
+   }
+  },
+  {
+   "title": "Multi-Account Restore Sign-In Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Display a hint on the sign-in screen explaining that logging into an existing account recovers previously created pets.",
+   "why": "8 support emails (the top support theme) reported pets missing or reset after signing in with different accounts.",
+   "config": {
+    "sign_in": {
+     "hint": "Sign in with your original account to automatically restore existing pets and avoid account resets."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding informative copy to the sign-in screen inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.035,
+   "score": 8.48,
+   "score_note": "Strong evidence as the top support theme (8 emails) with a low-cost copy/hint tweak on a high drop-off step (27.1%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 148.4
+  },
+  {
+   "title": "Photo Formatting Guidelines Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add clear photo formatting recommendations on the photo upload screen to prevent generation distortion.",
+   "why": "3 support emails mentioned that making a custom pet failed or the visual result looked incorrect.",
+   "config": {
+    "upload_photos": {
+     "hint": "Upload front-facing, well-lit photos for the most accurate custom pet generation."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Asks for personal photos of the user"
+   }
+  },
+  {
+   "title": "Path Selection Bonus Badge",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Add highlight incentive badges on the choose_path screen offering free starting accessories for selected paths.",
+   "why": "choose_path has a 76.2% conversion rate and a mean time of 514s, showing decision hesitation early on.",
+   "config": {
+    "choose_path": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Includes Starter Accessory Pack!",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy must not mention gifts, bonus packs, or free extras."
+   }
+  },
+  {
+   "title": "Desktop Notification Toggle During Wait",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Provide a desktop notification toggle on the waiting screen to alert users when pet generation is finished.",
+   "why": "The waiting step takes over 38 minutes on average (mean 2336s), causing users to leave the app unattended.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "hint": "We will pop up a system alert on your desktop when your pet is ready!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a completion notification toggle during the waiting screen is permitted inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 6.78,
+   "score_note": "Directly addresses severe duration friction (38m mean wait time) matching previous home/wait_info success (+4.0%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 148.4
+  },
+  {
+   "title": "Engaging Story Value Proposition Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Rewrite story screen headline and body copy to clearly explain desktop pet interactivity and set instant expectations.",
+   "why": "Early drop-off at choose_path (76.2% conversion) happens within a median of 8s due to lack of immediate product context.",
+   "config": {
+    "story": {
+     "headline": "Adopt Your Desktop Companion",
+     "body": "Create an interactive pet that wanders your screen, plays games, and keeps you company while you work."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating story copy to introduce the desktop pet is allowed and fulfills the screen's job."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 7.69,
+   "score_note": "Config-only copy tweak addressing fast 8s drop-off at choose_path; aligns with modest positive prior test (+1.8%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 148.4
+  },
+  {
+   "title": "Stage Layout Welcome Banner",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Update home_intro screen to a prominent stage layout featuring step counters and a clear completion action button.",
+   "why": "Finish step conversion drops to 64.8% with an extremely long mean duration (5815s), showing users stalling at the final step.",
+   "config": {
+    "home_intro": {
+     "layout": "stage",
+     "show_step_counter": true,
+     "button_label": "Release Pet to Desktop"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro layout while keeping its completion action is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 3.99,
+   "score_note": "Targets high finish step drop-off (35.2%), but layout redesigns have low confidence due to prior negative test (-6.2%)."
+  }
+ ],
+ "picked": [
+  "Multi-Account Restore Sign-In Hint",
+  "Engaging Story Value Proposition Copy",
+  "Desktop Notification Toggle During Wait"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 536.1,
+ "decisions": [
+  {
+   "test": "sim-7",
+   "title": "Engaging Story Value Proposition Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": 74,
+   "share": 1.0,
+   "planned_harm": 148.4,
+   "result": {
+    "step": {
+     "control": 0.7845,
+     "treatment": 0.7317,
+     "lift": -0.0673,
+     "lift_se": 0.0188,
+     "p": 0.000549
+    },
+    "finish": {
+     "control": 0.2015,
+     "treatment": 0.1894,
+     "lift": -0.0599,
+     "lift_se": 0.068,
+     "p": 0.393005
+    },
+    "users_per_group": 1573
+   },
+   "outcome": "stopped early: choose_path worse",
+   "score": 7.69,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": -0.0371,
+   "finishers_delta_hidden": -11.82
+  },
+  {
+   "test": "sim-6",
+   "title": "Multi-Account Restore Sign-In Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 148.4,
+   "result": {
+    "step": {
+     "control": 0.7414,
+     "treatment": 0.7539,
+     "lift": 0.0168,
+     "lift_se": 0.0175,
+     "p": 0.331244
+    },
+    "finish": {
+     "control": 0.201,
+     "treatment": 0.2063,
+     "lift": 0.0265,
+     "lift_se": 0.0524,
+     "p": 0.608018
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.48,
+   "predicted_lift": 0.035,
+   "true_lift_hidden": 0.0327,
+   "finishers_delta_hidden": 19.19
+  },
+  {
+   "test": "sim-8",
+   "title": "Desktop Notification Toggle During Wait",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 148.4,
+   "result": {
+    "step": {
+     "control": 0.8761,
+     "treatment": 0.8729,
+     "lift": -0.0037,
+     "lift_se": 0.0165,
+     "p": 0.824352
+    },
+    "finish": {
+     "control": 0.2063,
+     "treatment": 0.2057,
+     "lift": -0.0032,
+     "lift_se": 0.0505,
+     "p": 0.949096
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.78,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": -0.0108,
+   "finishers_delta_hidden": -6.34
+  },
+  {
+   "test": "sim-2",
+   "title": "Interactive Pet Controls Guided Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "weeks": 2,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 90.9,
+   "result": {
+    "step": {
+     "control": 0.635,
+     "treatment": 0.7772,
+     "lift": 0.2238,
+     "lift_se": 0.0275,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.1818,
+     "treatment": 0.2192,
+     "lift": 0.2053,
+     "lift_se": 0.0442,
+     "p": 0.0
+    },
+    "users_per_group": 6000,
+    "first_week": {
+     "step": {
+      "control": 0.6222,
+      "treatment": 0.7897,
+      "lift": 0.2692,
+      "lift_se": 0.0418,
+      "p": 0.0
+     },
+     "finish": {
+      "control": 0.168,
+      "treatment": 0.2103,
+      "lift": 0.252,
+      "lift_se": 0.0674,
+      "p": 2.8e-05
+     },
+     "users_per_group": 3000
+    },
+    "retest": {
+     "step": {
+      "control": 0.6465,
+      "treatment": 0.766,
+      "lift": 0.1848,
+      "lift_se": 0.0364,
+      "p": 0.0
+     },
+     "finish": {
+      "control": 0.1957,
+      "treatment": 0.228,
+      "lift": 0.1652,
+      "lift_se": 0.0582,
+      "p": 0.002179
+     },
+     "users_per_group": 3000
+    }
+   },
+   "outcome": "won after re-test, shipped",
+   "score": 6.25,
+   "predicted_lift": 0.12,
+   "true_lift_hidden": 0.2122,
+   "finishers_delta_hidden": 239.65
+  }
+ ],
+ "shipped": [
+  "Interactive Pet Controls Guided Flow"
+ ],
+ "ends_week": 2,
+ "weights_next": {
+  "impact": 0.324,
+  "evidence": 0.388,
+  "confidence": 1.296,
+  "cost": 1.992
+ },
+ "lessons_next": [
+  "Predictions were consistently too high across all tests compared to noise-corrected results.",
+  "Evidence is still thin for all change types because each kind of change has only a single test so far.",
+  "No clear effect was seen for sign_in notification, sign_in hint, choose_path reorder, or home notification changes."
+ ]
+}

@@ -1,0 +1,430 @@
+{
+ "round": 10,
+ "starts_week": 10,
+ "funnel": {
+  "choose_path": 0.778521684,
+  "sign_in": 0.82359918914724,
+  "adoption": 0.6420687,
+  "home": 0.8385282000000001,
+  "finish": 0.7847031816000001
+ },
+ "weights_used": {
+  "impact": 1.406,
+  "evidence": 2.4,
+  "confidence": 0.097,
+  "cost": 0.097
+ },
+ "lessons_used": [
+  "Helpful changes: Reordering sign-in after adoption, specific desktop flows (summon, visibility & control), targeted hints (photo upload, path helper, sign-in security), card carousel/single-click layouts, and control redesigns consistently won.",
+  "Harmful changes: Desktop docking setup flow, spotlight path selector layout, split personality redesign, account persistence hint, and specific copy changes (streamlined path copy, companion name certification copy) significantly hurt performance.",
+  "No clear effect: Loading/wait/progress indicators, notifications, tutorial/showcase screens, incentives, and several copy and layout variations showed no clear effect.",
+  "Predictions too high: Large predicted gains (+8.5% to +15.0%) consistently overestimated actual impact, frequently resulting in minor gains, no clear effect, or early test cutoffs.",
+  "Predictions too low: Major winning tests—especially key desktop flows (visibility & control, summon flow), card carousel layout, and sign-in security hint—were significantly underestimated."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Adoption Certificate Interactive Mascot Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate layout with a large live mascot preview and interactive pet naming feedback before final confirmation.",
+   "why": "Adoption has a steep drop-off at 64.2% conversion and a high mean time of 1017s; interactive live visual feedback speeds up commitment.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "split",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "mascot",
+        "asset": "asset:pet_preview",
+        "style": "large"
+       },
+       {
+        "role": "certificate",
+        "type": "name_input",
+        "label": "Give your pet a name",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[0]': a mascot cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Active Overlay Test Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Introduce a desktop overlay test sub-flow while waiting where users verify that the pet layer renders cleanly over their open windows.",
+   "why": "3 support emails reported pets not showing on desktop or app failing to open, while home step median wait is 201s.",
+   "config": {
+    "waiting": {
+     "hint": "Testing desktop overlay display rendering..."
+    },
+    "new_desktop_overlay_test": {
+     "headline": "Desktop Display Verification",
+     "body": "Ensure your desktop pet layer is visible over open desktop windows.",
+     "components": [
+      {
+       "type": "preview",
+       "asset": "asset:desktop_layer_test",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Companion Desktop Docking Guidance Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a dedicated quick-start screen showing how to summon, minimize, and dock the pet to the system tray.",
+   "why": "3 support emails reported post-onboarding confusion regarding how to control, hide, or talk to their desktop pet.",
+   "config": {
+    "home_intro": {
+     "button_label": "Explore Docking Controls"
+    },
+    "new_docking_guide": {
+     "headline": "Managing Your Desktop Pet",
+     "body": "Use quick tray icons or key combinations to hide, dock, or interact with your companion anytime.",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Control Options",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Story First Flow Sequence Reorder",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Reorder the entry experience so the story screen plays immediately before path selection to set clear emotional context.",
+   "why": "Choose path drops 22.1% of users with a high mean time of 514s due to early hesitation before seeing the context.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid reordering of onboarding screens retaining all required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.025,
+   "score": 4.59,
+   "score_note": "Addresses a large 22.1% drop on choose_path, but evidence comes only from funnel timing, not support emails.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 167.2
+  },
+  {
+   "title": "Custom Photo Multi Angle Guidance Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Display a guidance hint on the photo upload screen explaining that clear lighting and frontal photos produce the best pet generation results.",
+   "why": "3 support emails reported custom pet generation failures or unexpected visual output during adoption.",
+   "config": {
+    "upload_photos": {
+     "hint": "For best results, upload clear, well-lit photos with full face visibility."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Asks for user photos with full face visibility"
+   }
+  },
+  {
+   "title": "Existing Pet Account Recovery Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit hint on sign-in clarifying that users should log in with their previous social provider to recover existing pets.",
+   "why": "8 support emails (the single largest issue category) reported missing or reset pets after signing in again with a secondary provider.",
+   "config": {
+    "sign_in": {
+     "hint": "To keep your existing pet, make sure to sign in with the same social account used before."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of account recovery hint on sign-in screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.04,
+   "score": 8.83,
+   "score_note": "Strong evidence with 8 support emails and sign-in drop; targeted sign-in hints consistently performed well.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 167.2
+  },
+  {
+   "title": "Waiting Screen Progress Checklist Layout",
+   "target_step": "home",
+   "type": "layout",
+   "change": "Switch the waiting screen layout to a structured checklist showing pet generation and desktop asset preparation stages in real-time.",
+   "why": "Home step has a high mean time (2336s) and median time (201s), causing users to believe the setup stalled.",
+   "config": {
+    "waiting": {
+     "layout": "checklist",
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "checklist",
+        "style": "calm"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.replace.wait_status[0]': a checklist cannot do the wait_status job (use ['animation', 'mascot', 'preview', 'progress', 'text', 'timer', 'tip_carousel'])"
+   }
+  },
+  {
+   "title": "Desktop Tray Shortcut Intro Copy",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Update the finish screen headline and body copy to explicitly mention the system tray icon shortcut and right-click menu.",
+   "why": "Users submitted multiple emails confused about how to hide or summon their pet after onboarding completes.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Companion is Live on Your Desktop!",
+     "body": "Look for the pet icon in your system tray to quickly hide, call, or manage pet settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update on home intro overlay."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.005,
+   "score": 6.59,
+   "score_note": "Supported by emails, but pure copy updates historically hurt performance or yielded negative lift.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 90.3
+  },
+  {
+   "title": "Path Selection Choice Cards Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Replace path selection options with split choice cards featuring visual companion previews to accelerate decision making.",
+   "why": "Choose path takes a median of 8s but mean of 514s with 77.9% conversion; visual choice cards reduce cognitive friction.",
+   "config": {
+    "choose_path": {
+     "layout": "split",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Single Account Sign-In Card Layout",
+   "target_step": "sign_in",
+   "type": "layout",
+   "change": "Reformat sign-in options into a clean centered card layout highlighted with explicit account security badges.",
+   "why": "Sign-in stall bugs and account reset confusion account for 10 support emails overall.",
+   "config": {
+    "sign_in": {
+     "layout": "card",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "badge",
+        "label": "Secure Account Sync",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  }
+ ],
+ "picked": [
+  "Story First Flow Sequence Reorder",
+  "Existing Pet Account Recovery Hint",
+  "Desktop Tray Shortcut Intro Copy"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 424.7,
+ "decisions": [
+  {
+   "test": "sim-35",
+   "title": "Story First Flow Sequence Reorder",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 167.2,
+   "result": {
+    "step": {
+     "control": 0.7623,
+     "treatment": 0.8293,
+     "lift": 0.0879,
+     "lift_se": 0.0143,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.2357,
+     "treatment": 0.2637,
+     "lift": 0.1188,
+     "lift_se": 0.0502,
+     "p": 0.012227
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 4.59,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": 0.0809,
+   "finishers_delta_hidden": 60.13
+  },
+  {
+   "test": "sim-36",
+   "title": "Existing Pet Account Recovery Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 167.2,
+   "result": {
+    "step": {
+     "control": 0.8056,
+     "treatment": 0.7976,
+     "lift": -0.0099,
+     "lift_se": 0.0147,
+     "p": 0.502562
+    },
+    "finish": {
+     "control": 0.247,
+     "treatment": 0.239,
+     "lift": -0.0324,
+     "lift_se": 0.0441,
+     "p": 0.470042
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.83,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": -0.0169,
+   "finishers_delta_hidden": -12.56
+  },
+  {
+   "test": "sim-37",
+   "title": "Desktop Tray Shortcut Intro Copy",
+   "target_step": "finish",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 90.3,
+   "result": {
+    "step": {
+     "control": 0.7872,
+     "treatment": 0.7661,
+     "lift": -0.0268,
+     "lift_se": 0.0241,
+     "p": 0.27253
+    },
+    "finish": {
+     "control": 0.2417,
+     "treatment": 0.2457,
+     "lift": 0.0166,
+     "lift_se": 0.0462,
+     "p": 0.718197
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.59,
+   "predicted_lift": -0.005,
+   "true_lift_hidden": -0.0014,
+   "finishers_delta_hidden": -1.04
+  }
+ ],
+ "shipped": [
+  "Story First Flow Sequence Reorder"
+ ],
+ "ends_week": 10,
+ "weights_next": {
+  "impact": 1.349,
+  "evidence": 2.451,
+  "confidence": 0.1,
+  "cost": 0.1
+ },
+ "lessons_next": [
+  "Helpful changes: Reordering onboarding flow sequences (sign-in after adoption, story-first flow), targeted functional hints (photo upload, path helper, sign-in security), effective layouts (card carousel, single-click identity), specific desktop flows (summon, visibility & control), and quick control redesigns consistently won.",
+  "Harmful changes: Desktop docking setup flow, split personality layout redesign, spotlight path selector layout, account persistence hint, and specific copy changes (streamlined path copy, companion name certification copy) significantly hurt performance and led to early test stops.",
+  "No clear effect: Wait, progress, and loading indicators, background notifications, tutorial and showcase screens, incentives, and several copy and layout variations showed no clear effect.",
+  "Predictions too high: Large predicted gains (+8.5% to +15.0%) consistently overestimated actual impact, frequently yielding smaller gains, no clear effect, or early test cutoffs.",
+  "Predictions too low: Major winning tests—especially key desktop flows (visibility & control, summon flow), story-first sequence reordering, card carousel layout, and sign-in security hint—were significantly underestimated."
+ ]
+}

@@ -1,0 +1,524 @@
+{
+ "round": 1,
+ "starts_week": 1,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Redesign Pet Adoption Stage",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign pet picking screen into a high-visibility stage layout with live pet visual previews and pre-configured companion archetypes.",
+   "why": "Adoption has the lowest step conversion in the core setup (60.9%) and long median time (89s), plus users reported custom pet generation failures.",
+   "config": {
+    "pick_friend": {
+     "headline": "Choose Your Desktop Companion",
+     "body": "Select a ready-to-go companion or build your custom pet.",
+     "layout": "stage",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "style": "playful",
+        "label": "Companion Archetypes"
+       },
+       {
+        "role": "pet_choices",
+        "type": "preview",
+        "style": "rounded",
+        "asset": "asset:pet_preview_stage"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Defer Sign In After Pet Creation",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move sign-in step to occur after pet selection and customization so users establish emotional investment before creating an account.",
+   "why": "Sign in currently loses 27.1% of users before they even create a pet, and users complain about pets resetting after re-authenticating.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "sign_in",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "sign_in": {
+     "headline": "Save Your Companion to Your Account",
+     "body": "Sign in now to sync your new pet safely across all your desktop devices.",
+     "layout": "card"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Moving sign-in step after pet creation is explicitly allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.15,
+   "score": 5.42,
+   "score_note": "Sign-in loses 27.1% of users and support reports data loss; reordering adds emotional investment but requires flow structural work.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Desktop Controls Interactive Tutorial",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Replace the static home intro with an interactive checklist tutorial demonstrating how to summon, move, and talk to your desktop pet.",
+   "why": "Finish step drops off 35.2% of users, and support emails show confusion on how to control or hide the pet once setup completes.",
+   "config": {
+    "home_intro": {
+     "headline": "Meet Your Desktop Companion!",
+     "body": "Try these quick actions to learn how your pet lives on your desktop screen.",
+     "layout": "checklist",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "checklist",
+        "style": "emphasis",
+        "label": "Desktop Controls Tutorial"
+       },
+       {
+        "role": "home_welcome",
+        "type": "button",
+        "label": "Launch Pet on Desktop",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  },
+  {
+   "title": "Desktop Readiness Guide Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Insert a new screen before desktop initialization explaining background execution and desktop screen positioning.",
+   "why": "The waiting step has a 2336s mean time, and users reported support issues where the pet does not appear on desktop or app fails to launch.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_desktop_guide",
+     "waiting",
+     "home_intro"
+    ],
+    "new_desktop_guide": {
+     "headline": "Preparing Desktop Overlay",
+     "body": "Your pet walks right on top of your desktop windows. Make sure application permissions are granted.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "mascot",
+       "style": "playful",
+       "asset": "asset:desktop_demo_anim"
+      },
+      {
+       "type": "button",
+       "label": "Ready to Launch",
+       "action": "next"
+      }
+     ]
+    },
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new guide screen inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.1,
+   "score": 5.42,
+   "score_note": "Home step has extreme 2336s mean time and explicit launch failure tickets; adding a new screen requires a full release."
+  },
+  {
+   "title": "Account Pet Recovery Warning",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit account sync explanation hint on the sign-in screen informing users how signing in protects pet data.",
+   "why": "Support received 8 emails regarding missing or reset pets after signing in again with existing accounts.",
+   "config": {
+    "sign_in": {
+     "hint": "Use your primary account to automatically restore existing pets and save current progress.",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an account sync explanation hint to sign-in is permitted."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.05,
+   "score": 6.25,
+   "score_note": "Copy hint addresses sign-in pet reset emails and is trivial to implement via config."
+  },
+  {
+   "title": "Custom Pet Creation Safeguards",
+   "target_step": "adoption",
+   "type": "wait_info",
+   "change": "Add photo guidelines and rendering status tips to the photo upload screen to ensure high-quality custom pet creation.",
+   "why": "Users reported bug emails about custom pet generation failing or rendering incorrectly during adoption.",
+   "config": {
+    "upload_photos": {
+     "headline": "Upload Photos for Custom Pet",
+     "hint": "Use clear, well-lit photos facing forward for the best rendering result.",
+     "layout": "split",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "style": "subtle",
+       "text": "Tips for perfect 3D pet generation"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding photo guidelines to the photo upload screen is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.12,
+   "score": 7.5,
+   "score_note": "Adoption has the highest drop-off rate (39.1%) backed by rendering failure bug emails; status info improves completion.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Spotlight Layout for Path Selection",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Switch choose_path layout to spotlight cards to make path choices clear and immediate.",
+   "why": "choose_path has a high mean time of 514s, showing users spend substantial time deciding on initial options.",
+   "config": {
+    "choose_path": {
+     "layout": "spotlight",
+     "headline": "How Would You Like to Start?",
+     "body": "Choose a preset pet profile or craft a custom friend."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Layout update maintains both adoption and custom creation paths."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.08,
+   "score": 5.83,
+   "score_note": "Choose_path loses 23.8% with 514s mean time; spotlight layout simplifies decision making.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Waiting Screen Desktop Status Updates",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Enable live loading progress bar, time estimation, and desktop notification trigger on the waiting screen.",
+   "why": "The waiting step has a median time of 201s and mean of 2336s, leading to drop-offs and desktop visibility support tickets.",
+   "config": {
+    "waiting": {
+     "headline": "Hatching Your Desktop Pet...",
+     "body": "We are generating high-res desktop animations. You can minimize this window anytime.",
+     "show_progress": true,
+     "show_time_estimate": true,
+     "notify_when_ready": true,
+     "tip_delay_seconds": 5
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding real loading progress indicators on the waiting screen is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.12,
+   "score": 7.92,
+   "score_note": "Home step drop-off and huge wait times (201s median) align with desktop support tickets; live updates reduce perceived friction.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Completion Reward Badge Incentive",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Display an exclusive starter pet accessory reward badge on the final onboarding screen.",
+   "why": "Overall onboarding finish rate is only 17.8%, requiring stronger incentives to reach the final step.",
+   "config": {
+    "home_intro": {
+     "headline": "Welcome Starter Pack Unlocked!",
+     "hint": "Finish onboarding to claim your pet's starter desktop accessory.",
+     "components": [
+      {
+       "type": "badge",
+       "style": "highlight",
+       "label": "Unlocked: Golden Collar Item"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions unlocked starter pack item/free extra reward."
+   }
+  },
+  {
+   "title": "Streamlined Story Intro Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Shorten intro story screen copy and highlight key benefits to speed up initial onboarding momentum.",
+   "why": "Users take an average of 514s on the first step, indicating copy heavy text blocks delaying progression.",
+   "config": {
+    "story": {
+     "headline": "Your New Virtual Companion Awaits",
+     "body": "Bring an interactive pet to your desktop in under 2 minutes.",
+     "button_label": "Adopt Now"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating story screen copy maintains its job of introducing the pet."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.05,
+   "score": 5.42,
+   "score_note": "High average duration on choose_path indicates heavy reading; copy shortening is quick config."
+  }
+ ],
+ "picked": [
+  "Defer Sign In After Pet Creation",
+  "Waiting Screen Desktop Status Updates",
+  "Custom Pet Creation Safeguards",
+  "Spotlight Layout for Path Selection"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 410.8,
+ "decisions": [
+  {
+   "test": "sim-1",
+   "title": "Defer Sign In After Pet Creation",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.7345,
+     "treatment": 0.79,
+     "lift": 0.0755,
+     "lift_se": 0.0252,
+     "p": 0.001816
+    },
+    "finish": {
+     "control": 0.1733,
+     "treatment": 0.22,
+     "lift": 0.2692,
+     "lift_se": 0.0945,
+     "p": 0.001303
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "won, shipped",
+   "score": 5.42,
+   "predicted_lift": 0.15,
+   "true_lift_hidden": 0.0513,
+   "finishers_delta_hidden": 14.88
+  },
+  {
+   "test": "sim-2",
+   "title": "Waiting Screen Desktop Status Updates",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.8412,
+     "treatment": 0.8745,
+     "lift": 0.0397,
+     "lift_se": 0.0255,
+     "p": 0.112233
+    },
+    "finish": {
+     "control": 0.21,
+     "treatment": 0.214,
+     "lift": 0.019,
+     "lift_se": 0.0717,
+     "p": 0.788688
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.92,
+   "predicted_lift": 0.12,
+   "true_lift_hidden": 0.0498,
+   "finishers_delta_hidden": 14.45
+  },
+  {
+   "test": "sim-3",
+   "title": "Custom Pet Creation Safeguards",
+   "target_step": "adoption",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.6346,
+     "treatment": 0.6504,
+     "lift": 0.025,
+     "lift_se": 0.0371,
+     "p": 0.495179
+    },
+    "finish": {
+     "control": 0.2127,
+     "treatment": 0.1967,
+     "lift": -0.0752,
+     "lift_se": 0.0666,
+     "p": 0.277454
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.5,
+   "predicted_lift": 0.12,
+   "true_lift_hidden": 0.0485,
+   "finishers_delta_hidden": 14.07
+  },
+  {
+   "test": "sim-4",
+   "title": "Spotlight Layout for Path Selection",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.7667,
+     "treatment": 0.756,
+     "lift": -0.0139,
+     "lift_se": 0.0202,
+     "p": 0.493159
+    },
+    "finish": {
+     "control": 0.192,
+     "treatment": 0.1853,
+     "lift": -0.0347,
+     "lift_se": 0.0731,
+     "p": 0.64075
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.83,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": -0.0106,
+   "finishers_delta_hidden": -3.08
+  }
+ ],
+ "shipped": [
+  "Defer Sign In After Pet Creation"
+ ],
+ "ends_week": 1,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

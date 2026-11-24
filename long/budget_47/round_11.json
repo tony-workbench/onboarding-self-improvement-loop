@@ -1,0 +1,376 @@
+{
+ "round": 11,
+ "starts_week": 11,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7932978,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.062,
+  "evidence": 0.062,
+  "confidence": 0.062,
+  "cost": 3.813
+ },
+ "lessons_used": [
+  "Predictions were mostly too high compared to actual noise-corrected results, except for sign_in notification where the prediction was too low.",
+  "No effect was seen for home new_flow changes across 2 tests.",
+  "No effect was seen for adoption redesign across 2 tests, though 1 test made adoption worse and was stopped early.",
+  "Evidence is still thin for adoption new_flow, choose_path reorder, finish new_screen, sign_in notification, and sign_in reorder, as each has only 1 test."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Sign In Push Notification Reminder",
+   "target_step": "sign_in",
+   "type": "notification",
+   "change": "Adds a desktop system notification trigger when the sign-in window takes longer than usual or stalls.",
+   "why": "2 support emails reported that the sign-in screen fails to appear or stalls, and mean sign-in time is high at 567s.",
+   "config": {
+    "sign_in": {
+     "notify_when_ready": true,
+     "hint": "We will notify you via system banner as soon as authentication connects."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds system notification hint during sign-in without breaking onboarding rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.08,
+   "score": 5.18,
+   "score_note": "Strong positive historical test result (+8%) and both funnel stalling data and support emails confirm the issue."
+  },
+  {
+   "title": "Move Sign In To Finish Phase",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves the sign-in step to the end of onboarding right before the final home intro screen.",
+   "why": "Sign-in currently drops off 20.7% of users early; letting users customize their pet first builds engagement before requiring account creation.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "sign_in",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Moving sign-in to later in onboarding is explicitly allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.0,
+   "score": 0.16,
+   "score_note": "Reordering sign-in previously yielded negligible impact (-0.1%) and requires moderate structural changes."
+  },
+  {
+   "title": "Story Screen After Path Selection",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Places path selection as the very first screen, followed by the story context screen.",
+   "why": "Choose path has a huge mean time (514s) and 23.8% dropoff; letting users choose their path first gives immediate agency.",
+   "config": {
+    "_order": [
+     "choose_path",
+     "story",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "existing screens must keep their order; only sign_in may move"
+   }
+  },
+  {
+   "title": "Multi Step Pet Personality Customizer",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Introduces a multi-stage guided flow on the adoption certificate screen to select pet traits interactively.",
+   "why": "Adoption has the lowest step conversion in the entire funnel at 60.9% and takes a long mean time of 1017s.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Select Companion Personality Traits",
+       "style": "playful",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "The adoption certificate screen loses its essential job of showing the adoption with an official stamp."
+   }
+  },
+  {
+   "title": "Desktop Overlay Setup Complete Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Adds a dedicated completion screen after home intro showing interactive shortcut cards for desktop pet controls.",
+   "why": "Support receives multiple emails regarding confusion on how to control, hide, or talk to the desktop pet after finishing onboarding.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_desktop_ready"
+    ],
+    "new_desktop_ready": {
+     "headline": "Your Companion is Ready on Your Desktop!",
+     "body": "Use these quick key shortcuts and controls to summon, hide, or speak with your pet.",
+     "button_label": "Start Playing",
+     "layout": "spotlight"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new setup complete screen after home intro is explicitly permitted."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.05,
+   "score": 0.31,
+   "score_note": "Adding new finish screens previously hurt conversion (-6.7%) despite high user support feedback.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 95.5
+  },
+  {
+   "title": "Estimated Creation Time Counter",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays an estimated time remaining indicator and tip carousel on the waiting screen during pet rendering.",
+   "why": "The waiting step has a median time of 201s and mean of 2336s, causing user uncertainty while rendering.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "tip_delay_seconds": 15,
+     "body": "Your desktop companion is being brought to life. This usually takes about 2 minutes."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding estimated time and tips to the waiting screen during a real wait is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 5.05,
+   "score_note": "Addresses high wait times on home step, but home flow changes have historically shown little to no effect.",
+   "slot": "best score"
+  },
+  {
+   "title": "Pick Friend Spotlight Showcase Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the pick friend screen into a dynamic spotlight showcase displaying character trait tags and large visual previews.",
+   "why": "Adoption dropoff is 39.1%, and redesigning character selection makes picking a pet more engaging.",
+   "config": {
+    "pick_friend": {
+     "layout": "spotlight",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "preview",
+        "text": "Featured Pets",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Path Selection Speed Guidance Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Adds a reassuring hint on the path selection screen explaining that paths can be changed anytime in settings.",
+   "why": "Choose path has an unusually high mean time (514s), indicating users hesitate over making the wrong permanent choice.",
+   "config": {
+    "choose_path": {
+     "hint": "Don't worry—you can switch your path choice anytime later in settings!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful path selection guidance text without modifying pricing or dark patterns."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 9.82,
+   "score_note": "Simple copy hint targeting path hesitation; low cost with mild positive expectation.",
+   "slot": "best score"
+  },
+  {
+   "title": "Account Persistence Safety Assurance Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Updates the headline and text on the sign-in screen reassuring users that signing in guarantees their pet will never be reset or lost.",
+   "why": "8 support emails complained about pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "headline": "Save Your Pet Permanently",
+     "body": "Signing in links your pet securely to your account so progress and traits are never lost across restarts."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates sign-in copy to reassure account safety within allowed onboarding modifications."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.04,
+   "score": 9.95,
+   "score_note": "Strong support email signal (8 emails) and config-only text change addressing user persistence fears.",
+   "slot": "best score"
+  },
+  {
+   "title": "Home Intro Two Column Action Center",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Changes the home intro screen layout to a two-column setup separating welcoming copy from control instructions.",
+   "why": "Finish step dropoff is 35.2% and mean completion time is 5815s, with post-onboarding confusion around desktop pet controls.",
+   "config": {
+    "home_intro": {
+     "layout": "two_column",
+     "headline": "Welcome Your Companion!",
+     "body": "Your pet is active on your desktop screen. Here are key controls to interact with them."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the home intro layout while retaining its introductory controls job."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.005,
+   "score": 0.31,
+   "score_note": "High dropoff step with support backing, but layout redesigns in onboarding have consistently underperformed."
+  }
+ ],
+ "picked": [
+  "Desktop Overlay Setup Complete Screen"
+ ],
+ "held_by_harm_budget": [
+  "Account Persistence Safety Assurance Copy",
+  "Path Selection Speed Guidance Hint",
+  "Estimated Creation Time Counter"
+ ],
+ "harm_budget": 116.4,
+ "planned_harm": 95.5,
+ "decisions": [
+  {
+   "test": "sim-11",
+   "title": "Desktop Overlay Setup Complete Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 95.5,
+   "result": {
+    "step": {
+     "control": 0.6644,
+     "treatment": 0.6823,
+     "lift": 0.027,
+     "lift_se": 0.0343,
+     "p": 0.425266
+    },
+    "finish": {
+     "control": 0.1913,
+     "treatment": 0.199,
+     "lift": 0.0401,
+     "lift_se": 0.0545,
+     "p": 0.453738
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 0.31,
+   "predicted_lift": -0.05,
+   "true_lift_hidden": 0.0636,
+   "finishers_delta_hidden": 35.51
+  }
+ ],
+ "shipped": [],
+ "ends_week": 11,
+ "weights_next": {
+  "impact": 0.063,
+  "evidence": 0.063,
+  "confidence": 0.063,
+  "cost": 3.81
+ },
+ "lessons_next": [
+  "Predictions were mostly too high compared to actual noise-corrected results, except for sign_in notification where the prediction was too low.",
+  "Sign-in notification was helpful, but with only 1 test, evidence is still thin.",
+  "No effect was seen for home new_flow changes across 2 tests.",
+  "No effect was seen for adoption redesign across 2 tests, though 1 test made adoption worse and was stopped early.",
+  "Evidence is still thin for adoption new_flow, choose_path reorder, finish new_screen, sign_in notification, and sign_in reorder."
+ ]
+}

@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Stage layout redesign for pet selection: Redesign the pet choice screen into a central stage layout featuring interactive preview cards and personality tags.\n   config: {\"pick_friend\": {\"layout\": \"stage\", \"headline\": \"Choose Your Desktop Companion\", \"replace\": {\"pet_choices\": [{\"role\": \"pet_choices\", \"type\": \"choice_cards\", \"style\": \"playful\", \"action\": \"choose\"}]}}}\n1: [finish, new_screen] Desktop habitat selection screen: Add a new desktop habitat theme picker screen right before final intro screen.\n   config: {\"new_habitat_picker\": {\"headline\": \"Select Your Desktop Habitat\", \"body\": \"Pick the starting cozy corner for your pet to live on your screen.\", \"layout\": \"grid\", \"components\": [{\"type\": \"choice_cards\", \"style\": \"rounded\", \"action\": \"choose\"}, {\"type\": \"button\", \"label\": \"Continue\", \"action\": \"next\", \"style\": \"emphasis\"}]}, \"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"new_habitat_picker\", \"home_intro\"]}\n2: [sign_in, reorder] Post-intro sign-in reorder: Move sign-in to the very end of onboarding, after home intro visual setup.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"sign_in\"]}\n3: [adoption, new_flow] Interactive pet naming flow: Insert a dedicated naming screen with real-time text input and audio feedback right after adoption certificate.\n   config: {\"new_pet_naming\": {\"headline\": \"Name Your New Pet\", \"body\": \"Give your desktop friend a unique name to finish adoption.\", \"layout\": \"centered\", \"components\": [{\"type\": \"name_input\", \"style\": \"large\"}, {\"type\": \"sound\", \"action\": \"play\"}, {\"type\": \"button\", \"label\": \"Confirm Name\", \"action\": \"next\", \"style\": \"emphasis\"}]}, \"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_pet_naming\", \"sign_in\", \"waiting\", \"home_intro\"]}\n4: [choose_path, layout] Grid layout for path options: Display adoption path choices in a side-by-side grid of visual choice cards.\n   config: {\"choose_path\": {\"layout\": \"grid\", \"headline\": \"How Would You Like to Create Your Pet?\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"style\": \"rounded\", \"action\": \"choose\"}]}}}\n5: [home, hint] Background generation wait hint: Add an explicit status hint reassuring users that pet graphics are rendering in the background.\n   config: {\"waiting\": {\"hint\": \"We are preparing your pet's desktop animation files in the background. It will pop up automatically shortly!\", \"show_time_estimate\": true}}\n6: [sign_in, copy] One-click sign in copy tweak: Simplify sign-in headline and body copy to highlight instant one-click authentication.\n   config: {\"sign_in\": {\"headline\": \"Quick One-Click Sign In\", \"body\": \"Use your primary account to save your companion so your pet is always preserved when re-logging in.\"}}\n7: [finish, incentive] First-day treat starter gift incentive: Display a treat pack bonus reward badge on the final welcome screen.\n   config: {\"home_intro\": {\"components\": [{\"type\": \"badge\", \"text\": \"Bonus Unlocked: First-Day Treat Pack Added to Inventory!\", \"style\": \"highlight\"}]}}\n8: [adoption, wait_info] Photo upload quality checker widget: Add a photo clarity checker preview component with upload tips on the photo upload screen.\n   config: {\"upload_photos\": {\"hint\": \"For best custom pet results, upload a well-lit photo with a single clear subject.\", \"components\": [{\"type\": \"preview\", \"label\": \"Image Quality Checker\", \"style\": \"plain\"}]}}\n9: [home, notification] Desktop ready tray notification: Enable ready notifications on the waiting screen so users get alerted when generation finishes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"text\", \"text\": \"Feel free to minimize this window. We'll send a system notification when your pet is ready!\", \"style\": \"subtle\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the pet selection layout within onboarding without violating rules."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid habitat selection screen inside onboarding."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in within onboarding is explicitly permitted."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserting a pet naming step inside onboarding is permitted."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns path options into a grid layout while preserving screen functionality."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds informative status hint and real time estimate to the waiting screen."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update for the sign-in screen."
+   },
+   {
+    "index": 7,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions a bonus gift, which violates rule 3."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a helpful image quality checker component to the photo upload screen."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a ready notification feature to the waiting screen within onboarding."
+   }
+  ]
+ }
+}

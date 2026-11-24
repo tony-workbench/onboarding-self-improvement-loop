@@ -1,0 +1,364 @@
+{
+ "round": 20,
+ "starts_week": 20,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.314,
+  "evidence": 0.103,
+  "confidence": 1.251,
+  "cost": 2.332
+ },
+ "lessons_used": [
+  "No kind of change has proven helpful yet, as no test produced a statistically significant win.",
+  "Adding new finish screens (finish, new_screen) harms performance, with 3 tests agreeing after noise correction (-3.7% overall).",
+  "Reordering sign-in (sign_in, reorder) harms performance, with 2 tests agreeing after noise correction (-2.4% overall).",
+  "New adoption flows (adoption, new_flow) harm performance, with 2 tests agreeing after noise correction (-1.8% overall).",
+  "Evidence is thin or shows no clear effect for new home flows, adoption redesigns, path selection redesigns, and finish redesigns.",
+  "Predictions were consistently overly optimistic compared to measured results."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Choose Path Grid Selection Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Rebuild the path options section on the choose_path screen into a clean grid layout with distinct choice cards for each pet selection path.",
+   "why": "Choose_path has a 76.2% conversion rate and high mean duration of 514s, indicating decision fatigue with the current selection layout.",
+   "config": {
+    "choose_path": {
+     "layout": "grid",
+     "replace": {
+      "path_options": [
+       {
+        "type": "choice_cards",
+        "role": "path_options",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Choose Path Quick Selection Tip",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Add a quick hint below the story screen header reassuring users that their path choice can be changed later anytime.",
+   "why": "Mean time on choose_path step is 514s (vs 8s median), showing users get stuck hesitating over their initial choice.",
+   "config": {
+    "story": {
+     "hint": "Don't worry, you can always adopt additional pets or change paths later in settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a helpful hint to the story screen without violating onboarding copy rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.005,
+   "score": 7.74,
+   "score_note": "High mean hesitation time, but lacks support email corroboration.",
+   "slot": "best score"
+  },
+  {
+   "title": "Sign In Simplified Centered Layout",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign_in screen to use a centered layout with prominent sign-in options and clear account safety messaging.",
+   "why": "Sign_in drops conversion to 72.9% and support received 8 emails about pets missing or reset after signing in with wrong accounts.",
+   "config": {
+    "sign_in": {
+     "layout": "centered",
+     "headline": "Sign In to Save Your Companion",
+     "replace": {
+      "sign_in_options": [
+       {
+        "type": "button",
+        "role": "sign_in_options",
+        "label": "Sign In with Account",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'sign_in.sign_in_options' does not do the job (a sign-in button that says so): needs 1 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Waiting Screen Desktop Background Notification",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable a system notification on the waiting screen to alert users when their desktop pet finished generating while minimized.",
+   "why": "Waiting step has a median time of 201s and mean of 2336s, and support reported 3 cases of pets not appearing when users switch away.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "headline": "Preparing Your Desktop Companion",
+     "body": "We will notify you on your desktop as soon as your pet is ready!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a desktop notification setting to the waiting screen within onboarding rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 2.08,
+   "score_note": "Strong evidence from support and funnel, but requires native OS integration and release.",
+   "slot": "best score"
+  },
+  {
+   "title": "Waiting Screen Tip Carousel",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add an auto-rotating tip carousel component to the waiting screen sharing basic tips on pet controls and desktop behavior.",
+   "why": "Home waiting step takes median 201s/mean 2336s, and support gets 3 emails about desktop pet controls being unclear after onboarding.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Tip: Right-click your pet on the desktop anytime to open quick controls and settings.",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a tip carousel to the waiting screen without introducing false urgency or modifying pricing."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.0,
+   "score": 0.52,
+   "score_note": "Clear evidence, but adding new UI components historically yields neutral or negative results."
+  },
+  {
+   "title": "Pick Friend Selection Reward Incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Display a clear badge component highlighting complimentary companion starter items upon picking a pet friend.",
+   "why": "Adoption conversion is low at 60.9% with a mean duration of 1017s, indicating users need extra motivation during pet selection.",
+   "config": {
+    "pick_friend": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Includes Starter Accessory Pack",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions free extras or starter items ('Includes Starter Accessory Pack'), which violates the rule against mentioning gifts or extras."
+   }
+  },
+  {
+   "title": "Photo Upload Friendly Guidance Header",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Update headline and body on the upload_photos screen to clearly explain photo quality needs and prevent generation errors.",
+   "why": "Support received 3 emails regarding custom pet creation failing or looking wrong, and adoption conversion drops to 60.9%.",
+   "config": {
+    "upload_photos": {
+     "headline": "Upload Clear Pet Photos",
+     "body": "Use well-lit photos showing your pet's face clearly for the best desktop pet creation result.",
+     "hint": "Front-facing photos with clear lighting work best."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates guidance copy on the photo upload screen without removing required functionality."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 8.44,
+   "score_note": "Targets largest drop step with strong support evidence via low-risk copy tweak.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Adoption Certificate Full Bleed Stage Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen using a full bleed layout with an interactive pet preview component.",
+   "why": "Adoption conversion drops significantly to 60.9% and takes over 1000s on average, needing a more engaging certificate view.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "full_bleed",
+     "components": [
+      {
+       "type": "preview",
+       "asset": "asset:pet_preview",
+       "style": "large"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "Redesigning the adoption certificate components to only include a preview removes the official stamp required for the adoption certificate screen."
+   }
+  },
+  {
+   "title": "Choose Path Guided Intro New Screen",
+   "target_step": "choose_path",
+   "type": "new_screen",
+   "change": "Add a new introductory screen before choose_path to explain how desktop pets live on the user's screen.",
+   "why": "Choose_path conversion is 76.2% with a long mean duration of 514s, showing users lack initial context about desktop pets.",
+   "config": {
+    "_order": [
+     "story",
+     "new_path_intro",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "choose_path": {
+     "headline": "Select Your Journey"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_path_intro']"
+   }
+  },
+  {
+   "title": "Home Intro Pet Desktop Visibility Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Add an explicit hint text on home_intro explaining how to summon or show the pet if it hides off-screen.",
+   "why": "Finish conversion is 64.8% and support received 3 emails about pets not appearing on desktop or being hard to control.",
+   "config": {
+    "home_intro": {
+     "hint": "If your pet wanders off-screen, click the system tray icon to recall it immediately."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a helpful visibility hint to home_intro without modifying elements outside of onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.005,
+   "score": 6.61,
+   "score_note": "High impact step and strong evidence, though finish step changes historically perform poorly.",
+   "slot": "best score"
+  }
+ ],
+ "picked": [
+  "Photo Upload Friendly Guidance Header"
+ ],
+ "held_by_harm_budget": [
+  "Choose Path Quick Selection Tip",
+  "Home Intro Pet Desktop Visibility Hint",
+  "Waiting Screen Desktop Background Notification"
+ ],
+ "harm_budget": 106.9,
+ "planned_harm": 102.7,
+ "decisions": [
+  {
+   "test": "sim-20",
+   "title": "Photo Upload Friendly Guidance Header",
+   "target_step": "adoption",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.6232,
+     "treatment": 0.6542,
+     "lift": 0.0497,
+     "lift_se": 0.0387,
+     "p": 0.187054
+    },
+    "finish": {
+     "control": 0.188,
+     "treatment": 0.1993,
+     "lift": 0.0603,
+     "lift_se": 0.079,
+     "p": 0.432206
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.44,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": 0.0377,
+   "finishers_delta_hidden": 10.87
+  }
+ ],
+ "shipped": [],
+ "ends_week": 20,
+ "weights_next": {
+  "impact": 0.272,
+  "evidence": 0.092,
+  "confidence": 1.308,
+  "cost": 2.328
+ },
+ "lessons_next": [
+  "No kind of change has proven helpful yet, as no test produced a statistically significant win.",
+  "Adding new finish screens (finish, new_screen) harms performance, with 3 tests agreeing (-3.7% after noise correction).",
+  "Reordering sign-in (sign_in, reorder) harms performance, with 2 tests agreeing (-2.4% after noise correction).",
+  "No clear effect was seen for new adoption flows, adoption redesigns, path selection redesigns, or new home flows across multiple tests.",
+  "Evidence is still thin for adoption copy changes and finish redesigns, with only one test each.",
+  "Predictions were consistently overly optimistic compared to measured results."
+ ]
+}

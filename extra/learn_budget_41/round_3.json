@@ -1,0 +1,431 @@
+{
+ "round": 3,
+ "starts_week": 3,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "Evidence is still thin for adoption and new_flow changes, as only one test has been completed so far.",
+  "Evidence is still thin for finish and new_screen changes, as only one test has been completed so far.",
+  "No kind of change has proven helpful yet, as no test has shown a clear significant effect.",
+  "Predictions were consistently too high in both tests compared to the noise-corrected results."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Late Account Authentication Flow",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move the sign-in step to occur after pet selection so users can choose a companion before committing to account registration.",
+   "why": "Sign-in step currently sees drop-off (72.9% conversion) with long mean duration (567s). Deferring auth builds user intent first.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "sign_in",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "sign_in": {
+     "headline": "Save Your Companion Progress",
+     "body": "Sign in to back up your desktop pet profile and prevent data loss."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in after pet selection within onboarding is explicitly permitted by Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.02,
+   "score": 2.5,
+   "score_note": "Defers sign-in to build intent, but structural flow change carries high implementation cost."
+  },
+  {
+   "title": "Pick Friend Stage Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the companion selection screen into an interactive stage view with dynamic pet choice cards.",
+   "why": "Adoption conversion drops to 60.9% with an 89s median time. An engaging stage layout reduces selection friction.",
+   "config": {
+    "pick_friend": {
+     "headline": "Meet Your Desktop Companion",
+     "layout": "stage",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "label": "Select your companion",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Desktop Display Diagnostic Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Add a desktop display check screen prior to waiting to ensure screen overlay permissions are set correctly.",
+   "why": "Support receives frequent reports about pets failing to show on the desktop or the app failing to open.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_desktop_check",
+     "waiting",
+     "home_intro"
+    ],
+    "new_desktop_check": {
+     "headline": "Desktop Display Verification",
+     "body": "Verifying screen overlay permissions so your pet can safely navigate your desktop.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:desktop_verify",
+       "style": "emphasis"
+      },
+      {
+       "type": "button",
+       "label": "Grant & Continue",
+       "action": "next",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new desktop display diagnostic screen inside onboarding is allowed under Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 4.17,
+   "score_note": "Strongly supported by display issues, but adding a new screen historically showed negative lift.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Desktop Controls Interactive Guide",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Introduce a new interactive tutorial screen demonstrating how to control, hide, and talk to your pet.",
+   "why": "Multiple support tickets express post-onboarding confusion regarding how to control or hide the desktop pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_controls_tutorial",
+     "home_intro"
+    ],
+    "new_controls_tutorial": {
+     "headline": "Mastering Desktop Commands",
+     "body": "Learn how to drag your pet, open shortcut menus, and toggle desktop visibility.",
+     "layout": "two_column",
+     "components": [
+      {
+       "type": "video",
+       "asset": "asset:controls_demo",
+       "style": "rounded"
+      },
+      {
+       "type": "checklist",
+       "label": "Quick Controls Checklist",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new interactive controls tutorial screen inside onboarding is allowed under Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 3.33,
+   "score_note": "Helps post-onboarding pet control confusion, but requires building a new flow."
+  },
+  {
+   "title": "Path Options Split Screen Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Convert the choose_path screen layout to a side-by-side split screen with clear choice cards.",
+   "why": "choose_path has a high mean time (514s) and 76.2% conversion; a split screen makes path comparison immediate.",
+   "config": {
+    "choose_path": {
+     "layout": "split",
+     "headline": "Choose Your Onboarding Journey",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Select Path",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Account Reset and Continuity Banner",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit persistence hint on sign_in clarifying how authenticating preserves existing pet data.",
+   "why": "8 support emails complained about missing or reset pets after signing back in.",
+   "config": {
+    "sign_in": {
+     "hint": "Sign in with your primary account to preserve your pet save state and avoid account resets."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a hint explaining account sign-in persistence complies with fair design rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.04,
+   "score": 7.08,
+   "score_note": "Config-only hint backed by 8 support tickets addressing sign-in data confusion.",
+   "slot": "best score"
+  },
+  {
+   "title": "Custom Pet Generation Guidance Carousel",
+   "target_step": "adoption",
+   "type": "wait_info",
+   "change": "Add a tip carousel on photo upload explaining optimal image clarity for custom pet generation.",
+   "why": "Support receives tickets noting that custom pet generation fails or generates distorted results.",
+   "config": {
+    "upload_photos": {
+     "headline": "Upload High Quality Pet Photos",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Tips for clear custom pet rendering",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding helpful photo upload tips on the photo upload screen is an allowed component change within onboarding."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 6.67,
+   "score_note": "Targets high drop-off adoption step (60.9%) and addresses custom generation failures.",
+   "slot": "best score"
+  },
+  {
+   "title": "Background Preparation Time Estimator",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Enable time estimates, progress indicators, and completion notifications during the waiting step.",
+   "why": "Waiting stage has median time of 201s and mean of 2336s, causing drop-offs due to uncertain wait times.",
+   "config": {
+    "waiting": {
+     "headline": "Preparing Your Pet's Desktop Home",
+     "show_time_estimate": true,
+     "show_progress": true,
+     "notify_when_ready": true,
+     "tip_delay_seconds": 10
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding time estimates, progress indicators, and readiness notifications during the real wait step is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 5.83,
+   "score_note": "Addresses severe duration bottleneck (mean 2336s) with clear wait time estimations."
+  },
+  {
+   "title": "Desktop Pet Quick Start Command Copy",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Update home_intro text to clearly outline main desktop shortcuts and interaction commands.",
+   "why": "Users report post-onboarding confusion on how to summon, drag, or interact with their pet.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Pet is Ready! Quick Controls",
+     "body": "Right-click your pet for actions menu. Press Alt+P to toggle desktop view, or drag to reposition.",
+     "button_label": "Start Desktop Companion"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating home_intro copy to outline desktop shortcuts is allowed within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.03,
+   "score": 7.08,
+   "score_note": "Low cost text update for finish step addressing user confusion on pet shortcuts.",
+   "slot": "best score"
+  },
+  {
+   "title": "Mascot Story Intro Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the story intro screen into a story scroll layout featuring an animated companion mascot.",
+   "why": "Over 23% of users drop off before completing choose_path; an engaging animated intro improves early retention.",
+   "config": {
+    "story": {
+     "layout": "story_scroll",
+     "headline": "Welcome to Your Virtual Desktop Companion",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "mascot",
+        "asset": "asset:welcome_mascot",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'story.intro_story' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'video'] with an asset:story/ asset"
+   }
+  }
+ ],
+ "picked": [
+  "Desktop Display Diagnostic Screen"
+ ],
+ "held_by_harm_budget": [
+  "Account Reset and Continuity Banner",
+  "Desktop Pet Quick Start Command Copy",
+  "Custom Pet Generation Guidance Carousel"
+ ],
+ "harm_budget": 106.9,
+ "planned_harm": 102.7,
+ "decisions": [
+  {
+   "test": "sim-3",
+   "title": "Desktop Display Diagnostic Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.8175,
+     "treatment": 0.7725,
+     "lift": -0.055,
+     "lift_se": 0.0302,
+     "p": 0.074352
+    },
+    "finish": {
+     "control": 0.1853,
+     "treatment": 0.1707,
+     "lift": -0.0791,
+     "lift_se": 0.0723,
+     "p": 0.293688
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.17,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": -0.0339,
+   "finishers_delta_hidden": -9.3
+  }
+ ],
+ "shipped": [],
+ "ends_week": 3,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "Evidence is still thin for adoption, new_flow, finish, and home changes, as only one test has been completed for each.",
+  "For new_screen changes (2 tests), no clear effect was seen, with both leaning negative after noise correction.",
+  "No kind of change has proven helpful yet, as no test has shown a clear significant effect.",
+  "Predictions were consistently too high across all three tests compared to noise-corrected results."
+ ]
+}

@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [choose_path, redesign] Story & Path Combined Spotlight Hub: Combine story intro and path selection into a unified spotlight screen featuring visual path choice cards.\n   config: {\"choose_path\": {\"layout\": \"spotlight\", \"headline\": \"Welcome to Desktop Pets\", \"body\": \"Select how you would like to bring your new desktop companion to life.\", \"replace\": {\"path_options\": [{\"type\": \"choice_cards\", \"label\": \"Select Creation Path\", \"text\": \"Instant Preset Pet or Custom Photo Hatching\", \"style\": \"large\", \"action\": \"choose\", \"role\": \"path_options\"}]}}}\n1: [sign_in, reorder] Move Sign-In Screen After Adoption: Reorder onboarding so users choose and customize their pet before signing in to their account.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n2: [finish, new_screen] Desktop Mascot Quick Reference Cheatsheet: Add a new cheatsheet screen before completing onboarding that highlights desktop controls, hotkeys, and hide commands.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_controls_cheatsheet\"], \"new_controls_cheatsheet\": {\"headline\": \"Desktop Pet Controls Cheat Sheet\", \"body\": \"Click and drag to move your pet around. Right-click to hide or summon them anytime.\", \"layout\": \"card\", \"components\": [{\"type\": \"checklist\", \"text\": \"Drag & Drop, Double Click Menu, Alt+H Hide Shortcut\", \"style\": \"rounded\"}]}}\n3: [adoption, new_flow] Multi-Step Pet Customization Studio: Redesign pick_friend into a split-screen interactive Studio view with live trait selection and mascot preview.\n   config: {\"pick_friend\": {\"layout\": \"split\", \"headline\": \"Pet Customization Studio\", \"body\": \"Customize your pet appearance and personality before adoption.\", \"replace\": {\"pet_choices\": [{\"type\": \"choice_cards\", \"label\": \"Choose Base Species & Color\", \"style\": \"highlight\", \"action\": \"choose\", \"role\": \"pet_choices\"}]}, \"components\": [{\"type\": \"mascot\", \"text\": \"Live Pet Preview\", \"style\": \"large\"}]}}\n4: [sign_in, hint] Existing Account Cloud Pet Recovery Notice: Display a prominent hint on the sign-in screen assuring users that logging into an existing account restores saved pets.\n   config: {\"sign_in\": {\"hint\": \"Logging into an existing account? Your previously saved pets will automatically restore.\"}}\n5: [home, wait_info] Desktop Renderer Diagnostic Status Timer: Add explicit rendering stage progress and diagnostic helper status to the waiting screen.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"tip_delay_seconds\": 12, \"body\": \"Initializing desktop graphics overlay. Diagnostic check running in background...\"}}\n6: [choose_path, copy] Path Selection Express vs Custom Copy: Clarify the distinction between instant preset adoption and photo-based custom pet creation in choose_path copy.\n   config: {\"choose_path\": {\"headline\": \"Select Creation Method\", \"body\": \"Pick an Express Ready-Made Pet in seconds, or Custom Build a pet from your own photos.\", \"hint\": \"You can add more pets anytime later from the desktop tray menu.\"}}\n7: [adoption, layout] Adoption Certificate Layout Grid: Reformat the adoption certificate screen into a clear grid layout with prominent verification details.\n   config: {\"adoption_certificate\": {\"layout\": \"grid\", \"headline\": \"Official Desktop Pet Certificate\", \"body\": \"Review pet details and confirm your adoption to spawn your mascot.\"}}\n8: [home, notification] Desktop Spawn Audio Notification Alert: Add an audio alert notification component when waiting finishes and the desktop pet spawns.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"sound\", \"label\": \"Play Chime on Desktop Spawn\", \"style\": \"playful\", \"action\": \"play\"}]}}\n9: [finish, incentive] First Day Pet Treat Starter Reward Banner: Display a welcome badge and starter treat incentive banner on the final home_intro screen.\n   config: {\"home_intro\": {\"components\": [{\"type\": \"badge\", \"text\": \"Claim Free Starter Treat Box\", \"style\": \"highlight\", \"action\": \"next\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": false,
+    "rule": 1,
+    "reason": "Removes the required story onboarding step by combining it with choose_path."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign_in after adoption is explicitly allowed within onboarding."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new controls cheatsheet screen after home_intro is allowed."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning pick_friend into a split view retains its core pet selection job."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an account pet recovery hint to sign_in complies with all base rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding diagnostic progress details to the waiting screen is permitted."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Copy update clearly offers both adoption and custom pet creation paths without mentioning pricing."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Reformatting the adoption certificate into a grid retains the screen's core job and layout structure."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a completion chime component to the waiting screen is allowed."
+   },
+   {
+    "index": 9,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions 'Free Starter Treat Box', violating rule 3 against mentioning free extras or gifts."
+   }
+  ]
+ }
+}

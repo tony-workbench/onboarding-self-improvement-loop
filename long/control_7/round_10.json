@@ -1,0 +1,469 @@
+{
+ "round": 10,
+ "starts_week": 10,
+ "funnel": {
+  "choose_path": 0.8988030029999999,
+  "sign_in": 0.7997858999999999,
+  "adoption": 0.6993147,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Home Intro Floating Companion Controls Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign the final home intro screen into a full-bleed visual layout highlighting quick desktop shortcuts, hiding options, and interaction modes.",
+   "why": "Support received multiple tickets regarding confusion on how to control or hide the pet, and the finish step has a 64.8% completion rate with very long mean dwell time.",
+   "config": {
+    "home_intro": {
+     "layout": "full_bleed",
+     "headline": "Your Desktop Pet is Ready to Play!",
+     "body": "Right-click your pet anytime to hide, move, or open controls from your system tray.",
+     "hint": "Try right-clicking your companion once onboarding completes.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Quick Tip: Right-click to hide or control",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of the home intro screen within onboarding."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.12,
+   "score": 6.25,
+   "score_note": "Finish step has high churn (35.2% drop) and extreme dwell time, backed by multiple support tickets. Requires UI release.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 111.2
+  },
+  {
+   "title": "Desktop Spawn Check Visual Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Insert a new verification step right after waiting to display a preview of the rendered desktop pet and confirm window visibility before entering main app.",
+   "why": "Users reported pets failing to show on desktop or custom pet generation looking broken, causing drop-offs during waiting and home transition.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_spawn_check",
+     "home_intro"
+    ],
+    "waiting": {
+     "notify_when_ready": true,
+     "show_time_estimate": true
+    },
+    "new_desktop_spawn_check": {
+     "headline": "Confirm Pet Appearance",
+     "body": "Check how your companion appears on screen before finishing setup.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "preview",
+       "asset": "asset:pet_preview",
+       "style": "rounded"
+      },
+      {
+       "type": "button",
+       "label": "Looks Great, Spawn Now",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a desktop preview step before finishing onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.05,
+   "score": 4.58,
+   "score_note": "Fixes broken desktop pet render complaints, but adding a brand new screen introduces extra friction."
+  },
+  {
+   "title": "Late Sign-In Conversion Reorder",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move sign-in to occur after pet selection and certificate adoption, placing account creation right before generation waiting.",
+   "why": "Asking users to sign in as step 2 leads to an early 20% churn before users have established emotional commitment to a specific pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid reordering of the sign-in step permitted by onboarding rules."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.15,
+   "score": 5.83,
+   "score_note": "Deferring auth until commitment is established is a high-confidence UX pattern targeting early 20% drop-off.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 166.8
+  },
+  {
+   "title": "Custom Pet Live Rendering Verification Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Introduce a interactive photo validation and live pet preview component directly into the upload photos step.",
+   "why": "3 support tickets highlighted custom pet creation failures or distorted render outputs, and adoption step drop-off is 30.1%.",
+   "config": {
+    "upload_photos": {
+     "layout": "two_column",
+     "headline": "Customize & Preview Your Pet",
+     "body": "Upload photos to generate a 3D desktop companion. Check the preview below to ensure high quality.",
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "label": "Select Photos",
+        "style": "rounded"
+       },
+       {
+        "role": "photo_upload",
+        "type": "preview",
+        "asset": "asset:live_pet_render",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[1]': a preview cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Waiting Stage Dynamic Progress & Time Display",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display explicit visual progress bars, remaining time estimates, and stage indicators while the pet is generating on the waiting screen.",
+   "why": "Waiting median time is 201s and mean is 2336s, indicating users leave the desktop app unattended or get stuck without visual feedback.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "headline": "Generating Your Desktop Pet",
+     "body": "We are polishing your pet's animations. This usually takes around 2 minutes.",
+     "components": [
+      {
+       "type": "timer",
+       "text": "Estimated time remaining: ~90s",
+       "style": "calm"
+      },
+      {
+       "type": "progress",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'waiting.components[0].text' has characters outside the allowed set: ['~']"
+   }
+  },
+  {
+   "title": "Sign-In Cloud Save Protection Copy Reassurance",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Update sign-in headline and hint copy to emphasize that logging in preserves existing pets and cloud progress permanently.",
+   "why": "8 support emails complained about missing or reset pets after signing back in, causing reluctance to complete sign-in.",
+   "config": {
+    "sign_in": {
+     "headline": "Save & Protect Your Desktop Companion",
+     "body": "Sign in to back up your pet, sync across devices, and ensure your progress is never lost.",
+     "hint": "Your existing pets will automatically sync to this account."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update for the sign-in step emphasizing progress backup."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.08,
+   "score": 9.17,
+   "score_note": "Directly supported by 8 user emails regarding reset fear; config/copy change with low effort."
+  },
+  {
+   "title": "Choose Path Compact Split Screen Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Switch choose_path layout to a split view displaying pet paths side by side with visual feature comparisons.",
+   "why": "Mean time spent on choose_path is 514s, showing decision paralysis on the current path layout.",
+   "config": {
+    "choose_path": {
+     "layout": "split",
+     "headline": "Select Your Pet Experience",
+     "body": "Choose whether to pick from companion presets or create a custom pet from photos."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout redesign of choose_path preserving both path options."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 2.92,
+   "score_note": "Step converts well (89.9%) despite high dwell time (514s mean), limiting potential recovery impact.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 166.8
+  },
+  {
+   "title": "Adoption Certificate Starter Accessory Incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Add an adoption certificate completion reward badge giving users a bonus starter toy item upon completing adoption.",
+   "why": "Adoption step drops 30.1% of users (69.9% conversion rate), so adding a tangible unlock incentive encourages completion.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Official Adoption Certificate",
+     "body": "Name your pet and claim your free Starter Toy Box accessory upon completing adoption!",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Includes Free Starter Toy Pack",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions free extras/gifts ('free Starter Toy Box accessory')."
+   }
+  },
+  {
+   "title": "Home Intro Desktop Shortcuts Hint Notification",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Add a desktop readiness notification toggle and prominent quick control hint on home_intro.",
+   "why": "3 support tickets involved post-onboarding confusion regarding how to control or hide the pet once created.",
+   "config": {
+    "home_intro": {
+     "notify_when_ready": true,
+     "hint": "Quick tip: Press Ctrl+Shift+P to summon or hide your pet at any time."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid shortcut hint and notification configuration on home intro."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.07,
+   "score": 5.83,
+   "score_note": "Targets finish step confusion noted in 3 support emails with lower effort than full redesign."
+  },
+  {
+   "title": "Story Welcome Fast-Track Duration Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Add a duration hint on the welcome story screen informing users setup takes under 2 minutes.",
+   "why": "High mean time on choose_path (514s) indicates users step away during early onboarding intro screens.",
+   "config": {
+    "story": {
+     "hint": "Fast setup • Takes under 2 minutes to bring your pet to life",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'story.hint' has characters outside the allowed set: ['•']"
+   }
+  }
+ ],
+ "picked": [
+  "Home Intro Floating Companion Controls Redesign",
+  "Late Sign-In Conversion Reorder",
+  "Choose Path Compact Split Screen Layout"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 444.8,
+ "decisions": [
+  {
+   "test": "sim-37",
+   "title": "Home Intro Floating Companion Controls Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 111.2,
+   "result": {
+    "step": {
+     "control": 0.6409,
+     "treatment": 0.6518,
+     "lift": 0.0169,
+     "lift_se": 0.0291,
+     "p": 0.556842
+    },
+    "finish": {
+     "control": 0.285,
+     "treatment": 0.292,
+     "lift": 0.0246,
+     "lift_se": 0.0415,
+     "p": 0.549581
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.25,
+   "predicted_lift": 0.12,
+   "true_lift_hidden": -0.0414,
+   "finishers_delta_hidden": -36.53
+  },
+  {
+   "test": "sim-38",
+   "title": "Late Sign-In Conversion Reorder",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 166.8,
+   "result": {
+    "step": {
+     "control": 0.8043,
+     "treatment": 0.831,
+     "lift": 0.0331,
+     "lift_se": 0.0131,
+     "p": 0.010289
+    },
+    "finish": {
+     "control": 0.2977,
+     "treatment": 0.297,
+     "lift": -0.0022,
+     "lift_se": 0.0396,
+     "p": 0.954953
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 5.83,
+   "predicted_lift": 0.15,
+   "true_lift_hidden": 0.0121,
+   "finishers_delta_hidden": 10.68
+  },
+  {
+   "test": "sim-39",
+   "title": "Choose Path Compact Split Screen Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 166.8,
+   "result": {
+    "step": {
+     "control": 0.9193,
+     "treatment": 0.9377,
+     "lift": 0.0199,
+     "lift_se": 0.0073,
+     "p": 0.005855
+    },
+    "finish": {
+     "control": 0.2923,
+     "treatment": 0.2997,
+     "lift": 0.0251,
+     "lift_se": 0.0408,
+     "p": 0.533825
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 2.92,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": 0.0162,
+   "finishers_delta_hidden": 14.29
+  }
+ ],
+ "shipped": [
+  "Late Sign-In Conversion Reorder",
+  "Choose Path Compact Split Screen Layout"
+ ],
+ "ends_week": 10,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

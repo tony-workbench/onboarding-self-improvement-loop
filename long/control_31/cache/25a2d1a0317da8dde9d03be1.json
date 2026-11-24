@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, new_screen] Companion Personality Alignment Matrix: Adds a dedicated pet personality and behavior trait selection screen right before certificate generation to help users tailor how their pet acts on desktop.\n   config: {\"new_personality_quiz\": {\"headline\": \"Define Your Pet's Desktop Personality\", \"body\": \"Choose how active, playful, or quiet your companion will be on your desktop.\", \"layout\": \"grid\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Select Behavior Trait\", \"style\": \"playful\", \"action\": \"choose\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_personality_quiz\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n1: [sign_in, hint] Account Recovery Key & Email Safeguard Notice: Display an explicit warning and confirmation prompt on the sign-in screen explaining how signing in preserves pet customization across sessions.\n   config: {\"sign_in\": {\"hint\": \"Signing in anchors your companion data to this account so your custom pet is never lost or reset.\", \"components\": [{\"type\": \"badge\", \"text\": \"Account Data Safeguard Active\", \"style\": \"highlight\"}]}}\n2: [finish, new_flow] Interactive Desktop Pet Docking & Controls Orientation: Introduces a guided quick-control setup block on the final home intro screen teaching users shortcuts for minimizing, summoning, and moving their pet.\n   config: {\"home_intro\": {\"headline\": \"Master Your Companion Controls\", \"body\": \"Learn the essential shortcuts to summon, dock, or hide your desktop pet anytime.\", \"layout\": \"two_column\", \"components\": [{\"type\": \"checklist\", \"label\": \"Desktop Shortcuts Quick Guide\", \"style\": \"plain\"}]}}\n3: [home, wait_info] Live Desktop Environment Render Diagnostics Card: Adds a live rendering engine diagnostic status panel on the waiting screen to inform users as the desktop overlay prepares.\n   config: {\"waiting\": {\"headline\": \"Preparing Desktop Rendering Engine\", \"body\": \"We are verifying screen overlay permissions and graphic rendering settings for seamless desktop display.\", \"notify_when_ready\": true, \"components\": [{\"type\": \"progress\", \"label\": \"Desktop Overlay Status Check\", \"style\": \"emphasis\"}]}}\n4: [choose_path, redesign] Split-Canvas Companion Path & Showcase Selection: Replaces the existing path selection UI with a split-canvas comparison comparing instant preset adopt vs custom creation side-by-side with live animated pet previews.\n   config: {\"choose_path\": {\"headline\": \"Choose Your Companion Journey\", \"layout\": \"split\", \"replace\": {\"path_options\": [{\"type\": \"choice_cards\", \"label\": \"Instant Preset Companion vs Custom Pet Creation\", \"style\": \"rounded\", \"action\": \"choose\", \"role\": \"path_options\"}]}}}\n5: [adoption, hint] Pre-Generation Custom Photo Quality Guardrail: Displays dynamic photo composition and lighting tips directly inside the custom photo upload screen to prevent generation glitches.\n   config: {\"upload_photos\": {\"hint\": \"For best results, use bright lighting, clear focus, and a direct front-facing view of your pet.\", \"components\": [{\"type\": \"badge\", \"text\": \"Photo Clarity Inspection Enabled\", \"style\": \"calm\"}]}}\n6: [sign_in, reorder] Late-Stage Sign-In Security Reordering: Moves the sign_in step to after waiting screen so users see their rendered pet in action on desktop before securing their account.\n   config: {\"sign_in\": {\"headline\": \"Save Your Companion to Cloud\", \"body\": \"Your pet is ready on your desktop! Sign in now to enable multi-device sync and cloud backup.\"}, \"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"sign_in\", \"home_intro\"]}\n7: [finish, layout] Desktop Pet Interaction Audio & Sound Toggle: Updates home_intro layout to spotlight companion audio settings and sound feedback toggles.\n   config: {\"home_intro\": {\"layout\": \"spotlight\", \"hint\": \"Customize companion sounds and desktop notification alerts here.\", \"components\": [{\"type\": \"sound\", \"label\": \"Desktop Sound Effects\", \"style\": \"playful\", \"action\": \"play\"}]}}\n8: [adoption, incentive] Adoption Certificate Name & Birthday Celebration Stamp: Adds an interactive official pet birthday and adoption badge generator component to the adoption certificate screen.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Pet Adoption Certificate\", \"body\": \"Give your pet a name and select its official adoption date to claim your unique companion badge.\", \"replace\": {\"official_stamp\": [{\"type\": \"badge\", \"text\": \"Official Pet Adoption Seal\", \"style\": \"highlight\", \"role\": \"official_stamp\"}]}}}\n9: [home, notification] Desktop Visibility Troubleshooter Banner: Displays a notification banner on the waiting screen with direct troubleshooting steps if desktop overlay setup takes longer than expected.\n   config: {\"waiting\": {\"hint\": \"If your pet doesn't appear on screen shortly, click here for quick multi-monitor overlay settings.\", \"components\": [{\"type\": \"button\", \"label\": \"Troubleshoot Desktop View\", \"style\": \"subtle\", \"action\": \"open_tip\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a personality trait selection step inside onboarding is permitted."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding account recovery information on the sign-in screen is allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding controls orientation to the home intro screen is allowed inside onboarding."
+   },
+   {
+    "index": 3,
+    "pass": false,
+    "rule": 2,
+    "reason": "The waiting screen copy replaces the pet creation indicator with rendering diagnostics, losing the job of showing that the pet is being made."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "The split-canvas path selection retains both preset adoption and custom creation options."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding photo upload quality tips is valid and keeps the original step job intact."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to occur after the waiting screen is explicitly allowed."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating the home intro layout with audio settings is allowed within onboarding."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "The replacement official stamp element maintains the required official adoption seal role and appearance."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a troubleshooting banner to the waiting screen does not lose its primary job or violate rules."
+   }
+  ]
+ }
+}

@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, reorder] Move sign-in after pet choice: Shift account sign-in to occur right after picking or building a pet, so users build emotional attachment before account creation.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n1: [finish, new_screen] Add desktop controls walkthrough screen: Insert a short interactive guide screen before finishing that demonstrates hotkeys, hiding, and dragging your pet on desktop.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_controls\", \"home_intro\"], \"home_intro\": {\"headline\": \"Your desktop pet is ready!\", \"body\": \"Use hotkeys or click your pet on the desktop anytime to summon or hide them.\"}}\n2: [adoption, redesign] Redesign pet picking with live grid preview: Transform the pick_friend screen into a responsive grid layout featuring animated mascot previews and clear pet badges.\n   config: {\"pick_friend\": {\"layout\": \"grid\", \"headline\": \"Choose your companion\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Select Pet Style\", \"style\": \"playful\", \"action\": \"choose\"}, {\"type\": \"preview\", \"asset\": \"asset:pet_preview\", \"style\": \"highlight\"}]}}\n3: [home, new_flow] Desktop launch status and diagnostic flow on waiting: Add real-time progress steps and desktop display check tips to the waiting screen to verify desktop overlay compatibility.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"layout\": \"checklist\", \"components\": [{\"type\": \"progress\", \"label\": \"Preparing desktop overlay...\", \"style\": \"emphasis\"}, {\"type\": \"tip_carousel\", \"text\": \"If pet doesn't appear, check desktop display permission settings.\", \"style\": \"calm\"}]}}\n4: [choose_path, copy] Clarify path options upfront: Update choose_path text to explicitly state the difference between quick instant adoption and custom photo-based creation.\n   config: {\"choose_path\": {\"headline\": \"How would you like to adopt?\", \"body\": \"Pick an existing pet instantly, or upload photos to create a custom companion.\", \"hint\": \"You can always create more pets later from settings.\"}}\n5: [sign_in, hint] Account cloud-save warning hint: Add explicit hint text on sign_in explaining that signing in links pets to your account so they won't disappear on restart.\n   config: {\"sign_in\": {\"hint\": \"Sign in with the same account every time to keep your saved pets synchronized.\", \"show_step_counter\": true}}\n6: [home, wait_info] Display notification toggle during generation wait: Enable progress bar, time estimate, and desktop readiness notification option on the waiting screen.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"notify_when_ready\": true, \"tip_delay_seconds\": 5}}\n7: [choose_path, layout] Split layout for path selection: Switch choose_path screen layout to a split view comparing Instant Adoption side-by-side with Custom Pet Creator.\n   config: {\"choose_path\": {\"layout\": \"split\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Instant vs Custom\", \"style\": \"rounded\", \"action\": \"choose\"}]}}\n8: [adoption, hint] Photo requirement guidance tips: Add photo selection guidelines and preview tip on upload_photos screen to prevent custom pet generation failures.\n   config: {\"upload_photos\": {\"hint\": \"Use clear, well-lit photos facing forward for best custom pet generation.\", \"components\": [{\"type\": \"photo_picker\", \"label\": \"Upload Pet Photo\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n9: [finish, incentive] Desktop control cheat sheet on home intro: Add a visual controls keymap card and mascot welcome banner to home_intro.\n   config: {\"home_intro\": {\"layout\": \"card\", \"headline\": \"Welcome your new friend!\", \"body\": \"Press Shift+Pet to drag. Right-click for options. Double click to chat!\", \"components\": [{\"type\": \"mascot\", \"asset\": \"asset:mascot_welcome\", \"style\": \"playful\"}, {\"type\": \"checklist\", \"label\": \"Quick Controls Cheat Sheet\", \"style\": \"rounded\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Moving sign-in after pet choice within onboarding is permitted by rule 4."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a controls walkthrough screen within onboarding is permitted by rule 4."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning pick_friend to a grid layout preserves its core job of pet selection."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding diagnostic checklist to waiting screen preserves its core job of showing pet creation."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Clarifying path options preserves both choices and avoids mentioning pricing."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an account synchronization hint on sign_in is allowed within onboarding."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling progress indicators and readiness notifications on waiting screen is allowed."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Split layout for choose_path maintains both adoption options."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Photo selection guidance tips improve upload_photos without violating rules."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a controls cheat sheet to home_intro is allowed."
+   }
+  ]
+ }
+}

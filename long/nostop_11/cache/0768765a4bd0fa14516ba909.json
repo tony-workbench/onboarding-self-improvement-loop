@@ -1,0 +1,89 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Score each onboarding change. Sub-scores:\n- impact 0-3: how many users the targeted step loses and how much this could recover\n- evidence 0-3: whether the funnel and the support mail both point at this problem\n- confidence 0-2: how likely this kind of change works, judged from the lessons below\n- cost 0-2: 2 = config only, 0 = needs new screens and a release\nAlso give predicted_lift: expected relative change in the target step's conversion, e.g. 0.05.\n\nLessons from earlier weeks:\nPredictions were consistently too high across all tested changes.\nEvidence is still thin across all kinds of changes because each kind has only one test so far.\nReordering sign-in was the only change with a winning test (sign_in, reorder), though evidence remains thin.\nRedesigning the home screen (home, redesign) made onboarding worse, and adding a new finish screen (finish, new_screen) triggered a guardrail rollback.\nNo clear effect was seen for hint changes (finish, hint and home, hint), copy tweaks (sign_in, copy), or adoption wait info widgets (adoption, wait_info).\n\nMeasured so far, by kind of change (relative change on the target step):\n- adoption, wait_info: +2.2% after noise correction, 1 test(s) (one test only: weak evidence, not a pattern yet)\n- finish, hint: -1.5% after noise correction, 1 test(s) (one test only: weak evidence, not a pattern yet)\n- finish, new_screen: -7.0% after noise correction, 1 test(s) (one test only: weak evidence, not a pattern yet)\n- home, hint: +0.1% after noise correction, 1 test(s) (one test only: weak evidence, not a pattern yet)\n- home, redesign: -3.0% after noise correction, 1 test(s) (one test only: weak evidence, not a pattern yet)\n- sign_in, copy: +0.6% after noise correction, 1 test(s) (one test only: weak evidence, not a pattern yet)\n- sign_in, reorder: +2.8% after noise correction, 1 test(s) (one test only: weak evidence, not a pattern yet)\n\nFunnel:\n- choose_path: 76.2%, median 8s / mean 514s\n- sign_in: 76.0%, median 3s / mean 567s\n- adoption: 60.9%, median 89s / mean 1017s\n- home: 81.3%, median 201s / mean 2336s\n- finish: 64.8%, median 395s / mean 5815s\n- finishing onboarding overall: 18.6%\n\nReturn JSON {\"scores\": [{\"index\": i, \"impact\": n, \"evidence\": n, \"confidence\": n, \"cost\": n,\n\"predicted_lift\": x, \"note\": short}]}\n\nChanges:\n0: [home, redesign] Waiting Screen Playground Redesign: Redesign the waiting screen into a centered interactive playground preview while pet generation completes in the background. (why: The home (waiting) step has a median duration of 201s (mean 2336s). Providing an interactive layout reduces perceived wait time and lowers drop-offs.)\n1: [finish, new_screen] Desktop Visibility Check Screen: Add a dedicated screen right before home intro that confirms the pet renders visibly on the user's desktop screen. (why: Support received 3 bug emails about pets failing to show on the desktop screen or the app failing to open at the home stage.)\n2: [adoption, new_flow] Structured Photo Upload Flow: Transform photo upload into a multi-step checklist flow with guidelines for custom pet creation. (why: Adoption has a 60.9% dropoff rate and 1017s mean completion time, plus 3 support reports of custom pet creation failing or looking wrong.)\n3: [home, notification] Pet Ready Desktop Notification: Add a desktop system notification toggle and time estimate on the waiting screen. (why: Users spend a median of 201s on the waiting screen; notifications allow users to multitask safely without abandoning onboarding.)\n4: [adoption, hint] Custom Photo Quality Guidelines Hint: Add photo selection quality guidelines and visual badge hints to the photo upload screen. (why: Support received 3 bug reports about custom pet generation failing or looking wrong, causing user frustration during adoption.)\n5: [home, wait_info] Waiting Screen Progress Timer: Display an active progress bar and estimated time remaining indicator during pet generation. (why: Users wait median 201s (mean 2336s) on the waiting screen without clear feedback on remaining generation time.)\n6: [sign_in, copy] Sign-In Pet Persistence Copy Clarification: Update sign-in headline and body text to explicitly reassure users that signing in preserves pet data across sessions. (why: The top support theme last week was missing or reset pets after signing in again (8 support emails).)\n7: [choose_path, incentive] Mascot Welcome Incentive: Add a playful animated mascot component to the initial story screen welcoming users to the app. (why: Choose path drops 23.8% of starting users right at the beginning of the onboarding funnel.)\n8: [finish, layout] Final Intro Spotlight Layout: Switch the home intro screen layout to spotlight view focused directly on launching the desktop pet. (why: The finish step drops off to 64.8% conversion with a median time of 395s, showing hesitation at the final onboarding screen.)",
+ "answer": {
+  "scores": [
+   {
+    "index": 0,
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0,
+    "predicted_lift": -0.03,
+    "note": "Home screen redesign previously decreased conversion by -3.0%; high risk of failure."
+   },
+   {
+    "index": 1,
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0,
+    "predicted_lift": -0.07,
+    "note": "Adding a new finish screen triggered a guardrail rollback with -7.0% lift in previous test."
+   },
+   {
+    "index": 2,
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0,
+    "predicted_lift": 0.015,
+    "note": "Targets highest drop-off step with support evidence, but complex new flow changes carry high risk."
+   },
+   {
+    "index": 3,
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0,
+    "predicted_lift": 0.008,
+    "note": "Addresses long waiting screen duration; low evidence from support mail and requires OS notifications."
+   },
+   {
+    "index": 4,
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1,
+    "predicted_lift": 0.005,
+    "note": "High drop-off step supported by complaints, but past hint changes showed minimal to negative impact."
+   },
+   {
+    "index": 5,
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1,
+    "predicted_lift": 0.018,
+    "note": "Addresses wait duration; wait_info showed modest positive lift (+2.2%) in adoption."
+   },
+   {
+    "index": 6,
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2,
+    "predicted_lift": 0.006,
+    "note": "Strong support mail alignment (8 emails) and low implementation cost, but copy changes yield weak lift (+0.6%)."
+   },
+   {
+    "index": 7,
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0,
+    "predicted_lift": 0.01,
+    "note": "Targets initial 23.8% step drop-off without support complaints; animation requires moderate effort."
+   },
+   {
+    "index": 8,
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1,
+    "predicted_lift": -0.005,
+    "note": "Targets 35.2% drop-off at finish step, but layout redesigns tend to hurt onboarding conversion."
+   }
+  ]
+ }
+}

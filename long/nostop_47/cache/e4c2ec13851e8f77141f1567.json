@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Certificate Audio Preview Redesign: Redesign the adoption certificate screen into a split layout featuring interactive pet audio reaction samples and a mascot preview before confirmation.\n   config: {\"adoption_certificate\": {\"layout\": \"split\", \"headline\": \"Meet & Verify Your New Companion\", \"body\": \"Listen to voice samples and confirm adoption details to ensure your pet fits your workspace setup.\", \"components\": [{\"type\": \"sound\", \"label\": \"Test Voice Sample\", \"style\": \"playful\", \"action\": \"play\"}, {\"type\": \"mascot\", \"asset\": \"asset:pet_preview\", \"style\": \"rounded\"}]}}\n1: [finish, new_screen] Desktop Tray Launch Prep Screen: Add a new dedicated screen before completing onboarding explaining how to invoke, hide, and manage the pet from the system desktop tray.\n   config: {\"home_intro\": {\"headline\": \"Welcome to Your New Workspace!\", \"body\": \"Your pet is active and ready on your desktop screen.\"}, \"new_desktop_launch_prep\": {\"headline\": \"Desktop Control & Tray Guide\", \"body\": \"Your pet resides in your system tray. Right-click the icon anytime to summon, hide, or open companion options.\", \"layout\": \"centered\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:tray_guide_diagram\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Launch Desktop Companion\", \"action\": \"next\", \"style\": \"emphasis\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_launch_prep\", \"home_intro\"]}\n2: [adoption, new_flow] Pet Trait Audio Tuning Flow: Introduce a interactive personality tuning stage on pick_friend with dynamic audio reaction previews and workspace advice tip carousels.\n   config: {\"pick_friend\": {\"layout\": \"stage\", \"headline\": \"Select Companion Personality Traits\", \"body\": \"Choose personality tendencies and test sound cues to customize how your pet reacts to your work habits.\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Select Personality\", \"action\": \"choose\", \"style\": \"highlight\"}, {\"type\": \"tip_carousel\", \"text\": \"Calm pets stay quiet during focus hours; energetic pets trigger quick animations.\", \"style\": \"calm\"}, {\"type\": \"sound\", \"label\": \"Play Personality Audio\", \"action\": \"play\", \"style\": \"playful\"}]}}\n3: [choose_path, redesign] Animated Story Intro Redesign: Redesign the story intro screen with full bleed video previews showing real desktop pet interactions across different operating workflows.\n   config: {\"story\": {\"layout\": \"full_bleed\", \"headline\": \"Transform Your Workspace\", \"body\": \"See how an interactive desktop pet seamlessly integrates with your apps and productivity routines.\", \"components\": [{\"type\": \"animation\", \"asset\": \"asset:desktop_story_anim\", \"style\": \"rounded\"}, {\"type\": \"video\", \"asset\": \"asset:workflow_demo\", \"style\": \"plain\"}]}}\n4: [sign_in, hint] Account Pet Data Preservation Notice: Display an explicit data protection hint on sign-in clarifying that pet progress and custom creations are securely saved to the account.\n   config: {\"sign_in\": {\"hint\": \"Signing in anchors your companion to this account so your custom pet is never lost when logging in across devices.\"}}\n5: [home, wait_info] Desktop Render Step Timer & Animation: Add an animated visual render progress indicator with a real-time step countdown timer to the waiting screen.\n   config: {\"waiting\": {\"headline\": \"Building Desktop Animations\", \"body\": \"Generating companion graphics and asset packs tailored to your desktop resolution.\", \"show_time_estimate\": true, \"components\": [{\"type\": \"timer\", \"label\": \"Estimated Time Remaining\", \"style\": \"plain\"}, {\"type\": \"animation\", \"asset\": \"asset:render_spinner\", \"style\": \"rounded\"}]}}\n6: [home, notification] Render Completion Audio Notification Toggle: Add an audio completion alert switch and chime test button on the waiting screen so users know when generation finishes while backgrounded.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"hint\": \"Turn on completion alert chime so you can safely minimize the window while your pet renders.\", \"components\": [{\"type\": \"sound\", \"label\": \"Test Completion Chime\", \"action\": \"play\", \"style\": \"subtle\"}]}}\n7: [adoption, layout] Photo Upload Quality Grid Layout: Change upload_photos screen to a structured grid layout with photo lighting quality checklist cards.\n   config: {\"upload_photos\": {\"layout\": \"grid\", \"headline\": \"Upload Photos for 3D Customization\", \"body\": \"Provide clear photos for optimal mesh generation and accurate companion styling.\", \"components\": [{\"type\": \"checklist\", \"text\": \"Well-lit photo with clear background contrast\", \"style\": \"plain\"}, {\"type\": \"photo_picker\", \"label\": \"Select Photos\", \"style\": \"rounded\"}]}}\n8: [finish, incentive] Home Desktop Companion Bonus Badge: Add a Founder Companion early unlock badge and welcome reward highlight component to home_intro.\n   config: {\"home_intro\": {\"headline\": \"Your Pet Has Arrived!\", \"body\": \"You have unlocked exclusive starter accessories and founder status for your desktop companion.\", \"components\": [{\"type\": \"badge\", \"label\": \"Founder Companion Badge Unlocked\", \"style\": \"highlight\"}]}}\n9: [choose_path, copy] Path Companion Purpose Explainer Copy: Update choose_path headline and body to explicitly differentiate focus assistant pets from casual idle companions.\n   config: {\"choose_path\": {\"headline\": \"Choose Your Companion's Mode\", \"body\": \"Select 'Focus Partner' for gentle work reminders or 'Idle Companion' for fun background desk animations. Easily switch anytime.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": false,
+    "rule": 2,
+    "reason": "The redesigned adoption certificate removes the required official stamp."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an instructional tray prep screen before home intro inside onboarding complies with all rules."
+   },
+   {
+    "index": 2,
+    "pass": false,
+    "rule": 2,
+    "reason": "Redefining pick_friend to select personality traits removes the required functionality of choosing a pet."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the story screen to feature video previews still introduces the pet and complies with all rules."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a data preservation hint to the sign-in screen is permitted within onboarding."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a progress indicator and timer for a real render wait is allowed on the waiting screen."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an optional render completion audio toggle to the waiting screen complies with all rules."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating the upload_photos screen to a grid layout with a checklist and photo picker maintains its core job."
+   },
+   {
+    "index": 8,
+    "pass": false,
+    "rule": 3,
+    "reason": "Promoting unlocked starter accessories and reward badges in onboarding copy violates Rule 3 regarding free extras/gifts."
+   },
+   {
+    "index": 9,
+    "pass": false,
+    "rule": 2,
+    "reason": "Changing choose_path to choose between companion modes loses the required options of adopting versus making your own pet."
+   }
+  ]
+ }
+}

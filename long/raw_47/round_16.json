@@ -1,0 +1,548 @@
+{
+ "round": 16,
+ "starts_week": 16,
+ "funnel": {
+  "choose_path": 0.8860979722692495,
+  "sign_in": 0.8624268430516294,
+  "adoption": 0.72997597428,
+  "home": 0.8650193253299999,
+  "finish": 0.762720624
+ },
+ "weights_used": {
+  "impact": 0.608,
+  "evidence": 0.192,
+  "confidence": 0.568,
+  "cost": 2.632
+ },
+ "lessons_used": [
+  "Reordering sign-in after pet or companion selection worked, whereas reordering sign-in after photo upload hurt performance.",
+  "Targeted sign-in security and persistence hints, along with path duration and persistence hints, frequently worked, though several hints showed no clear effect or hurt.",
+  "Personality-driven headlines, headline refreshes, and live generation countdown timers worked, but general story copy, photo quality guidance, and time headlines either hurt or showed no clear effect.",
+  "Select layout redesigns and tutorial screens worked (such as the photo upload split layout and desktop tray guide screen), whereas sub-flows, trait selectors, and flow bypasses either hurt or showed no clear effect.",
+  "Notifications, audio chimes, wait-screen activity tips, badges, and incentives showed no clear effect.",
+  "Predictions overestimated gains for sub-flows, story copy, and post-photo sign-in reordering, while underestimating gains for targeted headlines, live timers, and specific guide or layout updates."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop pet status verification screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Adds a post-generation verification step that confirms the companion successfully rendered on the desktop before completing setup.",
+   "why": "3 support tickets reported pets failing to show on the desktop or the app failing to open after the waiting step.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_verify",
+     "home_intro"
+    ],
+    "new_desktop_verify": {
+     "headline": "Desktop Pet Verification",
+     "body": "Checking that your companion loaded properly on your desktop.",
+     "layout": "centered"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a verification screen inside onboarding is allowed and preserves all required steps."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.01,
+   "score": 0.67,
+   "score_note": "Extra verification sub-flows and post-generation steps historically hurt or show no gain."
+  },
+  {
+   "title": "Split layout companion photo selection stage",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns photo selection into a split layout combining interactive preview frame with photo picker controls.",
+   "why": "3 support emails reported custom pet generation failing or looking wrong, and previous split layout changes proved effective.",
+   "config": {
+    "upload_photos": {
+     "layout": "split",
+     "replace": {
+      "photo_upload": [
+       {
+        "type": "photo_picker",
+        "label": "Select Photo",
+        "role": "photo_upload"
+       },
+       {
+        "type": "preview",
+        "style": "large",
+        "role": "photo_upload"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[1]': a preview cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Dual path choice split destination flow",
+   "target_step": "choose_path",
+   "type": "new_flow",
+   "change": "Rebuilds path selection into a dual-column layout comparing instant preset adoption with custom photo creation.",
+   "why": "The choose_path step has a long mean time of 514s, showing users struggle to compare journey options.",
+   "config": {
+    "choose_path": {
+     "layout": "two_column",
+     "replace": {
+      "path_options": [
+       {
+        "type": "choice_cards",
+        "label": "Starter Companion Path",
+        "action": "choose",
+        "role": "path_options"
+       },
+       {
+        "type": "choice_cards",
+        "label": "Custom AI Generation Path",
+        "action": "choose",
+        "role": "path_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Spotlight stage finish welcome redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Rebuilds the final onboarding screen into a spotlight stage layout emphasizing active companion status.",
+   "why": "Finish step drop-off is 23.7% and multiple users were confused about pet controls immediately after onboarding.",
+   "config": {
+    "home_intro": {
+     "layout": "spotlight",
+     "replace": {
+      "home_welcome": [
+       {
+        "type": "text",
+        "text": "Your companion is active on your desktop screen",
+        "style": "emphasis",
+        "role": "home_welcome"
+       },
+       {
+        "type": "button",
+        "label": "Get Started",
+        "action": "next",
+        "role": "home_welcome"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro welcome screen layout inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.035,
+   "score": 1.33,
+   "score_note": "Finish step has high drop-off, but finish redesigns previously dropped conversion by 3.9%."
+  },
+  {
+   "title": "Existing pet sign-in safety hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Displays an explicit hint on the sign-in screen reassuring users that logging in preserves existing pet data.",
+   "why": "8 support emails (the top issue) reported pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Sign in to securely sync your pets and keep your desktop companions saved."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a sign-in data safety hint is allowed within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.025,
+   "score": 9.49,
+   "score_note": "Top support complaint backed by strong evidence; targeted sign-in persistence hints reliably work.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 183.1
+  },
+  {
+   "title": "Generation system status progress info",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Adds active background system status text alongside the live timer during pet generation.",
+   "why": "The home waiting step has a high mean duration of 2336s, causing user drop-off.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "hint": "Generating companion graphics... your desktop pet will appear shortly."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding status progress info and timer to the waiting screen is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.017,
+   "score": 6.04,
+   "score_note": "Addresses extreme mean wait times on home step; wait info updates consistently perform well (+1.5%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 183.1
+  },
+  {
+   "title": "Path selection journey headline update",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Updates the story headline to highlight fast path selection clarity.",
+   "why": "Learnings show targeted headline refreshes improve early funnel speed and conversion.",
+   "config": {
+    "story": {
+     "headline": "Choose Your Desktop Companion Journey Path"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating story headline text within onboarding is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.016,
+   "score": 7.25,
+   "score_note": "Story copy changes at path selection historically underperformed (-1.6% across 6 tests).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 183.1
+  },
+  {
+   "title": "Photo processing optimization hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Displays a hint during photo upload reassuring users that uploaded photos are automatically optimized.",
+   "why": "Support received multiple complaints about custom pet generation output looking unexpected.",
+   "config": {
+    "upload_photos": {
+     "hint": "Uploaded photos are automatically optimized for desktop rendering."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an optimization hint to photo upload within onboarding is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.005,
+   "score": 7.91,
+   "score_note": "Targeted at adoption drop-off, but photo quality guidance hints showed no clear positive effect.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 183.1
+  },
+  {
+   "title": "Background generation ready desktop alert",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enables a desktop notification option when companion generation completes on the waiting screen.",
+   "why": "Users face high mean wait times (2336s) and lose context while waiting for pet creation.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling desktop ready notifications on the waiting screen is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.005,
+   "score": 4.62,
+   "score_note": "High wait times justify intervention, but notification experiments previously showed minimal effect."
+  },
+  {
+   "title": "Tray navigation guide final screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Adds a new end-of-flow screen showing users how to control and hide the desktop pet via the system tray.",
+   "why": "3 support emails indicated confusion about how to control, hide, or talk to the pet after completing onboarding.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_tray_guide"
+    ],
+    "new_tray_guide": {
+     "headline": "Desktop Tray Companion Controls",
+     "body": "Use the menu bar icon to toggle visibility or interact with your companion anytime.",
+     "layout": "card"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new guidance screen following home intro is explicitly allowed by rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.012,
+   "score": 2.75,
+   "score_note": "Tray guide screens explicitly proven effective in prior lessons; finish new screens average +0.9%.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 110.4
+  }
+ ],
+ "picked": [
+  "Tray navigation guide final screen",
+  "Existing pet sign-in safety hint",
+  "Photo processing optimization hint",
+  "Path selection journey headline update",
+  "Generation system status progress info"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 842.8,
+ "decisions": [
+  {
+   "test": "sim-67",
+   "title": "Tray navigation guide final screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 110.4,
+   "result": {
+    "step": {
+     "control": 0.7659,
+     "treatment": 0.7573,
+     "lift": -0.0111,
+     "lift_se": 0.0206,
+     "p": 0.590295
+    },
+    "finish": {
+     "control": 0.374,
+     "treatment": 0.361,
+     "lift": -0.0348,
+     "lift_se": 0.0327,
+     "p": 0.296341
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 2.75,
+   "predicted_lift": 0.012,
+   "true_lift_hidden": -0.0207,
+   "finishers_delta_hidden": -23.02
+  },
+  {
+   "test": "sim-68",
+   "title": "Existing pet sign-in safety hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 183.1,
+   "result": {
+    "step": {
+     "control": 0.864,
+     "treatment": 0.8786,
+     "lift": 0.0169,
+     "lift_se": 0.0107,
+     "p": 0.112911
+    },
+    "finish": {
+     "control": 0.3663,
+     "treatment": 0.3907,
+     "lift": 0.0664,
+     "lift_se": 0.0353,
+     "p": 0.052005
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 9.49,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": 0.0027,
+   "finishers_delta_hidden": 3.0
+  },
+  {
+   "test": "sim-69",
+   "title": "Photo processing optimization hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 183.1,
+   "result": {
+    "step": {
+     "control": 0.7207,
+     "treatment": 0.794,
+     "lift": 0.1016,
+     "lift_se": 0.0185,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.3663,
+     "treatment": 0.3943,
+     "lift": 0.0764,
+     "lift_se": 0.0355,
+     "p": 0.025497
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 7.91,
+   "predicted_lift": -0.005,
+   "true_lift_hidden": 0.0957,
+   "finishers_delta_hidden": 106.44
+  },
+  {
+   "test": "sim-70",
+   "title": "Path selection journey headline update",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 183.1,
+   "result": {
+    "step": {
+     "control": 0.8827,
+     "treatment": 0.88,
+     "lift": -0.003,
+     "lift_se": 0.0094,
+     "p": 0.749454
+    },
+    "finish": {
+     "control": 0.3723,
+     "treatment": 0.3753,
+     "lift": 0.0081,
+     "lift_se": 0.0337,
+     "p": 0.810214
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.25,
+   "predicted_lift": -0.016,
+   "true_lift_hidden": 0.0005,
+   "finishers_delta_hidden": 0.56
+  },
+  {
+   "test": "sim-71",
+   "title": "Generation system status progress info",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 183.1,
+   "result": {
+    "step": {
+     "control": 0.863,
+     "treatment": 0.8314,
+     "lift": -0.0366,
+     "lift_se": 0.0142,
+     "p": 0.011214
+    },
+    "finish": {
+     "control": 0.3687,
+     "treatment": 0.3563,
+     "lift": -0.0335,
+     "lift_se": 0.0331,
+     "p": 0.320395
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 6.04,
+   "predicted_lift": 0.017,
+   "true_lift_hidden": -0.0205,
+   "finishers_delta_hidden": -22.8
+  }
+ ],
+ "shipped": [
+  "Photo processing optimization hint"
+ ],
+ "ends_week": 16,
+ "weights_next": {
+  "impact": 0.538,
+  "evidence": 0.19,
+  "confidence": 0.466,
+  "cost": 2.806
+ },
+ "lessons_next": [
+  "Reordering sign-in after pet or companion selection worked, whereas reordering sign-in after photo upload hurt performance.",
+  "Targeted sign-in security and persistence hints, path duration hints, and photo processing hints won, while many other hints had no clear effect or hurt.",
+  "Personality-driven headlines, headline refreshes, and live countdown timers won, whereas general story copy, time headlines, and photo quality guidance hurt or showed no clear effect.",
+  "Specific layout redesigns and tutorial screens (such as photo upload split layout and tray guide screen) won, while sub-flows, trait selectors, and most flow bypasses hurt or showed no clear effect.",
+  "Notifications, audio chimes, wait-screen activity tips, badges, and incentives showed no clear effect.",
+  "Predictions overestimated gains for sub-flows, story copy, and post-photo sign-in reordering, while underestimating gains for targeted headlines, live timers, specific guide screens, and photo hints."
+ ]
+}

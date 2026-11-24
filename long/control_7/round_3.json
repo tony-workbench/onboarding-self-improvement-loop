@@ -1,0 +1,476 @@
+{
+ "round": 3,
+ "starts_week": 3,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7997858999999999,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Account Recovery and Sync Clarification Panel",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in options panel with clear visual badges indicating existing account sync options and pet recovery warnings.",
+   "why": "8 support emails complained about missing or reset pets after signing back in, showing severe confusion over existing account credentials versus new sessions.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Sync & Save Your Pet",
+     "body": "Use the exact same account you previously used to restore your existing desktop pets.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "badge",
+        "text": "Existing User? Sign in to recover your pets",
+        "style": "highlight"
+       },
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Continue with Account",
+        "style": "emphasis",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Interactive Pet Control Keybindings Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a dedicated interactive guide screen before home intro showing hotkeys to summon, hide, and talk to your pet on the desktop.",
+   "why": "Multiple support emails reported confusion on how to control or hide pets post-onboarding, and finish step conversion drops significantly to 64.8%.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_control_guide",
+     "home_intro"
+    ],
+    "home_intro": {
+     "headline": "Your Pet is Ready for Your Desktop!",
+     "body": "Use your shortcut key anytime to toggle your pet or access settings."
+    },
+    "new_control_guide": {
+     "headline": "How to Interact With Your Pet",
+     "body": "Quick key combinations to manage your desktop companion.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "text",
+       "text": "Double Click: Talk to pet | Right Click: Menu | Alt+H: Hide",
+       "style": "plain"
+      },
+      {
+       "type": "button",
+       "label": "Got It!",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'new_control_guide.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Preset Style Fallback Flow for Custom Pet Creation",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Introduce a curated visual preset selector step when photo upload fails or generates unintended custom pet aesthetics.",
+   "why": "Custom pet generation failure and bad rendering accounts for 3 support tickets, contributing to the lowest conversion step (adoption at 60.9%).",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "new_style_fallback",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "upload_photos": {
+     "hint": "If photo upload fails, you can pick from pre-rendered pet styles on the next screen."
+    },
+    "new_style_fallback": {
+     "headline": "Choose a Fallback Pet Style",
+     "body": "Pick a default look if your photo upload needs fine-tuning.",
+     "layout": "grid",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Select Style",
+       "style": "playful",
+       "action": "choose"
+      },
+      {
+       "type": "button",
+       "label": "Continue",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a style fallback flow after photo upload while preserving all onboarding steps."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.08,
+   "score": 6.25,
+   "score_note": "Adoption has the lowest conversion (60.9%) and explicit support tickets highlight custom creation failures.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 147.4
+  },
+  {
+   "title": "Story Scroll Path Selection Layout Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Transform the path selection screen into a full story-scroll experience illustrating companion modes visually.",
+   "why": "The choose_path step has a huge mean time (514s) despite a fast median (8s), showing that stuck users stall out due to decision paralysis.",
+   "config": {
+    "choose_path": {
+     "layout": "story_scroll",
+     "headline": "Select Your Desktop Journey",
+     "body": "Scroll through pet personalities and pick the companion style that fits your workflow.",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "Replaces path choice with pet personality selection, losing the job of offering both adopting and making your own."
+   }
+  },
+  {
+   "title": "System Tray Spawn Guidance and Display Warning",
+   "target_step": "home",
+   "type": "hint",
+   "change": "Add an explicit system tray tip and status hint to the waiting screen for users whose security software hides desktop overlay windows.",
+   "why": "Support received multiple tickets where pets failed to appear on desktop or app seemed stuck on opening.",
+   "config": {
+    "waiting": {
+     "hint": "Pet not appearing? Check your system tray (bottom-right icons) or allow desktop overlay permissions.",
+     "tip_delay_seconds": 10
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds system tray hints to the waiting screen within allowed onboarding changes."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.0,
+   "score": 5.83,
+   "score_note": "Addresses multiple tickets regarding hidden tray overlays on the home waiting step.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 147.4
+  },
+  {
+   "title": "Adoption Certificate Name Input and Badge Reward",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Add an interactive name prompt and animated official badge directly on the adoption certificate screen.",
+   "why": "Adoption has the highest friction and drop-off (60.9% conversion, median 89s / mean 1017s); adding ownership milestone elements boosts completion.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Official Adoption Certificate",
+     "body": "Give your desktop pet a name to finalize its adoption registration.",
+     "components": [
+      {
+       "type": "name_input",
+       "label": "Pet Name",
+       "style": "rounded"
+      },
+      {
+       "type": "badge",
+       "text": "Certified Desktop Companion",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds name input and an official badge while retaining the official stamp job of the certificate."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.0,
+   "score": 5.0,
+   "score_note": "Targets the highest drop-off step (adoption) with motivation, though support mail doesn't explicitly ask for it."
+  },
+  {
+   "title": "Desktop Spawn Time Estimate and Push Notification Toggle",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable desktop readiness notifications and display a real-time progress timer on the waiting screen.",
+   "why": "The home waiting step takes a median of 201s and mean of 2336s, causing users to abandon the app while generation finishes.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "notify_when_ready": true,
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Displays progress and estimate for a real wait time on the waiting screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.0,
+   "score": 5.83,
+   "score_note": "Directly targets extreme wait times (mean 2336s) on home step to reduce background abandonment."
+  },
+  {
+   "title": "Reassuring Switch-Anytime Path Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update headline and body copy on choose_path emphasizing that path selection is temporary and easily changed in settings.",
+   "why": "High drop-off and excessive mean time (514s) indicate users worry they are making an irreversible choice.",
+   "config": {
+    "choose_path": {
+     "headline": "Pick a Path (You Can Change This Anytime)",
+     "body": "Select how you'd like your pet to interact with you today. You can freely switch paths later in app settings.",
+     "hint": "No wrong choices! All paths unlock full desktop pet features."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "Changes copy to interaction style selection, losing the required job of offering adopting versus making your own."
+   }
+  },
+  {
+   "title": "Stage Rendering Checklist on Waiting Screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Replace the static waiting graphic with a live multi-step rendering status checklist showing background loading progress.",
+   "why": "Mean wait time is over 38 minutes (2336s), leaving users unsure if the app crashed or is still initializing your pet.",
+   "config": {
+    "waiting": {
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "checklist",
+        "text": "Preparing 3D pet models | Generating animations | Spawning desktop window",
+        "style": "plain"
+       },
+       {
+        "role": "wait_status",
+        "type": "progress",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.replace.wait_status[0]': a checklist cannot do the wait_status job (use ['animation', 'mascot', 'preview', 'progress', 'text', 'timer', 'tip_carousel'])"
+   }
+  },
+  {
+   "title": "Interactive Pet Gesture and Voice Testing Playground",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a pre-desktop playground screen where users try pet gestures and voice commands in a sandbox before final setup.",
+   "why": "Post-onboarding users struggle to understand pet controls and interaction features, leading to early churn.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_gesture_playground",
+     "home_intro"
+    ],
+    "home_intro": {
+     "headline": "All Set! Meet Your Pet On Your Desktop",
+     "body": "Your companion is active and waiting for your commands."
+    },
+    "new_gesture_playground": {
+     "headline": "Try Your First Pet Commands",
+     "body": "Click on your pet or speak to see how it responds on your desktop.",
+     "layout": "spotlight",
+     "components": [
+      {
+       "type": "preview",
+       "style": "large"
+      },
+      {
+       "type": "button",
+       "label": "Test Wave Gesture",
+       "style": "playful",
+       "action": "play"
+      },
+      {
+       "type": "button",
+       "label": "Ready to Launch",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new gesture playground screen inside onboarding while keeping all required steps intact."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.0,
+   "score": 2.92,
+   "score_note": "Adding a full sandbox screen increases onboarding length, despite post-onboarding benefit."
+  }
+ ],
+ "picked": [
+  "Preset Style Fallback Flow for Custom Pet Creation",
+  "System Tray Spawn Guidance and Display Warning"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 294.8,
+ "decisions": [
+  {
+   "test": "sim-10",
+   "title": "Preset Style Fallback Flow for Custom Pet Creation",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 147.4,
+   "result": {
+    "step": {
+     "control": 0.5898,
+     "treatment": 0.541,
+     "lift": -0.0828,
+     "lift_se": 0.0275,
+     "p": 0.003873
+    },
+    "finish": {
+     "control": 0.1727,
+     "treatment": 0.16,
+     "lift": -0.0734,
+     "lift_se": 0.0536,
+     "p": 0.1877
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 6.25,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": -0.0653,
+   "finishers_delta_hidden": -34.99
+  },
+  {
+   "test": "sim-11",
+   "title": "System Tray Spawn Guidance and Display Warning",
+   "target_step": "home",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 147.4,
+   "result": {
+    "step": {
+     "control": 0.824,
+     "treatment": 0.7955,
+     "lift": -0.0346,
+     "lift_se": 0.0205,
+     "p": 0.096624
+    },
+    "finish": {
+     "control": 0.177,
+     "treatment": 0.179,
+     "lift": 0.0113,
+     "lift_se": 0.0561,
+     "p": 0.839524
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.83,
+   "predicted_lift": 0.0,
+   "true_lift_hidden": -0.0056,
+   "finishers_delta_hidden": -3.0
+  }
+ ],
+ "shipped": [],
+ "ends_week": 3,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

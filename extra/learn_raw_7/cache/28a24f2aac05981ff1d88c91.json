@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, reorder] Move Sign-In After Photo Upload: Reorder the onboarding sequence to place sign-in directly after photo upload and before adoption certificate creation.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n1: [adoption, redesign] Preset Photo Selector Component Redesign: Replace the photo upload section with interactive sample photo choice cards alongside the upload option.\n   config: {\"upload_photos\": {\"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"choice_cards\", \"text\": \"Select a sample portrait or upload your own photo\", \"style\": \"rounded\"}]}}}\n2: [home, new_screen] Dedicated Render Preparation Screen: Insert a dedicated pre-render status screen before the waiting screen showing asset preparation steps.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_render_prep\", \"waiting\", \"home_intro\"], \"new_render_prep\": {\"headline\": \"Preparing Desktop Pet Assets\", \"body\": \"Verifying render engine readiness and unpacking companion files.\", \"layout\": \"centered\", \"show_progress\": true}}\n3: [choose_path, reorder] Prioritize Path Choice Over Intro Story: Swap the initial story screen and path selection screen so users immediately pick their onboarding route.\n   config: {\"_order\": [\"choose_path\", \"story\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n4: [home, wait_info] Waiting Screen Background Status Toggle: Enable background execution status indicators and step counters on the waiting screen.\n   config: {\"waiting\": {\"show_progress\": true, \"show_step_counter\": true, \"notify_when_ready\": true}}\n5: [finish, redesign] Home Intro Quick Control Checklist Redesign: Replace the standard welcome area on home intro with an explicit desktop control checklist component.\n   config: {\"home_intro\": {\"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"checklist\", \"text\": \"1. Left-click to pet. 2. Drag to reposition on screen. 3. Right-click for options menu.\", \"style\": \"plain\"}]}}}\n6: [sign_in, redesign] Account Selection Choice Cards Redesign: Replace standard sign-in options with distinct account choice cards separating new adoption from returning account login.\n   config: {\"sign_in\": {\"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"choice_cards\", \"text\": \"Choose 'Returning Owner' to restore existing pets or 'New Owner' to create a new companion.\", \"style\": \"emphasis\"}]}}}\n7: [adoption, redesign] Pick Friend Visual Choice Cards Redesign: Replace default friend choices with high-visibility playful choice cards on the pick_friend screen.\n   config: {\"pick_friend\": {\"replace\": {\"pet_choices\": [{\"role\": \"pet_choices\", \"type\": \"choice_cards\", \"text\": \"Select your starter companion archetype\", \"style\": \"playful\"}]}}}\n8: [choose_path, redesign] Mascot Guided Intro Story Redesign: Replace the opening story intro block with a mascot component to welcome new users.\n   config: {\"story\": {\"replace\": {\"intro_story\": [{\"role\": \"intro_story\", \"type\": \"mascot\", \"text\": \"Hi! Pick how you would like to create your desktop companion today.\", \"style\": \"playful\"}]}}}\n9: [home, wait_info] Waiting Screen Status Estimate Badge: Add an active generation status badge component to the waiting screen.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"components\": [{\"type\": \"badge\", \"text\": \"Pet render engine initializing in background\", \"style\": \"subtle\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in after photo upload is explicitly permitted under rule 4 and retains all required steps."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the photo step with choice cards while retaining photo upload preserves the screen's core function."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new pre-render preparation screen inside onboarding is allowed under rule 4 and keeps all required steps."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering the story screen after choose path is allowed under rule 4 as all required steps remain present."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding status indicators and step counters to the waiting screen is permitted inside onboarding."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro welcome element to include controls checklist is allowed within onboarding."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning sign-in options into choice cards maintains the sign-in screen's core job."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning pet choices using playful choice cards preserves the job of letting the user pick a friend."
+   },
+   {
+    "index": 8,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replacing the story content with path creation text loses the screen's required job of introducing the pet."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a status badge and time estimate for a real pet generation wait on the waiting screen is allowed."
+   }
+  ]
+ }
+}

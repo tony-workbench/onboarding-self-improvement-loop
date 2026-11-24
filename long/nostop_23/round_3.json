@@ -1,0 +1,455 @@
+{
+ "round": 3,
+ "starts_week": 3,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7595451,
+  "adoption": 0.6978530999999999,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.334,
+  "evidence": 1.297,
+  "confidence": 0.866,
+  "cost": 0.504
+ },
+ "lessons_used": [
+  "Predictions remain consistently too high compared to noise-corrected results.",
+  "No clear effect was seen for home, wait_info changes, as both tests showed no clear effect.",
+  "Evidence for sign_in, reorder changes is still thin because the two tests do not agree after noise correction.",
+  "Evidence for adoption, redesign changes is still thin with only one test conducted.",
+  "Evidence for finish, redesign changes is still thin with only one test conducted."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Guided personality quiz path builder",
+   "target_step": "choose_path",
+   "type": "new_flow",
+   "change": "Add a new guided 3-question quiz screen (new_quiz) before path selection to automatically suggest the ideal pet companion path.",
+   "why": "choose_path drop-off is 23.8% with a high mean time of 514s, indicating decision paralysis when choosing a pet path.",
+   "config": {
+    "choose_path": {
+     "_order": [
+      "story",
+      "new_quiz",
+      "choose_path",
+      "sign_in",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "waiting",
+      "home_intro"
+     ],
+     "layout": "checklist",
+     "headline": "Find your ideal pet companion",
+     "hint": "Answer 3 quick questions or skip straight to path selection."
+    },
+    "new_quiz": {
+     "layout": "centered",
+     "headline": "What kind of desk buddy do you need?",
+     "body": "We will match you with a pet personality that fits your workday flow.",
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Quiet companion / Playful break buddy / Task focus helper",
+       "style": "playful",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Split layout sign-in with account sync explanation",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign sign-in to a split layout with clear visual copy explaining that your adopted pet and progress are securely tied to your sign-in method.",
+   "why": "8 support tickets reported pets missing or reset after signing in, causing user friction and sign-in drop-off (24.0%).",
+   "config": {
+    "sign_in": {
+     "layout": "split",
+     "headline": "Save & Sync Your Desktop Pet",
+     "body": "Sign in to keep your pet save data safely linked to your account across devices.",
+     "hint": "Your adopted companion stays saved to this login.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Continue to Secure Sync",
+        "style": "emphasis",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Desktop pet control cheatsheet screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a new onboarding screen (new_controls_guide) before home_intro that illustrates shortcuts for hiding, dragging, and interacting with the desktop pet.",
+   "why": "Finish step drop-off is 35.2% and support received multiple complaints from users confused about how to control or hide their pet.",
+   "config": {
+    "home_intro": {
+     "_order": [
+      "story",
+      "choose_path",
+      "sign_in",
+      "pick_friend",
+      "upload_photos",
+      "adoption_certificate",
+      "waiting",
+      "new_controls_guide",
+      "home_intro"
+     ]
+    },
+    "new_controls_guide": {
+     "layout": "stage",
+     "headline": "Quick Desktop Pet Controls",
+     "body": "Click and drag to move your pet, right-click to hide to tray, or tap spacebar to chat.",
+     "button_label": "Got It!",
+     "components": [
+      {
+       "type": "image",
+       "asset": "asset:controls_diagram",
+       "style": "rounded",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "new screens need an _order that places them"
+   }
+  },
+  {
+   "title": "Two-column pet traits and desktop preview layout",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign pick_friend to a two-column layout showing interactive pet trait selections alongside a live animated desktop preview.",
+   "why": "Adoption step drop-off is 30.2% with long completion time (mean 1017s), showing users need clearer real-time preview of their companion.",
+   "config": {
+    "pick_friend": {
+     "layout": "two_column",
+     "headline": "Customize Your Desktop Friend",
+     "body": "Select colors, traits, and behavior style to see your pet come to life.",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "preview",
+        "asset": "asset:live_pet_preview",
+        "style": "highlight",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Account persistence reassurance copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Update sign-in screen headline and hint to explicitly reassure users that sign-in restores previous pet progress and prevents duplicate pet resets.",
+   "why": "8 support emails complained about missing or reset pets after signing in.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Retain Your Pet & Progress",
+     "hint": "Signing in ensures your pet stays on your desktop whenever you relaunch."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Account sync copy update on sign-in is allowed and does not violate any rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.025,
+   "score": 7.81,
+   "score_note": "Strong evidence from 8 support emails directly addressing sign_in drop-off; low effort copy tweak.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Desktop readiness desktop notification",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable native desktop notification when pet initialization finishes so users return promptly if tabbed away.",
+   "why": "The waiting screen in the home step has a high mean duration of 2336s, indicating users minimize or walk away during load.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "hint": "We will notify you on your desktop as soon as your pet is ready!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Desktop notification configuration during the waiting step is explicitly allowed by rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.008,
+   "score": 2.82,
+   "score_note": "Funnel duration gap indicates drop-off, but prior home/wait_info tests showed no clear effect.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Welcome desktop treat unlock prompt",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Add an interactive welcome gift badge and claim button on the final home intro screen to give users an immediate action upon entering the desktop.",
+   "why": "Overall onboarding finish rate is only 21.3%, requiring an attractive final push.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Claim Free Starter Treat Pack",
+       "style": "playful",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Mentions a free starter treat pack in onboarding copy, violating rule 3."
+   }
+  },
+  {
+   "title": "Estimated path setup time hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Add a prominent time estimate callout and hint on choose_path clarifying that setup takes less than 2 minutes.",
+   "why": "choose_path mean time is 514s, suggesting users delay because they expect a long process.",
+   "config": {
+    "choose_path": {
+     "show_time_estimate": true,
+     "hint": "Quick Setup: Most users complete onboarding in under 2 minutes!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding setup time estimate copy to path selection complies with all base rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.018,
+   "score": 5.65,
+   "score_note": "Target step loses ~24% with high mean time, though evidence relies on funnel time skew without support email backing.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Interactive pet tips carousel while waiting",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Replace static waiting text with an auto-advancing tip carousel that teaches users pet tricks while the desktop environment loads.",
+   "why": "Waiting step drop-off is 18.7% and mean time is 2336s; engaging content reduces perceived wait time.",
+   "config": {
+    "waiting": {
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "tip_carousel",
+        "text": "Tip: Right-click your pet anytime to bring up the quick action menu!",
+        "style": "calm",
+        "action": "open_tip"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'waiting.wait_status' does not do the job: needs 1 of ['preview', 'progress', 'timer']"
+   }
+  },
+  {
+   "title": "Photo upload formatting guide",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Add explicit instructions and a hint on upload_photos detailing lighting and image framing tips for custom pet generation.",
+   "why": "3 support tickets reported custom pet generation failures or unexpected visual results.",
+   "config": {
+    "upload_photos": {
+     "headline": "Upload a Clear Photo for Custom Pet Creation",
+     "hint": "Use well-lit, frontal photos with clear backgrounds for best results."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Asks for personal information (photo)."
+   }
+  }
+ ],
+ "picked": [
+  "Account persistence reassurance copy",
+  "Estimated path setup time hint",
+  "Desktop readiness desktop notification"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-7",
+   "title": "Account persistence reassurance copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7629,
+     "treatment": 0.7905,
+     "lift": 0.0362,
+     "lift_se": 0.0164,
+     "p": 0.024586
+    },
+    "finish": {
+     "control": 0.228,
+     "treatment": 0.2233,
+     "lift": -0.0205,
+     "lift_se": 0.0469,
+     "p": 0.665473
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 7.81,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": 0.0125,
+   "finishers_delta_hidden": 8.21
+  },
+  {
+   "test": "sim-8",
+   "title": "Estimated path setup time hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7703,
+     "treatment": 0.7767,
+     "lift": 0.0082,
+     "lift_se": 0.0141,
+     "p": 0.557861
+    },
+    "finish": {
+     "control": 0.2147,
+     "treatment": 0.219,
+     "lift": 0.0202,
+     "lift_se": 0.0501,
+     "p": 0.683813
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.65,
+   "predicted_lift": 0.018,
+   "true_lift_hidden": 0.0242,
+   "finishers_delta_hidden": 15.89
+  },
+  {
+   "test": "sim-9",
+   "title": "Desktop readiness desktop notification",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.8268,
+     "treatment": 0.8053,
+     "lift": -0.026,
+     "lift_se": 0.0187,
+     "p": 0.170781
+    },
+    "finish": {
+     "control": 0.216,
+     "treatment": 0.2193,
+     "lift": 0.0154,
+     "lift_se": 0.0497,
+     "p": 0.754397
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 2.82,
+   "predicted_lift": 0.008,
+   "true_lift_hidden": -0.019,
+   "finishers_delta_hidden": -12.48
+  }
+ ],
+ "shipped": [
+  "Account persistence reassurance copy"
+ ],
+ "ends_week": 3,
+ "weights_next": {
+  "impact": 1.533,
+  "evidence": 1.394,
+  "confidence": 0.812,
+  "cost": 0.261
+ },
+ "lessons_next": [
+  "Predictions remain consistently too high compared to noise-corrected results.",
+  "No clear effect was seen for home, wait_info changes, as both tests showed no clear effect.",
+  "Evidence for sign_in, reorder changes is still thin because the two tests do not agree after noise correction.",
+  "Evidence for adoption, redesign changes is still thin with only one test conducted.",
+  "Evidence for sign_in, copy changes is still thin with only one test conducted.",
+  "Evidence for finish, redesign, choose_path, hint, and home, notification changes is still thin with only one test conducted each."
+ ]
+}

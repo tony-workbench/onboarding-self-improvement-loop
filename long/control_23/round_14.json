@@ -1,0 +1,505 @@
+{
+ "round": 14,
+ "starts_week": 14,
+ "funnel": {
+  "choose_path": 0.7906559396399999,
+  "sign_in": 0.7696782,
+  "adoption": 0.7189495468362899,
+  "home": 0.91904716716,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Choose Path Visual Grid Selection Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the path selection screen into a prominent grid layout featuring visual choice cards and instant selection buttons.",
+   "why": "The choose_path step has a mean duration of 514s, indicating significant user friction and decision paralysis when selecting a starting path.",
+   "config": {
+    "choose_path": {
+     "layout": "grid",
+     "headline": "Pick Your Companion Path",
+     "body": "Choose whether you want to adopt a ready mascot or customize your own desktop pet.",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Select Path",
+        "style": "emphasis",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Deferred Sign-In After Adoption Flow Reorder",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder the onboarding flow so sign-in takes place after pet adoption and photo upload, right before final waiting.",
+   "why": "77.0% sign-in conversion drops potential users before they have created emotional investment in their pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ],
+    "sign_in": {
+     "headline": "Save Your New Companion",
+     "body": "Sign in to secure your pet data and sync across sessions."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in after adoption and before waiting is explicitly allowed by the base rules."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.12,
+   "score": 5.83,
+   "score_note": "Deferring auth after value creation significantly reduces upfront sign-in churn, but requires flow reordering.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 164.2
+  },
+  {
+   "title": "Desktop Pet Controls Quick Guide New Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a dedicated interactive control guide screen right before finishing onboarding to teach desktop pet interactions.",
+   "why": "Multiple support tickets report user confusion after onboarding regarding how to hide, direct, or talk to their pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_pet_controls_guide",
+     "home_intro"
+    ],
+    "new_pet_controls_guide": {
+     "headline": "How to Interact with Your Pet",
+     "body": "Learn how to summon, move, and customize your desktop pet anytime.",
+     "layout": "card",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Click to Pet • Right-Click Menu • Drag to Move",
+       "style": "highlight"
+      },
+      {
+       "type": "button",
+       "label": "Got It!",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'new_pet_controls_guide.components[0].label' must be text up to 40 characters"
+   }
+  },
+  {
+   "title": "Guided Custom Photo Upload Subflow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Transform the photo upload screen into a two-column guided creation flow with reference pet image examples.",
+   "why": "3 support emails reported custom pet generation failures or bad visual output due to poor photo uploads.",
+   "config": {
+    "upload_photos": {
+     "layout": "two_column",
+     "headline": "Create Custom Pet from Photos",
+     "body": "Upload clear, well-lit photos of your pet for best render quality.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Clear face photo • Well lit • No background clutter",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'upload_photos.components[0].text' has characters outside the allowed set: ['•']"
+   }
+  },
+  {
+   "title": "Account Persistence and Multi-Device Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Display a explicit reassurance hint on the sign-in screen clarifying that signing in preserves pet state across app re-launches.",
+   "why": "Support received 8 emails about pets missing or resetting after signing back in.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in ensures your pet state, level, and memories are safely backed up.",
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding explanatory hint text regarding account backup to the sign-in screen adheres to all onboarding rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.05,
+   "score": 7.08,
+   "score_note": "Strong evidence from 8 support emails and sign-in dropoff; low-cost copy hint to address account loss fear."
+  },
+  {
+   "title": "Live Engine Load Checklist Status Banner",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add an active technical initialization checklist component on the waiting screen to lower perceived wait time.",
+   "why": "The waiting step has a median duration of 201s and mean of 2336s, causing drop-offs before completion.",
+   "config": {
+    "waiting": {
+     "layout": "checklist",
+     "headline": "Preparing Your Pet Desktop Assets...",
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Allocating overlay • Loading animations • Spawning desktop pet",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'waiting.components[0].text' has characters outside the allowed set: ['•']"
+   }
+  },
+  {
+   "title": "Adoption Certificate Mascot Stamp Layout Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen into a centered spotlight stage emphasizing the adoption seal and pet name confirmation.",
+   "why": "Adoption conversion drops to 71.9% with a high median time of 89s.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "spotlight",
+     "headline": "Official Adoption Certificate",
+     "body": "Your companion is officially ready for your desktop background!",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "mascot",
+        "asset": "asset:certificate_stamp",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[0]': a mascot cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Story Scroll Quick Start Copy Callout",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update intro story screen text with action-oriented copy explaining fast setup paths.",
+   "why": "Users take an average of 514s on path selection due to narrative ambiguity.",
+   "config": {
+    "story": {
+     "headline": "Meet Your Virtual Desktop Companion in Seconds",
+     "body": "Choose a pre-made pet for instant fun or design your own custom desktop pet.",
+     "button_label": "Start Choice"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating intro story copy maintains the primary function of introducing the pet companion."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.07,
+   "score": 6.25,
+   "score_note": "Addresses long 514s average duration on step 1 with simple copy quick-start callout.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 164.2
+  },
+  {
+   "title": "Desktop Shortcut Cheat Sheet Incentive Banner",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Add a visual hotkey card and completion badge on the home intro screen to encourage immediate interaction.",
+   "why": "3 support tickets noted post-onboarding confusion on pet commands and controls.",
+   "config": {
+    "home_intro": {
+     "headline": "Welcome Home! Your Pet is Ready",
+     "body": "Press Option/Alt + P anytime to bring up pet controls.",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Unlocked: Quick Pet Shortcut Hotkey",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding shortcut instructions to the home intro screen complies with onboarding rules and fair design guidelines."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.06,
+   "score": 5.83,
+   "score_note": "Finish step has lowest conversion (64.8%); cheat sheet card targets post-onboarding confusion mentioned in tickets.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 109.4
+  },
+  {
+   "title": "Pre-Made Pet Selection Carousel Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign pet pick view into a dynamic split visual stage showing pet traits and instant selection cards.",
+   "why": "Adoption stage experiences a 71.9% completion rate; visual clarity speeds up pet selection.",
+   "config": {
+    "pick_friend": {
+     "layout": "split",
+     "headline": "Select Your Preset Desktop Mascot",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "label": "Choose Companion",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the preset mascot pick screen preserves the functionality of letting the user choose a pet."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.09,
+   "score": 3.75,
+   "score_note": "Adoption loses 28.1% of users; full stage redesign boosts clarity but requires new UI release.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 164.2
+  }
+ ],
+ "picked": [
+  "Deferred Sign-In After Adoption Flow Reorder",
+  "Pre-Made Pet Selection Carousel Redesign",
+  "Story Scroll Quick Start Copy Callout",
+  "Desktop Shortcut Cheat Sheet Incentive Banner"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 602.0,
+ "decisions": [
+  {
+   "test": "sim-49",
+   "title": "Deferred Sign-In After Adoption Flow Reorder",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 164.2,
+   "result": {
+    "step": {
+     "control": 0.7815,
+     "treatment": 0.8291,
+     "lift": 0.0609,
+     "lift_se": 0.0151,
+     "p": 3e-05
+    },
+    "finish": {
+     "control": 0.2797,
+     "treatment": 0.3077,
+     "lift": 0.1001,
+     "lift_se": 0.0441,
+     "p": 0.017263
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 5.83,
+   "predicted_lift": 0.12,
+   "true_lift_hidden": 0.0632,
+   "finishers_delta_hidden": 53.62
+  },
+  {
+   "test": "sim-50",
+   "title": "Pre-Made Pet Selection Carousel Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 164.2,
+   "result": {
+    "step": {
+     "control": 0.7271,
+     "treatment": 0.7397,
+     "lift": 0.0173,
+     "lift_se": 0.0199,
+     "p": 0.379744
+    },
+    "finish": {
+     "control": 0.2863,
+     "treatment": 0.2847,
+     "lift": -0.0058,
+     "lift_se": 0.0406,
+     "p": 0.886354
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.75,
+   "predicted_lift": 0.09,
+   "true_lift_hidden": 0.0321,
+   "finishers_delta_hidden": 27.23
+  },
+  {
+   "test": "sim-51",
+   "title": "Story Scroll Quick Start Copy Callout",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 164.2,
+   "result": {
+    "step": {
+     "control": 0.8153,
+     "treatment": 0.8117,
+     "lift": -0.0045,
+     "lift_se": 0.0123,
+     "p": 0.715421
+    },
+    "finish": {
+     "control": 0.2807,
+     "treatment": 0.2683,
+     "lift": -0.0439,
+     "lift_se": 0.0401,
+     "p": 0.28445
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.25,
+   "predicted_lift": 0.07,
+   "true_lift_hidden": 0.0186,
+   "finishers_delta_hidden": 15.78
+  },
+  {
+   "test": "sim-52",
+   "title": "Desktop Shortcut Cheat Sheet Incentive Banner",
+   "target_step": "finish",
+   "type": "incentive",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 109.4,
+   "result": {
+    "step": {
+     "control": 0.6524,
+     "treatment": 0.6871,
+     "lift": 0.0531,
+     "lift_se": 0.0292,
+     "p": 0.062213
+    },
+    "finish": {
+     "control": 0.2803,
+     "treatment": 0.2913,
+     "lift": 0.0392,
+     "lift_se": 0.0424,
+     "p": 0.345714
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.83,
+   "predicted_lift": 0.06,
+   "true_lift_hidden": 0.0101,
+   "finishers_delta_hidden": 8.57
+  }
+ ],
+ "shipped": [
+  "Deferred Sign-In After Adoption Flow Reorder"
+ ],
+ "ends_week": 14,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

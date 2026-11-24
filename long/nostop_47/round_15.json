@@ -1,0 +1,499 @@
+{
+ "round": 15,
+ "starts_week": 15,
+ "funnel": {
+  "choose_path": 0.7956804000000001,
+  "sign_in": 0.80085350592,
+  "adoption": 0.6621657,
+  "home": 0.9419413069130892,
+  "finish": 0.7558271999999999
+ },
+ "weights_used": {
+  "impact": 0.08,
+  "evidence": 0.08,
+  "confidence": 0.207,
+  "cost": 3.633
+ },
+ "lessons_used": [
+  "Predictions frequently overestimated positive impact overall, but underestimated strong wins.",
+  "Home wait_info changes can be helpful (4 winning tests in rounds 3, 4, 7, and 9), though 6 tests showed no clear effect.",
+  "Sign-in hint changes can be helpful (2 winning tests in rounds 4 and 6), though 10 tests showed no clear effect.",
+  "Sign-in reorder and adoption new_flow changes proved consistently harmful across agreeing tests.",
+  "Choose_path layout, finish copy, finish new_screen, and home notification changes showed no clear effect across agreeing tests.",
+  "Evidence remains thin or inconsistent for adoption redesign, finish new_flow, choose_path copy, choose_path redesign, adoption hint, and single-test categories."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop Spawn Status Stage Redesign",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesign the rendering waiting step into a full-bleed stage layout featuring a live desktop preview animation while pet assets compile in the background.",
+   "why": "The home wait step takes a median of 201s (mean 2336s), and wait_info/home stage improvements produced 4 historical winning tests.",
+   "config": {
+    "waiting": {
+     "layout": "full_bleed",
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "animation",
+        "asset": "asset:desktop_render_preview",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'waiting.wait_status' does not do the job: needs 1 of ['preview', 'progress', 'timer']"
+   }
+  },
+  {
+   "title": "Desktop Tray Control Instructions Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Introduce a dedicated new screen at the end of onboarding displaying clear checklist instructions on using the system tray to control, show, or hide the desktop pet.",
+   "why": "Support tickets show post-onboarding confusion regarding how to control, hide, or talk to pets (3 emails) and desktop feature misbehavior (4 emails).",
+   "config": {
+    "new_tray_guide": {
+     "headline": "Managing Your Desktop Pet",
+     "body": "Use the system tray icon anytime to summon, hide, or adjust pet interaction settings on your desktop.",
+     "layout": "checklist"
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_tray_guide"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new instructional screen after home_intro while retaining all required onboarding steps is permitted under rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.017,
+   "score": 0.27,
+   "score_note": "New screens at finish step historically show negative lift (-1.7%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Path Option Cards Stage Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the choose path selection interface using an interactive stage layout with animated character preview cards.",
+   "why": "The choose_path step sees a 20.4% drop-off with a mean time of 514s, indicating initial user hesitation when picking a path.",
+   "config": {
+    "choose_path": {
+     "layout": "stage",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Desktop Pet Trait Demonstration Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Add an interactive demonstration flow on the final welcome screen showing live desktop pet cursor reactions before finishing setup.",
+   "why": "Users frequently contact support post-setup about confusion controlling or interacting with their desktop pet.",
+   "config": {
+    "home_intro": {
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "animation",
+        "asset": "asset:pet_interactive_demo",
+        "style": "playful"
+       }
+      ]
+     }
+    },
+    "new_demo_flow": {
+     "headline": "Test Pet Reactions",
+     "body": "Hover over your pet to see live reactions before completing setup.",
+     "layout": "centered"
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_demo_flow"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  },
+  {
+   "title": "Sign-In Existing Account Sync Reassurance",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add a prominent sync reassurance hint explaining that signing into an existing account immediately retrieves and restores existing pets and progress.",
+   "why": "The top support theme is pets missing or reset after signing in again (8 support emails).",
+   "config": {
+    "sign_in": {
+     "hint": "Signing into your existing account will automatically restore all your saved pets and progress."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an informational sync reassurance hint to the sign-in screen is permitted under rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.014,
+   "score": 9.67,
+   "score_note": "Top support theme addressed with a proven sign-in hint pattern (+1.4% avg).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Desktop Render Activity Progress Status Stream",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display a dynamic status activity text component on the waiting screen explaining current background generation stages such as asset extraction and desktop tray hookup.",
+   "why": "The home waiting step has a high median wait time of 201s, and wait_info changes have driven 4 past test wins.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "progress",
+       "style": "highlight"
+      },
+      {
+       "type": "text",
+       "text": "Hooking pet assets into OS system tray...",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding dynamic generation activity status information to the waiting screen is permitted under rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.015,
+   "score": 5.26,
+   "score_note": "Home wait_info is a reliable winning category with 4 past wins (+1.1% avg).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Photo Lighting and Angle Guidance Notice",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add a clear photo quality hint recommending high-contrast lighting and clear front angles to avoid custom pet generation errors.",
+   "why": "Support mail logged 3 reports of custom pet generation failing or looking wrong, and adoption is the main funnel drop point (66.2% conversion).",
+   "config": {
+    "upload_photos": {
+     "hint": "For best results, upload clear photos with direct lighting and visible pet facial features."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding photo guidance hints to the upload photos screen is allowed under rule 4."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.005,
+   "score": 9.42,
+   "score_note": "Targets highest dropoff step, but adoption hints have trended negative (-1.3%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Desktop Trait Mastery Bonus Incentive",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Add a visual badge incentive on the final welcome screen highlighting unlocked starter desktop animation items.",
+   "why": "Finish step conversion drops to 75.6% with mean completion times of 5815s; incentives help drive final step completion.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Bonus Unlocked: Starter Desktop Animation Pack",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions 'Bonus Unlocked', violating Rule 3 which forbids mentioning discounts, gifts, bonuses, or free extras."
+   }
+  },
+  {
+   "title": "Desktop Spawn Ready Desktop Alert Notification",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable an optional desktop alert system prompt on the render screen that notifies users when rendering completes if the app is minimized.",
+   "why": "Long background render times (median 201s, mean 2336s) cause users to minimize the app and lose track of onboarding.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "hint": "We will send a system notification as soon as your pet is ready on your desktop."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an optional completion notification prompt on the waiting screen is permitted under rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.006,
+   "score": 0.13,
+   "score_note": "Home notification changes showed no clear effect across agreeing tests."
+  },
+  {
+   "title": "Split Stage Adoption Certificate View",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Reorganize the adoption certificate screen into a split layout separating pet summary details from naming and confirmation controls.",
+   "why": "Adoption has the highest funnel drop-off (66.2% conversion), indicating layout friction during certificate completion.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "split"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reorganizing the adoption certificate screen layout without removing required elements or function is permitted under rule 4."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.01,
+   "score": 0.27,
+   "score_note": "Targets highest dropoff step, but adoption layout redesigns consistently underperform."
+  }
+ ],
+ "picked": [
+  "Desktop Tray Control Instructions Screen",
+  "Sign-In Existing Account Sync Reassurance",
+  "Photo Lighting and Angle Guidance Notice",
+  "Desktop Render Activity Progress Status Stream"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-60",
+   "title": "Desktop Tray Control Instructions Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7581,
+     "treatment": 0.8053,
+     "lift": 0.0623,
+     "lift_se": 0.0231,
+     "p": 0.005385
+    },
+    "finish": {
+     "control": 0.305,
+     "treatment": 0.313,
+     "lift": 0.0262,
+     "lift_se": 0.0396,
+     "p": 0.502521
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 0.27,
+   "predicted_lift": -0.017,
+   "true_lift_hidden": 0.0408,
+   "finishers_delta_hidden": 37.9
+  },
+  {
+   "test": "sim-61",
+   "title": "Sign-In Existing Account Sync Reassurance",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.8023,
+     "treatment": 0.839,
+     "lift": 0.0458,
+     "lift_se": 0.0142,
+     "p": 0.000932
+    },
+    "finish": {
+     "control": 0.3103,
+     "treatment": 0.32,
+     "lift": 0.0311,
+     "lift_se": 0.0393,
+     "p": 0.420323
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 9.67,
+   "predicted_lift": 0.014,
+   "true_lift_hidden": 0.0452,
+   "finishers_delta_hidden": 41.99
+  },
+  {
+   "test": "sim-62",
+   "title": "Photo Lighting and Angle Guidance Notice",
+   "target_step": "adoption",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.659,
+     "treatment": 0.6502,
+     "lift": -0.0133,
+     "lift_se": 0.0232,
+     "p": 0.568507
+    },
+    "finish": {
+     "control": 0.312,
+     "treatment": 0.2893,
+     "lift": -0.0726,
+     "lift_se": 0.0366,
+     "p": 0.05556
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 9.42,
+   "predicted_lift": -0.005,
+   "true_lift_hidden": -0.0273,
+   "finishers_delta_hidden": -25.36
+  },
+  {
+   "test": "sim-63",
+   "title": "Desktop Render Activity Progress Status Stream",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.9416,
+     "treatment": 0.9396,
+     "lift": -0.0021,
+     "lift_se": 0.01,
+     "p": 0.833584
+    },
+    "finish": {
+     "control": 0.3163,
+     "treatment": 0.2877,
+     "lift": -0.0906,
+     "lift_se": 0.0358,
+     "p": 0.015598
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.26,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": -0.0076,
+   "finishers_delta_hidden": -7.06
+  }
+ ],
+ "shipped": [
+  "Desktop Tray Control Instructions Screen",
+  "Sign-In Existing Account Sync Reassurance"
+ ],
+ "ends_week": 15,
+ "weights_next": {
+  "impact": 0.081,
+  "evidence": 0.081,
+  "confidence": 0.179,
+  "cost": 3.659
+ },
+ "lessons_next": [
+  "Predictions frequently overestimated positive impact overall, but underestimated strong wins.",
+  "Home wait_info changes can be helpful (4 winning tests in rounds 3, 4, 7, and 9), though 7 tests showed no clear effect.",
+  "Sign-in hint changes can be helpful (3 winning tests in rounds 4, 6, and 15), though 10 tests showed no clear effect.",
+  "Sign-in reorder and adoption new_flow changes proved consistently harmful across agreeing tests.",
+  "Choose_path layout, finish copy, and home notification changes showed no clear effect across agreeing tests.",
+  "Evidence remains thin or inconsistent for adoption redesign, finish new_flow, finish new_screen, choose_path copy, choose_path redesign, adoption hint, and single-test categories."
+ ]
+}

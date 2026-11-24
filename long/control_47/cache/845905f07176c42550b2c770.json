@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Interactive Pet Personality Traits Selector: Redesign the pet choice screen into a split view with dynamic trait selection cards and active pet animation previews.\n   config: {\"pick_friend\": {\"layout\": \"split\", \"headline\": \"Choose Your Companion's Personality\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Select Trait\", \"style\": \"playful\", \"action\": \"choose\"}, {\"type\": \"preview\", \"asset\": \"asset:pet_preview_traits\", \"style\": \"rounded\"}]}}\n1: [sign_in, new_screen] Account Recovery & Existing Pet Lookup Screen: Add a dedicated account lookup screen before sign in to search and verify previously created pets on cloud storage.\n   config: {\"_order\": [\"story\", \"choose_path\", \"new_account_lookup\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_account_lookup\": {\"headline\": \"Find Your Existing Pets\", \"body\": \"Enter your account email to locate previously saved desktop companions before logging in.\", \"layout\": \"centered\", \"components\": [{\"type\": \"text\", \"text\": \"Cloud Pet Lookup\", \"style\": \"emphasis\"}, {\"type\": \"button\", \"label\": \"Search Account\", \"style\": \"rounded\", \"action\": \"next\"}]}}\n2: [home, new_flow] Live Desktop Environment Calibration Flow: Introduce a desktop environment calibration step right after pet generation to verify desktop bounds and screen rendering.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_calibration\", \"home_intro\"], \"waiting\": {\"notify_when_ready\": true, \"show_progress\": true}, \"new_desktop_calibration\": {\"headline\": \"Calibrating Desktop Bounds\", \"body\": \"Testing screen overlay rendering areas so your pet lands safely on your desktop.\", \"layout\": \"stage\", \"components\": [{\"type\": \"animation\", \"asset\": \"asset:calibration_anim\", \"style\": \"large\"}]}}\n3: [finish, reorder] Onboarding Celebration & Desktop Launch Screen: Insert a dedicated desktop launch ceremony screen immediately before completing onboarding.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_launch_ceremony\", \"home_intro\"], \"home_intro\": {\"headline\": \"Welcome to Your Desktop!\", \"body\": \"Your pet is officially ready to explore your screen.\"}, \"new_desktop_launch_ceremony\": {\"headline\": \"Release Pet to Desktop\", \"body\": \"Click to launch your new companion onto your screen now!\", \"layout\": \"spotlight\", \"components\": [{\"type\": \"button\", \"label\": \"Release Pet Now\", \"style\": \"playful\", \"action\": \"next\"}]}}\n4: [choose_path, copy] Path Decision Quick Summary Callout: Update the choose_path text to explicitly call out estimated times for express adoption versus custom creation.\n   config: {\"choose_path\": {\"headline\": \"Pick Your Pet Journey\", \"body\": \"Choose Express Adoption (1 min) or Custom Creation (3 mins) to start.\", \"hint\": \"You can always create more pets later from your desktop tray.\"}}\n5: [sign_in, hint] Sign-In Freeze Prevention Notice: Display a fallback troubleshooting hint on the sign-in screen if sign-in fails or freezes.\n   config: {\"sign_in\": {\"hint\": \"Screen taking too long? Click refresh or sign in as guest to restore your pet later.\"}}\n6: [adoption, wait_info] Custom Photo Styling Diagnostic Guidelines: Add photo lighting and angle guidance badges directly on the photo upload screen.\n   config: {\"upload_photos\": {\"headline\": \"Upload High Quality Pet Photos\", \"body\": \"Ensure well-lit, front-facing photos for best 3D pet generation results.\", \"hint\": \"Supported formats: JPG, PNG under 10MB.\", \"components\": [{\"type\": \"badge\", \"label\": \"Lighting Check Passed\", \"style\": \"highlight\"}]}}\n7: [home, notification] Desktop Tray Icon Visibility Alert: Show an image hint during the waiting stage pointing to the system tray controls location.\n   config: {\"waiting\": {\"hint\": \"Look for the pet icon in your system tray (bottom right) to manage pet visibility anytime.\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:system_tray_guide\", \"style\": \"plain\"}]}}\n8: [finish, incentive] First Day Starter Item Reward Banner: Display an unlocked gift badge on the welcome intro screen rewarding users for finishing onboarding.\n   config: {\"home_intro\": {\"headline\": \"Your Pet Arrived with a Gift!\", \"body\": \"You unlocked the Free Starter Toy Pack! Find it in your desktop pet menu.\", \"components\": [{\"type\": \"badge\", \"label\": \"Unlocked: Plush Toy\", \"style\": \"playful\"}]}}\n9: [choose_path, layout] Compact Choice Split View Layout: Change choose_path screen layout to split view to present path choices side-by-side cleanly.\n   config: {\"choose_path\": {\"layout\": \"split\", \"headline\": \"Choose Express or Custom Pet\", \"body\": \"Compare path features side-by-side and dive right in.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "The redesign retains the required pet selection functionality on the Pick a Friend screen."
+   },
+   {
+    "index": 1,
+    "pass": false,
+    "rule": 5,
+    "reason": "Adding a new screen requesting the user's account email introduces a new request for personal data."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a calibration screen within onboarding preserves all required steps and screen jobs."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a launch ceremony screen before home_intro is allowed under onboarding customization rules."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding estimated time callouts does not violate any rules and preserves path selection functionality."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a troubleshooting hint to the sign-in screen maintains its core job and complies with rules."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding diagnostic guidelines and badges to the photo upload screen is a valid onboarding enhancement."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Providing a tray icon guide during the waiting screen is permitted and does not alter outside-onboarding screens."
+   },
+   {
+    "index": 8,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy explicitly mentions gifts and free extras ('Free Starter Toy Pack'), violating Rule 3."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating choose_path to a split view maintains the core choices of adopting or creating a pet."
+   }
+  ]
+ }
+}

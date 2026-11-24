@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_screen] Post-Setup Desktop Quick Launch Guide Screen: Adds a dedicated quick launch guide screen immediately after home intro showing how to summon, control, and dock the desktop pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_desktop_launch_guide\"], \"home_intro\": {\"button_label\": \"Continue to Desktop Guide\"}}\n1: [adoption, new_flow] Photo Guidelines Screen Before Upload: Inserts a photo requirements visual guide screen right before photo upload to ensure uploaded images process successfully.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_photo_guidelines\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"upload_photos\": {\"hint\": \"Follow photo criteria for optimal 3D pet rendering.\"}}\n2: [sign_in, reorder] Reorder Sign-In After Photo Upload: Moves sign-in screen to occur right after photo upload, capturing high user investment before certificate creation.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n3: [adoption, redesign] Redesign Upload Photos Screen with Structured Dropzone: Replaces standard photo upload area with an explicit multi-angle photo dropzone component showing sample poses.\n   config: {\"upload_photos\": {\"replace\": {\"photo_upload\": [{\"type\": \"photo_picker\", \"label\": \"Upload Front & Side Pet Photos\", \"style\": \"rounded\", \"action\": \"choose\", \"role\": \"photo_upload\"}]}}}\n4: [sign_in, incentive] Cloud Save Account Sync Banner on Sign-In: Displays a prominent cloud save reassurance badge detailing that pet progress is linked permanently to the account.\n   config: {\"sign_in\": {\"components\": [{\"type\": \"badge\", \"text\": \"Cloud Backup Enabled: Your pet data syncs to this account.\", \"style\": \"highlight\"}]}}\n5: [home, wait_info] Estimated Generation Time Display on Waiting Screen: Enables an explicit estimated time remaining display on the waiting screen while pet generation processes in background.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"body\": \"Your pet model is being built. Feel free to minimize this window.\"}}\n6: [finish, copy] Tray Icon Docking Copy on Home Intro: Updates home intro copy with explicit instructions on how to summon and minimize the pet via system tray.\n   config: {\"home_intro\": {\"headline\": \"Your Pet is Ready on Desktop!\", \"body\": \"Look for your pet icon in the system tray to toggle visibility, open controls, or access settings anytime.\"}}\n7: [choose_path, hint] Path Selection Helper Hint: Adds a clear hint on choose path explaining that pet styles can be changed later without losing progress.\n   config: {\"choose_path\": {\"hint\": \"Don't worry—you can switch between pre-made and custom pets at any time later!\"}}\n8: [sign_in, copy] Sign-In Stalling Fallback Option: Adds explicit sign-in help copy and recovery guidance if authentication window takes long to load.\n   config: {\"sign_in\": {\"hint\": \"Having trouble signing in? Ensure your browser permits popup windows or try signing in via email link.\"}}\n9: [finish, notification] Background Tray Notification Enable Toggle on Home Intro: Enables ready notification toggle on the home intro screen to inform users when background initialization completes.\n   config: {\"home_intro\": {\"notify_when_ready\": true}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a launch guide screen after home_intro is explicitly allowed in onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserting a photo guidelines screen before photo upload is an allowed onboarding sub-flow addition."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Moving sign-in to occur after photo upload is explicitly permitted by onboarding reordering rules."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the upload photos component preserves the photo upload job while improving UX."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a cloud save status banner to sign-in provides helpful context without violating any rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying estimated generation time during a real wait on the waiting screen is permitted."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating home intro copy with desktop controls instructions is allowed within onboarding."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a helpful hint on path selection maintains screen functionality and rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding sign-in recovery copy provides helpful user guidance without violating rules."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling notification settings on home intro is an allowed onboarding feature adjustment."
+   }
+  ]
+ }
+}

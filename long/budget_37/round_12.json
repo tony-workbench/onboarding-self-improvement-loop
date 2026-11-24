@@ -1,0 +1,457 @@
+{
+ "round": 12,
+ "starts_week": 12,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.8220932999999999,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.7695000000000001
+ },
+ "weights_used": {
+  "impact": 1.569,
+  "evidence": 0.98,
+  "confidence": 0.082,
+  "cost": 1.369
+ },
+ "lessons_used": [
+  "Evidence is still thin for adoption (new_screen, redesign), home (new_flow), and choose_path (reorder) changes because only one test has been completed for each.",
+  "Evidence is still thin for finish (new_screen) changes because the two completed tests disagreed after noise correction (+7.7% vs -6.2%).",
+  "Reordering sign_in steps was helpful overall, backed by 4 positive noise-corrected tests including 1 win (+8.0%), though no clear effect was seen in the other 3 tests.",
+  "Predictions were generally too high across most tests, but were too low for the round 8 sign_in reorder test."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Pet Trait Preference Survey Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Inserts a pre-selection quiz screen before pet selection to let users filter companions by trait and activity level.",
+   "why": "Adoption step drops off significantly at 60.9% conversion and takes median 89s / mean 1017s, indicating users feel overwhelmed by options without initial guidance.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "new_trait_quiz",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_trait_quiz": {
+     "headline": "What kind of desktop companion do you prefer?",
+     "body": "Select a personality style to narrow down the best pet options for your workspace.",
+     "layout": "cards",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Quiet Focus, Playful Assistant, Active Mascot",
+       "style": "rounded",
+       "action": "choose"
+      },
+      {
+       "type": "button",
+       "label": "Continue to Pets",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "layout 'cards' must be one of ['card', 'carousel', 'centered', 'checklist', 'compact', 'default', 'full_bleed', 'grid', 'list', 'split', 'spotlight', 'stage', 'story_scroll', 'two_column']"
+   }
+  },
+  {
+   "title": "Interactive Onboarding Desktop Companion Sandbox",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesigns the home intro welcome screen into a split interactive sandbox preview demonstrating desktop controls, hiding shortcuts, and chat options.",
+   "why": "Multiple support tickets report post-onboarding confusion regarding how to control, hide, or talk to their pet.",
+   "config": {
+    "home_intro": {
+     "headline": "Meet Your Desktop Companion!",
+     "body": "Try interacting with your new pet right now before finishing setup.",
+     "layout": "split",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "preview",
+        "text": "Live desktop pet preview box",
+        "style": "rounded",
+        "action": "play"
+       },
+       {
+        "role": "home_welcome",
+        "type": "checklist",
+        "text": "Try dragging, right-clicking for settings, or clicking to talk",
+        "style": "playful",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.replace.home_welcome[0]': a preview cannot do the home_welcome job (use ['animation', 'button', 'checklist', 'image', 'mascot', 'text'])"
+   }
+  },
+  {
+   "title": "Background Pet Preparation Status Stream",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Introduces a status stream screen after waiting that actively confirms rendering, trait setup, and file placement steps.",
+   "why": "The waiting stage takes a long median of 201s and mean of 2336s, leading to drop-offs when users think the app has frozen or stalled.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_prep_status",
+     "home_intro"
+    ],
+    "waiting": {
+     "notify_when_ready": true,
+     "tip_delay_seconds": 10
+    },
+    "new_prep_status": {
+     "headline": "Finalizing Desktop Setup",
+     "body": "Your pet is getting ready for your desktop environment.",
+     "layout": "checklist",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "progress",
+       "text": "Building animations & desktop assets...",
+       "style": "highlight"
+      },
+      {
+       "type": "button",
+       "label": "Launch Pet",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a setup status screen after waiting."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.04,
+   "score": 4.25,
+   "score_note": "Home step has long wait times, but new_flow historically reduced conversion (-8.3%)."
+  },
+  {
+   "title": "Late Sign-In Relocation Prior To Onboarding Completion",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves sign_in screen after pet creation and adoption certificate steps, right before final desktop loading.",
+   "why": "Earlier tests show sign_in step relocation post-adoption improves conversion (+8.0% noise-corrected win in earlier tests), letting users build affinity with their pet before committing an account.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "sign_in",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid reordering of sign in within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 6.16,
+   "score_note": "Reordering sign_in is backed by 4 positive tests including an 8.0% win.",
+   "slot": "big move",
+   "share": 0.7,
+   "planned_harm": 135.3
+  },
+  {
+   "title": "Path Selection Card Carousel Refinement",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Switches the path selection screen layout to an interactive carousel highlighting distinct workspace playstyles.",
+   "why": "Choose path has high mean duration (514s), indicating users linger on selecting a path due to text-heavy layout.",
+   "config": {
+    "choose_path": {
+     "layout": "carousel",
+     "headline": "Select Your Workspace Vibe",
+     "body": "Swipe to explore how your pet will interact with you during work.",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "The choose path screen no longer offers adopting and making your own."
+   }
+  },
+  {
+   "title": "Companion Adoption Completion Progress Incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Adds an official adoption status badge and step progress bar on the adoption certificate screen.",
+   "why": "Adoption has the lowest step conversion rate (60.9%) and long completion times.",
+   "config": {
+    "adoption_certificate": {
+     "show_progress": true,
+     "hint": "Your official pet adoption certificate is almost complete!",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Official Pet Adoption Verified",
+       "style": "highlight"
+      },
+      {
+       "type": "progress",
+       "text": "Step 3 of 4 Complete",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a progress indicator and verification badge to adoption certificate."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 7.37,
+   "score_note": "Adoption step has the highest drop-off (39.1%); progress incentive targets the biggest bottleneck.",
+   "slot": "best score"
+  },
+  {
+   "title": "Pet Rendering Live Tip Ticker",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Adds an automated tip carousel and time estimation ticker on the waiting screen while pet generation finishes.",
+   "why": "Waiting step takes median 201s / mean 2336s, causing user drop-off due to perceived app stalls or lack of progress indicators.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "tip_delay_seconds": 8,
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Tip: You can hide your desktop pet anytime using the taskbar menu.",
+       "style": "calm",
+       "action": "open_tip"
+      },
+      {
+       "type": "timer",
+       "text": "Estimated loading time: ~15 seconds",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'waiting.components[1].text' has characters outside the allowed set: ['~']"
+   }
+  },
+  {
+   "title": "Account Sync Risk Prevention Banner",
+   "target_step": "sign_in",
+   "type": "notification",
+   "change": "Displays a visible warning hint on sign_in instructing returning users to sign in with their original provider to prevent pet resets.",
+   "why": "Support received 8 emails regarding pets missing or reset after signing in with a different account.",
+   "config": {
+    "sign_in": {
+     "hint": "Important: Sign in with your existing Google/Apple account to restore existing pets and avoid accidental account resets."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid instructional hint added to the sign-in screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.03,
+   "score": 8.59,
+   "score_note": "Both funnel and 8 support emails confirm account reset confusion on sign_in."
+  },
+  {
+   "title": "Desktop Visibility & Taskbar Quick Guidance Tip",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Adds a explicit hint callout on home_intro explaining how to locate the pet icon in system tray or taskbar if it does not appear on top immediately.",
+   "why": "3 support tickets reported pets not showing on the desktop or failing to open immediately after onboarding completion.",
+   "config": {
+    "home_intro": {
+     "hint": "Pet not appearing on screen? Check your system tray (Windows) or Menu Bar (Mac) to toggle pet visibility."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid guidance tip added to the home intro screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 6.47,
+   "score_note": "Low-cost hint addressing 3 support tickets regarding missing desktop icon.",
+   "slot": "best score"
+  },
+  {
+   "title": "App Mode Selection Screen",
+   "target_step": "choose_path",
+   "type": "new_screen",
+   "change": "Inserts a high-level usage purpose screen prior to choose_path to differentiate between active companion mode and quiet widget mode.",
+   "why": "Choose path drop-offs and long mean times suggest users need clarity upfront on how the app operates on desktop before selecting specific paths.",
+   "config": {
+    "_order": [
+     "story",
+     "new_mode_select",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_mode_select": {
+     "headline": "How do you want your pet to live on your desktop?",
+     "body": "Choose your primary goal for a tailored onboarding journey.",
+     "layout": "spotlight",
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Interactive Desktop Friend, Quiet Background Widget",
+       "style": "large",
+       "action": "choose"
+      },
+      {
+       "type": "button",
+       "label": "Continue",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid insertion of an app mode selection screen within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.02,
+   "score": 3.43,
+   "score_note": "Adding a new screen to choose_path risks introducing extra friction."
+  }
+ ],
+ "picked": [
+  "Late Sign-In Relocation Prior To Onboarding Completion"
+ ],
+ "held_by_harm_budget": [
+  "Companion Adoption Completion Progress Incentive",
+  "Desktop Visibility & Taskbar Quick Guidance Tip"
+ ],
+ "harm_budget": 143.2,
+ "planned_harm": 135.3,
+ "decisions": [
+  {
+   "test": "sim-11",
+   "title": "Late Sign-In Relocation Prior To Onboarding Completion",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.7,
+   "planned_harm": 135.3,
+   "result": {
+    "step": {
+     "control": 0.8212,
+     "treatment": 0.8599,
+     "lift": 0.0471,
+     "lift_se": 0.0161,
+     "p": 0.002686
+    },
+    "finish": {
+     "control": 0.2624,
+     "treatment": 0.2614,
+     "lift": -0.0036,
+     "lift_se": 0.0516,
+     "p": 0.944042
+    },
+    "users_per_group": 2100
+   },
+   "outcome": "won, shipped",
+   "score": 6.16,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.0324,
+   "finishers_delta_hidden": 16.74
+  }
+ ],
+ "shipped": [
+  "Late Sign-In Relocation Prior To Onboarding Completion"
+ ],
+ "ends_week": 12,
+ "weights_next": {
+  "impact": 1.66,
+  "evidence": 0.828,
+  "confidence": 0.081,
+  "cost": 1.431
+ },
+ "lessons_next": [
+  "Evidence is still thin for adoption (new_screen, redesign), home (new_flow), and choose_path (reorder) changes because only one test has been completed for each.",
+  "Evidence is still thin for finish (new_screen) changes because the two completed tests disagreed after noise correction (+7.8% vs -6.2%).",
+  "Reordering sign_in steps was helpful overall, backed by 2 winning tests (+8.0% and +4.1%), though no clear effect was seen in the other 3 tests.",
+  "Predictions were generally too high across most tests, but were too low for the round 8 sign_in reorder test."
+ ]
+}

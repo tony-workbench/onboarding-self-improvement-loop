@@ -1,0 +1,464 @@
+{
+ "round": 2,
+ "starts_week": 2,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.8312058000000001,
+  "adoption": 0.6300714,
+  "home": 0.8534061000000001,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "Reordering sign-in until after pet adoption was effective and slightly outperformed predictions (+13.3% measured vs +12.0% predicted).",
+  "Home page redesigns like interactive waiting rooms are helpful (+5.6% measured), though initial predictions were too high (+8.0% predicted).",
+  "Adoption incentives like photo quality guides and companion previews improved results (+7.6% measured), but were overestimated (+10.0% predicted)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Story Narrative Companion Carousel Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Replace the standard story intro layout with a split view animated preview showcasing interactive pet moments before users pick a path.",
+   "why": "choose_path has a 23.8% drop-off rate and a high mean completion time of 514s, showing initial hesitation during story introduction.",
+   "config": {
+    "story": {
+     "layout": "split",
+     "headline": "Meet Your New Desktop Companion",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "animation",
+        "asset": "asset:pet_intro_anim",
+        "style": "playful"
+       },
+       {
+        "role": "intro_story",
+        "type": "text",
+        "text": "Choose how you want to bring your pet to life.",
+        "style": "plain"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'story.intro_story' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'video'] with an asset:story/ asset"
+   }
+  },
+  {
+   "title": "Pet Personality Calibration Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Add a dedicated pet personality choice screen before photo upload so users can define their pet's interactive traits.",
+   "why": "The adoption step drops 37% of users and takes 1017s mean; custom personality choice creates immediate ownership and engagement.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "new_personality",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "pick_friend": {
+     "headline": "Personalize Your Pet's Temperament"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_personality']"
+   }
+  },
+  {
+   "title": "Move Sign-In to Onboarding Hand-off",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder the sign-in step to occur right after pet generation finishes, immediately before introducing the pet on the desktop.",
+   "why": "8 support tickets cited pets missing after logging back in; placing sign-in right before desktop delivery reinforces cloud sync.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "sign_in",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to occur after waiting/adoption is explicitly allowed by rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.133,
+   "score": 6.67,
+   "score_note": "Reordering sign-in directly addresses 8 support tickets and matches proven historical lift (+13.3%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 155.3
+  },
+  {
+   "title": "Interactive Mini Games Waiting Experience",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Rebuild the waiting screen into a dynamic stage layout equipped with companion interaction mini-games while asset rendering takes place.",
+   "why": "Home waiting step has a long median duration of 201s (mean 2336s); active entertainment reduces abandonments while pets render.",
+   "config": {
+    "waiting": {
+     "layout": "stage",
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Play while your pet gets ready!",
+       "style": "playful"
+      },
+      {
+       "type": "timer",
+       "text": "Estimated ready time",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.components[1]': timer text must read like 'About 4 min left' (at most 30 min)"
+   }
+  },
+  {
+   "title": "Cloud Save Status & Sync Assurance Badge",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Display a prominent cloud save assurance hint and status badge on the sign-in screen.",
+   "why": "8 emails reported pets missing or reset after signing in again; clear messaging prevents confusion about saved pet data.",
+   "config": {
+    "sign_in": {
+     "hint": "Your adopted pet and custom settings are automatically saved to this account.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Cloud Save Active",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a cloud save status hint and badge to the sign-in screen is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.06,
+   "score": 7.08,
+   "score_note": "High evidence (8 emails) and config-only change, but sign-in step drop is moderate."
+  },
+  {
+   "title": "Custom Pet Generation Guarantee Badge",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Add a satisfaction guarantee badge and live quality helper to the photo upload screen.",
+   "why": "3 support tickets reported custom pet generation failures or unexpected rendering, causing adoption drop-offs.",
+   "config": {
+    "upload_photos": {
+     "hint": "Free instant retries included until your pet looks exactly how you want!",
+     "components": [
+      {
+       "type": "badge",
+       "text": "100% Custom Pet Guarantee",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions 'Free instant retries', which violates rule 3 forbidding mentions of prices, discounts, gifts, or free extras."
+   }
+  },
+  {
+   "title": "Desktop Interaction Shortcut Checklist Layout",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Change the home intro layout to a checklist format outlining primary pet commands like hiding, moving, and chatting.",
+   "why": "3 support tickets reported post-onboarding confusion regarding how to control, hide, or talk to the desktop pet.",
+   "config": {
+    "home_intro": {
+     "layout": "checklist",
+     "headline": "How to Interact With Your Pet",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "checklist",
+        "text": "Click pet to chat • Drag to move • Double-click tray to hide",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.replace.home_welcome[0].text' has characters outside the allowed set: ['•']"
+   }
+  },
+  {
+   "title": "Live 3D Render Hatching Progress Tracker",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Enable live progress percentage bar and detailed status updates during the pet creation wait screen.",
+   "why": "The waiting step mean time reaches 2336s; explicit progress indicators assure users the desktop app is actively working.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "hint": "Generating 3D mesh and animations for your companion...",
+     "components": [
+      {
+       "type": "progress",
+       "text": "Building 3D Companion...",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress indicators and live status updates to the waiting screen is explicitly allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.056,
+   "score": 4.58,
+   "score_note": "Addresses extreme mean wait time (2336s) at home step, but requires custom UI build.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 155.3
+  },
+  {
+   "title": "System Tray Location & Shortcut Notification Tip",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Add a reminder hint showing users where the app lives in the desktop taskbar and how to summon the pet.",
+   "why": "3 support messages noted pets failing to display on desktop or users unable to re-open the app after setup.",
+   "config": {
+    "home_intro": {
+     "hint": "Look for your pet on your desktop! Use the system tray icon to show or hide your companion anytime.",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Tip: Press Ctrl+Shift+P to summon your pet instantly.",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding system tray location hints and shortcut tips to the home intro screen is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.075,
+   "score": 7.92,
+   "score_note": "Targets high finish step drop (35.2%) with minimal config-only tip implementation.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 101.1
+  },
+  {
+   "title": "Simplified Onboarding Path Selection Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Revise the choose_path headline and body copy to clearly differentiate instant starter pets from photo custom creations.",
+   "why": "choose_path mean duration is 514s despite low median (8s), showing long-tail confusion when selecting an adoption path.",
+   "config": {
+    "choose_path": {
+     "headline": "Choose How to Adopt Your Companion",
+     "body": "Pick a ready-to-play starter pet in seconds, or create a unique companion from your own photos."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating choose_path copy while maintaining both adoption options is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.065,
+   "score": 7.08,
+   "score_note": "Addresses 514s mean duration confusion on path selection via easy copy tweak.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 155.3
+  }
+ ],
+ "picked": [
+  "Move Sign-In to Onboarding Hand-off",
+  "System Tray Location & Shortcut Notification Tip",
+  "Simplified Onboarding Path Selection Copy",
+  "Live 3D Render Hatching Progress Tracker"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 567.0,
+ "decisions": [
+  {
+   "test": "sim-4",
+   "title": "Move Sign-In to Onboarding Hand-off",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 155.3,
+   "result": {
+    "step": {
+     "control": 0.7913,
+     "treatment": 0.808,
+     "lift": 0.0211,
+     "lift_se": 0.0154,
+     "p": 0.167632
+    },
+    "finish": {
+     "control": 0.1743,
+     "treatment": 0.1793,
+     "lift": 0.0287,
+     "lift_se": 0.0573,
+     "p": 0.61176
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.67,
+   "predicted_lift": 0.133,
+   "true_lift_hidden": 0.014,
+   "finishers_delta_hidden": 7.45
+  },
+  {
+   "test": "sim-6",
+   "title": "Simplified Onboarding Path Selection Copy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 155.3,
+   "result": {
+    "step": {
+     "control": 0.7393,
+     "treatment": 0.7397,
+     "lift": 0.0005,
+     "lift_se": 0.0153,
+     "p": 0.976535
+    },
+    "finish": {
+     "control": 0.1667,
+     "treatment": 0.165,
+     "lift": -0.01,
+     "lift_se": 0.0573,
+     "p": 0.862217
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.08,
+   "predicted_lift": 0.065,
+   "true_lift_hidden": 0.024,
+   "finishers_delta_hidden": 12.77
+  },
+  {
+   "test": "sim-7",
+   "title": "Live 3D Render Hatching Progress Tracker",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 155.3,
+   "result": {
+    "step": {
+     "control": 0.8122,
+     "treatment": 0.8263,
+     "lift": 0.0174,
+     "lift_se": 0.021,
+     "p": 0.401958
+    },
+    "finish": {
+     "control": 0.179,
+     "treatment": 0.184,
+     "lift": 0.0279,
+     "lift_se": 0.0564,
+     "p": 0.615371
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.58,
+   "predicted_lift": 0.056,
+   "true_lift_hidden": 0.0084,
+   "finishers_delta_hidden": 4.47
+  }
+ ],
+ "shipped": [],
+ "ends_week": 2,
+ "weights_next": {
+  "impact": 1.332,
+  "evidence": 0.796,
+  "confidence": 1.056,
+  "cost": 0.816
+ },
+ "lessons_next": [
+  "Moving sign-in until after pet adoption was effective and slightly outperformed predictions (+13.3% measured vs +12.0% predicted), but moving sign-in to onboarding hand-off showed no clear effect.",
+  "Home page redesigns like interactive waiting rooms were helpful (+5.6% measured), though predictions were too high (+8.0% predicted).",
+  "Adoption incentives like photo quality guides and companion previews were helpful (+7.6% measured), but were overestimated (+10.0% predicted).",
+  "Simplifying onboarding path selection copy showed no clear effect.",
+  "Adding live 3D render hatching progress trackers to the home page showed no clear effect."
+ ]
+}

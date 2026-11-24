@@ -1,0 +1,470 @@
+{
+ "round": 2,
+ "starts_week": 2,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.836,
+  "evidence": 0.628,
+  "confidence": 0.761,
+  "cost": 1.775
+ },
+ "lessons_used": [
+  "Evidence is still thin for all change types (adoption redesign, choose_path copy, finish notification, home wait_info, sign_in reorder) since each has only one test.",
+  "No clear effect was seen across any of the tested changes, as no test achieved a statistically significant result.",
+  "Predictions were generally too high compared to measured and noise-corrected results."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Companion Personality Showcase Stage",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the friend selection screen into a stage layout with pet choice cards showcasing distinct personalities.",
+   "why": "Adoption conversion drops to 60.9% with a median time of 89s; a stage layout with distinct visual personality choices helps users choose faster.",
+   "config": {
+    "pick_friend": {
+     "layout": "stage",
+     "headline": "Meet Your Desktop Companion",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Select Companion",
+       "style": "playful",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the friend selection screen while preserving the ability to choose a pet."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.015,
+   "score": 2.61,
+   "score_note": "High drop-off step, but adoption redesign showed negative lift in prior tests.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Desktop Controls and Interaction Guide",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Adds a new guidance screen after home_intro explaining how to control, summon, hide, and interact with the desktop pet.",
+   "why": "Support received multiple tickets about confusion on controlling, hiding, or talking to pets, plus desktop feature misbehavior after setup.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_controls_guide"
+    ],
+    "home_intro": {
+     "button_label": "Learn Desktop Controls"
+    },
+    "new_controls_guide": {
+     "headline": "How to Interact with Your Pet",
+     "body": "Click to pet, drag to move, or right-click for options. Use system tray to hide or call back your companion.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "checklist",
+       "label": "Controls Quick Guide",
+       "style": "rounded",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new controls guide screen after home_intro, which is permitted by onboarding rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.015,
+   "score": 3.91,
+   "score_note": "Strong evidence from support mail and funnel, but adding a new screen increases friction and cost.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 66.8
+  },
+  {
+   "title": "Interactive Hatching Warmup Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Introduces an interactive hatching warmup screen right before the waiting screen to keep users entertained while pet assets finish generating.",
+   "why": "The waiting step has a median duration of 201s and mean of 2336s; interactive visual feedback reduces drop-offs during preparation.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_hatching_warmup",
+     "waiting"
+    ],
+    "waiting": {
+     "headline": "Your Pet is Arriving!"
+    },
+    "new_hatching_warmup": {
+     "headline": "Preparing Your Pet's New Home",
+     "body": "Tap to interact while your desktop companion finishes hatching!",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:hatching_egg",
+       "style": "playful",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order leaves out existing screens ['home_intro']: no step may be removed"
+   }
+  },
+  {
+   "title": "Cloud Account Persistence Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesigns the sign-in screen into a focused card layout highlighting automatic cloud backup for saved pet states.",
+   "why": "Top support theme (8 emails) reported missing or reset pets after signing in again; framing sign-in around data protection builds confidence.",
+   "config": {
+    "sign_in": {
+     "layout": "card",
+     "headline": "Secure Your Pet to the Cloud",
+     "body": "Sign in so your pet companion and custom settings are safely saved across restarts and updates.",
+     "hint": "Your pet state is permanently linked to your account credentials.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Cloud Account Protection Active",
+       "style": "emphasis",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.components[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Persistent Session Recovery Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Adds an explicit hint explaining how account login protects pet customization and stats across launches.",
+   "why": "8 support emails complained about pets resetting after sign-in, indicating confusion around account sync.",
+   "config": {
+    "sign_in": {
+     "hint": "Use the same login email to keep your adopted pet, stats, and custom items synced safely."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Companion Care Tips During Setup Wait",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays a tip carousel component on the waiting screen featuring companion care tips and shortcuts.",
+   "why": "Home wait median time is 201s; providing engaging tips reduces perceived wait time and prepares users for post-onboarding interactions.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Quick Tip: Right-click your pet on the desktop anytime for care options.",
+       "style": "subtle",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enhances the waiting screen with care tips while maintaining its core function."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.01,
+   "score": 3.44,
+   "score_note": "Target step has good conversion, and wait_info changes previously produced negative lift.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Desktop Companion Value Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Updates story screen headline and body text to clearly explain the benefits of having a desktop companion before choosing a path.",
+   "why": "Mean time on choose_path is 514s; setting clear expectations early on the story screen helps users decide quickly.",
+   "config": {
+    "story": {
+     "headline": "Meet Your New Desktop Workspace Buddy",
+     "body": "Choose your journey: adopt a pre-made companion or build a custom pet to keep you company while you work.",
+     "button_label": "Start Journey"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates story copy to introduce the desktop companion."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.005,
+   "score": 6.61,
+   "score_note": "Cheap text-only change with a slightly positive prior test result.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Official Adoption Seal Badge",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Adds a companion adoption seal badge to the adoption certificate screen to celebrate completing the pet choice.",
+   "why": "Adoption stage has the lowest conversion rate (60.9%); adding a tangible completion seal strengthens motivation.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Official Adoption Certificate",
+     "body": "Congratulations! Your desktop companion adoption is officially registered.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Certified Desktop Pet Companion",
+       "style": "highlight",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "Replaces the required official stamp on the adoption certificate with a generic badge that does not read as an official stamp."
+   }
+  },
+  {
+   "title": "First-Time Desktop Summoning Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Adds a prominent hint on home_intro showing shortcut keys and tray controls for summoning the pet.",
+   "why": "Users wrote to support asking how to control or bring back pets after onboarding finished.",
+   "config": {
+    "home_intro": {
+     "hint": "Your pet lives on your desktop screen! Click the system tray icon to summon, hide, or manage your pet anytime."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a desktop pet shortcut hint to home_intro."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.018,
+   "score": 6.13,
+   "score_note": "High evidence from support tickets and funnel with positive prior signal for finish hints."
+  },
+  {
+   "title": "Structured Photo Upload Guidance Layout",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Changes upload_photos layout to split with a clear photo recommendation checklist component.",
+   "why": "3 support tickets noted custom pet generation failures or bad results; clear upload guidance prevents poor input photos.",
+   "config": {
+    "upload_photos": {
+     "layout": "split",
+     "headline": "Upload Clear Companion Photos",
+     "hint": "For best custom pet results, upload bright, forward-facing photos.",
+     "components": [
+      {
+       "type": "checklist",
+       "label": "Upload Checklist: Front view, well-lit, clear background",
+       "style": "calm",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.components[0].label' must be text up to 40 characters"
+   }
+  }
+ ],
+ "picked": [
+  "Desktop Controls and Interaction Guide",
+  "Companion Personality Showcase Stage",
+  "Desktop Companion Value Headline",
+  "Companion Care Tips During Setup Wait"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 374.9,
+ "decisions": [
+  {
+   "test": "sim-6",
+   "title": "Desktop Controls and Interaction Guide",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 66.8,
+   "result": {
+    "step": {
+     "control": 0.5984,
+     "treatment": 0.6615,
+     "lift": 0.1054,
+     "lift_se": 0.0611,
+     "p": 0.068714
+    },
+    "finish": {
+     "control": 0.154,
+     "treatment": 0.172,
+     "lift": 0.1169,
+     "lift_se": 0.0926,
+     "p": 0.182012
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.91,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": 0.0411,
+   "finishers_delta_hidden": 10.05
+  },
+  {
+   "test": "sim-8",
+   "title": "Desktop Companion Value Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.746,
+     "treatment": 0.7647,
+     "lift": 0.025,
+     "lift_se": 0.0213,
+     "p": 0.234376
+    },
+    "finish": {
+     "control": 0.156,
+     "treatment": 0.1887,
+     "lift": 0.2094,
+     "lift_se": 0.0973,
+     "p": 0.017847
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.61,
+   "predicted_lift": 0.005,
+   "true_lift_hidden": 0.0047,
+   "finishers_delta_hidden": 1.15
+  },
+  {
+   "test": "sim-9",
+   "title": "Companion Care Tips During Setup Wait",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.7958,
+     "treatment": 0.8017,
+     "lift": 0.0074,
+     "lift_se": 0.0328,
+     "p": 0.820741
+    },
+    "finish": {
+     "control": 0.1547,
+     "treatment": 0.1613,
+     "lift": 0.0431,
+     "lift_se": 0.088,
+     "p": 0.616682
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.44,
+   "predicted_lift": -0.01,
+   "true_lift_hidden": 0.0173,
+   "finishers_delta_hidden": 4.23
+  }
+ ],
+ "shipped": [],
+ "ends_week": 2,
+ "weights_next": {
+  "impact": 0.574,
+  "evidence": 0.517,
+  "confidence": 0.584,
+  "cost": 2.325
+ },
+ "lessons_next": [
+  "Evidence is still thin for adoption redesign, finish new_screen, finish notification, and sign_in reorder, as each has only one test.",
+  "No clear effect was seen for choose_path copy across 2 tests; despite leaning positive, neither test was statistically significant.",
+  "No clear effect was seen for home wait_info across 2 tests.",
+  "No kind of change can be called helpful yet, as no test achieved a statistically significant win.",
+  "Predictions were overly optimistic in round 1, but underestimated measured outcomes in round 2 when predicting lower or negative gains."
+ ]
+}

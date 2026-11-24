@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, hint] Sign-In Pet Profile Sync Preservation Hint: Adds a clear hint on the sign-in screen explaining that signing in restores existing pet profiles and syncs pet memory across devices.\n   config: {\"sign_in\": {\"hint\": \"Signing in automatically restores your saved pet memory, active traits, and cloud sync across all devices.\"}}\n1: [finish, new_screen] Desktop Pet Quick Interaction Hotkey Cheat-Sheet Screen: Adds a new screen right after home intro displaying an interactive hotkey reference map for pet visibility, summoning, and voice controls.\n   config: {\"new_desktop_hotkey_cheatsheet\": {\"headline\": \"Master Desktop Pet Commands\", \"body\": \"Press Option+Space to summon your pet, Option+H to hide, or Option+V to talk instantly.\", \"components\": [{\"type\": \"checklist\", \"text\": \"Option+Space: Summon Pet\", \"style\": \"rounded\"}, {\"type\": \"checklist\", \"text\": \"Option+H: Hide to Tray\", \"style\": \"rounded\"}, {\"type\": \"checklist\", \"text\": \"Option+V: Voice Interaction\", \"style\": \"rounded\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_desktop_hotkey_cheatsheet\"]}\n2: [finish, redesign] Desktop Tray Control & Shortcut Interactive Redesign: Redesigns the home_intro welcome screen using interactive quick-action components that demonstrate system tray minimization and shortcut key toggles.\n   config: {\"home_intro\": {\"headline\": \"Quick System Controls & Shortcuts\", \"body\": \"Your pet lives in your desktop system tray. Practice toggling controls below before getting started.\", \"replace\": {\"home_welcome\": [{\"type\": \"button\", \"role\": \"home_welcome\", \"label\": \"Test System Tray Hide (Option+H)\", \"action\": \"next\", \"style\": \"playful\"}, {\"type\": \"button\", \"role\": \"home_welcome\", \"label\": \"Test Voice Command (Option+V)\", \"action\": \"next\", \"style\": \"highlight\"}]}}}\n3: [home, wait_info] Desktop Pet Trait Loading Stage Time Indicator: Displays a clear live processing stage indicator and estimated completion timer while rendering the custom pet visual on the waiting screen.\n   config: {\"waiting\": {\"headline\": \"Generating Your Desktop Companion\", \"body\": \"We are assembling animations, personality traits, and sound profiles for your pet.\", \"show_time_estimate\": true, \"show_progress\": true, \"tip_delay_seconds\": 10}}\n4: [sign_in, hint] Sign-In Multi-Device Profile Restoration Hint: Displays a reassuring notice above sign-in options confirming that logging in prevents duplicate profiles and links cloud memory.\n   config: {\"sign_in\": {\"hint\": \"Logging in connects your cloud account so your pet profile, level, and items are never reset or lost.\"}}\n5: [finish, new_flow] Desktop Pet Quick Command Training Flow: Introduces a brief interactive training flow screen at the finish step where users practice summoning, dragging, and muting their desktop pet.\n   config: {\"new_quick_command_training\": {\"headline\": \"Desktop Pet Control Practice\", \"body\": \"Try out pet commands right now on your desktop overlay before completing setup.\", \"components\": [{\"type\": \"button\", \"label\": \"Summon Pet Overlay\", \"action\": \"next\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Toggle Quiet Mode\", \"action\": \"next\", \"style\": \"subtle\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_quick_command_training\"]}\n6: [adoption, wait_info] Pet Trait Generation Live Status Step Info: Adds live status updates showing pet trait assembly, texture synthesis, and custom audio preview during adoption photo processing.\n   config: {\"upload_photos\": {\"hint\": \"Generating 3D mesh and trait audio... This usually takes 30-60 seconds.\", \"show_progress\": true, \"show_time_estimate\": true}}\n7: [finish, new_screen] Desktop Tray & Visibility Quick Reference Screen: Adds a dedicated system tray and visibility reference screen at the end of onboarding that explains how to reveal, hide, or pin the pet window.\n   config: {\"new_tray_visibility_screen\": {\"headline\": \"Managing Desktop Pet Visibility\", \"body\": \"If your pet disappears or desktop focus shifts, click the tray icon or use Option+H to toggle visibility instantly.\", \"components\": [{\"type\": \"text\", \"text\": \"1. System Tray Icon: Click to show/hide context menu.\", \"style\": \"plain\"}, {\"type\": \"text\", \"text\": \"2. Global Hotkey: Option+H toggles desktop visibility.\", \"style\": \"plain\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_tray_visibility_screen\"]}\n8: [adoption, hint] Custom Pet Trait Rendering Fallback Hint: Adds a helpful status hint on the photo upload screen guaranteeing high-quality preset fallback if photo trait generation fails or stalls.\n   config: {\"upload_photos\": {\"hint\": \"If photo trait synthesis encounters issues, default aesthetic presets will be automatically applied so your pet loads smoothly.\"}}\n9: [choose_path, hint] Path Selection Trait Customization Hint: Adds a clear hint on choose_path explaining how chosen path options influence pet interactions and initial desktop behavior.\n   config: {\"choose_path\": {\"hint\": \"Your selected path determines your pet's starting personality traits, background story, and initial hotkey actions.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a clear hint to the sign-in screen without violating any onboarding, pricing, or fair design rules."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new quick-reference screen following home_intro while preserving all required onboarding steps."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns components within home_intro without removing any required step, job, or introducing unfair patterns."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds progress and real-time processing indicators to the waiting screen, which is explicitly allowed."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an informative sync hint on sign-in without mentioning pricing, gifts, or unfair nudges."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new interactive training flow screen after home_intro while retaining all required steps."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds real wait processing progress and time estimation info to photo upload during pet generation."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid system tray reference screen after home_intro while preserving the complete onboarding order."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a fallback status hint to photo upload without changing functionality, pricing, or fair design standards."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an informative hint to choose_path screen that complies with all base rules."
+   }
+  ]
+ }
+}

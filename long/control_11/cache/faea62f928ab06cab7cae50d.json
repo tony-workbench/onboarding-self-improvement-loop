@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Interactive Adoption Personality Matrix Stage: Redesign the friend selection screen into an interactive personality matrix grid with live trait radar charts and direct pet voice previews.\n   config: {\"pick_friend\": {\"layout\": \"grid\", \"headline\": \"Match Your Pet Personality\", \"body\": \"Select traits and hear your pet respond in real time before adopting.\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Personality Matrix\", \"style\": \"playful\", \"action\": \"choose\"}, {\"type\": \"preview\", \"asset\": \"asset:personality_radar\", \"style\": \"rounded\"}, {\"type\": \"sound\", \"action\": \"play\", \"label\": \"Listen to Voice\"}]}}\n1: [home, new_screen] Desktop Pet Spawn Zone Playground Screen: Introduce a new interactive desktop positioning preview screen (new_desktop_spawn_zone) right before the waiting phase so users choose where their pet first appears on screen.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_desktop_spawn_zone\", \"waiting\", \"home_intro\"], \"new_desktop_spawn_zone\": {\"layout\": \"spotlight\", \"headline\": \"Choose Desktop Landing Zone\", \"body\": \"Pick where your desktop pet should first appear when setup completes.\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:screen_position_picker\", \"style\": \"emphasis\"}, {\"type\": \"button\", \"label\": \"Confirm Landing Zone\", \"action\": \"next\"}]}}\n2: [adoption, reorder] Certificate First Adoption Workflow Sequence: Move the adoption certificate screen before pet customization and photo uploads so users feel immediate ownership and commitment.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"adoption_certificate\", \"pick_friend\", \"upload_photos\", \"waiting\", \"home_intro\"], \"adoption_certificate\": {\"headline\": \"Your Official Adoption Registry\", \"body\": \"Name your companion first to issue your official desktop pet certificate.\"}}\n3: [finish, new_flow] Interactive Desktop Tray Command Sandbox Flow: Transform the final onboarding step into an active sandbox where users test desktop pet commands, hiding/showing controls, and system tray shortcuts.\n   config: {\"home_intro\": {\"layout\": \"split\", \"headline\": \"Desktop Pet Command Sandbox\", \"body\": \"Try out keyboard shortcuts and desktop tray controls right here before finishing setup.\", \"components\": [{\"type\": \"checklist\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Test System Tray Hide/Show\", \"action\": \"next\"}]}}\n4: [home, wait_info] Background Generation Activity Progress Log: Display a multi-stage background asset assembly timeline with detailed status updates on the waiting screen.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"headline\": \"Assembling Desktop Pet Engine\", \"body\": \"We are preparing high-FPS desktop animation models and audio assets.\", \"components\": [{\"type\": \"progress\", \"style\": \"emphasis\"}, {\"type\": \"timer\", \"style\": \"subtle\"}]}}\n5: [choose_path, copy] Instant Preset vs Custom Pet Expectation Header: Clarify path selection headlines with explicit setup time expectations (e.g. 30-second Preset vs Custom AI Generation).\n   config: {\"choose_path\": {\"headline\": \"Choose Your Pet Creation Experience\", \"body\": \"Select Instant Preset (Ready in 30s) or Custom Studio Pet (Unique AI Design).\", \"components\": [{\"type\": \"badge\", \"label\": \"Instant: 30 Seconds\", \"style\": \"highlight\"}, {\"type\": \"badge\", \"label\": \"Custom: AI Generated\", \"style\": \"rounded\"}]}}\n6: [sign_in, incentive] Account Cloud Recovery Sync Guarantee Badge: Add an explicit Cloud Pet Recovery Guarantee badge on the sign-in screen reassuring users that signed-in pets will never reset or get lost.\n   config: {\"sign_in\": {\"headline\": \"Protect Your Desktop Pet Account\", \"body\": \"Sign in to secure your pet state across app restarts and system reboots.\", \"components\": [{\"type\": \"badge\", \"label\": \"100% Pet Reset Protection Guarantee\", \"style\": \"emphasis\"}, {\"type\": \"text\", \"text\": \"Your pet progress and memory are saved permanently to your cloud account.\", \"style\": \"plain\"}]}}\n7: [adoption, layout] Two-Column Custom Photo Guidance Layout: Switch the upload_photos screen layout to a split two-column format with side-by-side good vs bad photo examples.\n   config: {\"upload_photos\": {\"layout\": \"two_column\", \"headline\": \"Photo Quality Checklist for Best Pet Results\", \"body\": \"Upload high-lighting, clear frontal photos to prevent rendering glitches.\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:photo_guide_good\", \"style\": \"rounded\"}, {\"type\": \"image\", \"asset\": \"asset:photo_guide_bad\", \"style\": \"subtle\"}]}}\n8: [finish, hint] Desktop Control Hotkeys Quick Cheat Sheet: Add a persistent desktop hotkey visual cheat sheet component to the final home_intro screen detailing hide, call, and settings hotkeys.\n   config: {\"home_intro\": {\"headline\": \"Desktop Pet Ready to Play!\", \"body\": \"Your companion is now active on your screen. Use these quick shortcuts anytime.\", \"components\": [{\"type\": \"checklist\", \"style\": \"emphasis\"}, {\"type\": \"badge\", \"label\": \"Hotkey: Ctrl+Shift+P (Show/Hide)\", \"style\": \"highlight\"}]}}\n9: [home, notification] App Ready Desktop Audio Chime & Notification Switch: Enable desktop audio chime and background readiness system alerts on the waiting screen so users know when rendering finishes if minimized.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"headline\": \"Building Pet Assets in Background\", \"body\": \"Feel free to minimize this window. We will sound a chime and notify your desktop when your pet is ready.\", \"components\": [{\"type\": \"sound\", \"action\": \"play\", \"label\": \"Test Readiness Chime\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of friend selection screen retaining core choice functionality."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new positioning preview screen within onboarding is allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering onboarding screens is explicitly permitted."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro with an interactive command sandbox is allowed."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying background assembly progress and estimated time on the waiting screen is permitted."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding setup time expectations on choose_path maintains path options without mentioning pricing."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a data protection guarantee badge to sign_in is allowed."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning photo upload screen with a two-column guidance layout is allowed."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a hotkey cheat sheet to home_intro is allowed."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling waiting screen readiness alerts and sound chimes is permitted."
+   }
+  ]
+ }
+}

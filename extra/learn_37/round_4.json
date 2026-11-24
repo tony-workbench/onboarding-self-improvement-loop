@@ -1,0 +1,574 @@
+{
+ "round": 4,
+ "starts_week": 4,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7698969,
+  "adoption": 0.74298,
+  "home": 0.8740562999999999,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 2.439,
+  "evidence": 0.466,
+  "confidence": 0.964,
+  "cost": 0.13
+ },
+ "lessons_used": [
+  "Evidence is still thin for adoption (redesign), choose_path (copy, hint, layout), finish (layout), and sign_in (hint, notification, reorder) changes, as each has only 1 test so far.",
+  "home new_flow changes have 3 tests with positive noise-corrected gains and 1 winning test, showing this kind of change can be helpful.",
+  "finish new_screen changes have 2 tests agreeing that no clear effect was seen.",
+  "No clear effect was seen for most changes tested so far (9 out of 13 tests).",
+  "Predictions generally overestimated impact for most tests, but underestimated the size of major wins like sign_in notification and adoption redesign."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Adoption Certificate Stage Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the adoption certificate screen into a theatrical stage layout with animated celebration and pet mascot presentation.",
+   "why": "Adoption step drop-off is high (74.3% conversion, median 89s / mean 1017s) and support received multiple complaints about custom pet generation results.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "headline": "Welcome Your New Desktop Companion!",
+     "body": "Your pet adoption certificate is official. Prepare your desktop workspace for their arrival.",
+     "components": [
+      {
+       "type": "mascot",
+       "asset": "asset:pet_stage_mascot",
+       "style": "playful",
+       "action": "play"
+      },
+      {
+       "type": "animation",
+       "asset": "asset:confetti_burst",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "The adoption certificate redesign removes the required official stamp."
+   }
+  },
+  {
+   "title": "Desktop Visibility Diagnostic Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Adds an automated desktop overlay diagnostic check during the waiting step to verify the pet will render properly on screen.",
+   "why": "Support received 3 emails about pets failing to show up on the desktop after onboarding, and the home waiting room has a high mean duration (2336s).",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "hint": "Checking graphics acceleration and desktop window permissions..."
+    },
+    "new_desktop_check": {
+     "headline": "Testing Desktop Display Permissions",
+     "body": "We are making sure your pet can freely wander across your screens.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "progress",
+       "label": "Verifying screen overlay capability...",
+       "style": "emphasis"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_check",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid desktop check screen to onboarding flow without violating rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.025,
+   "score": 7.42,
+   "score_note": "home new_flow changes have positive historical win rate and address long waiting times",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 114.8
+  },
+  {
+   "title": "Reorder Sign In After Pet Selection",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves account sign-in step to occur right after pet selection so users establish ownership immediately after choosing their pet.",
+   "why": "Support received 8 emails regarding missing or reset pets after signing back in, showing users lose track of account attachment during adoption.",
+   "config": {
+    "sign_in": {
+     "headline": "Save Your Companion to Your Cloud Account",
+     "body": "Sign in now to lock in your pet selection across all your devices."
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "sign_in",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Creates urgency by telling the user to sign in now to lock in their selection."
+   }
+  },
+  {
+   "title": "Desktop Control Interactive Demonstration",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Inserts a dedicated interactive controls preview screen right before completing onboarding to practice summoning and hiding the pet.",
+   "why": "Support received 3 emails about confusion on how to control/hide/talk to the pet and 4 emails about misbehaving desktop features post-onboarding.",
+   "config": {
+    "new_control_practice": {
+     "headline": "Try Out Your Desktop Controls",
+     "body": "Use quick shortcuts to summon, move, or minimize your pet at any time while working.",
+     "layout": "card",
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Practice Desktop Shortcuts",
+       "style": "rounded",
+       "action": "choose"
+      },
+      {
+       "type": "button",
+       "label": "Got It! Start Desktop Pet",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_control_practice"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interactive control practice screen after home_intro is allowed inside onboarding."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.001,
+   "score": 7.26,
+   "score_note": "Target step drops 35.2%, but finish new_screen tests consistently showed no clear effect"
+  },
+  {
+   "title": "Sign In Pet Protection Copy Clarification",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Updates sign-in headline and body copy to explicitly reassure users that existing cloud pets will sync automatically without losing progress.",
+   "why": "8 support emails complained about pets missing or resetting after signing in again, making this the largest support theme.",
+   "config": {
+    "sign_in": {
+     "headline": "Sync & Secure Your Desktop Pets",
+     "body": "Signing in ensures your pet settings, items, and custom models are permanently saved to your account across reinstalls.",
+     "hint": "Already have a pet on this account? It will be automatically restored."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Clarifies sign-in copy without touching pricing or losing screen functionality."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 6.76,
+   "score_note": "Addresses the largest support complaint theme with a simple copy update",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 114.8
+  },
+  {
+   "title": "Waiting Room Interactive Tip Carousel",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Adds an interactive tip carousel to the waiting screen explaining pet habits and desktop interactions while background rendering runs.",
+   "why": "The waiting room step takes a median of 201s and mean of 2336s, leading to drop-off before reaching home finish screen (64.8%).",
+   "config": {
+    "waiting": {
+     "headline": "Preparing Your Pet's New Workspace...",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Did you know? Double clicking your pet opens quick pet interactions.",
+       "style": "calm",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds tip carousel to waiting screen while retaining the job of showing pet creation progress."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.015,
+   "score": 4.18,
+   "score_note": "Addresses high waiting room duration in home step"
+  },
+  {
+   "title": "Choose Path Grid Selection Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Reconfigures the path selection screen into a visual grid layout for faster path comparison.",
+   "why": "Choose path takes a mean of 514s despite a fast 8s median, indicating extreme outlier hesitation for a key early funnel step.",
+   "config": {
+    "choose_path": {
+     "layout": "grid",
+     "headline": "Select Your Adoption Journey",
+     "body": "Pick how you would like to create or select your companion today."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns choose path layout while retaining options for both adopting and making your own pet."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.01,
+   "score": 4.62,
+   "score_note": "choose_path layout change previously resulted in a -2.5% drop",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 114.8
+  },
+  {
+   "title": "Photo Upload Example Quality Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Adds explicit camera lighting and framing guidance text directly below the photo upload component.",
+   "why": "3 support tickets reported custom pet generation failures or unexpected visual output.",
+   "config": {
+    "upload_photos": {
+     "hint": "Use bright, evenly lit photos with your pet centered for the best 3D desktop model generation.",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds quality guidance hint to photo upload screen without violating any base rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.005,
+   "score": 5.17,
+   "score_note": "Hints on onboarding steps have historically underperformed",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 114.8
+  },
+  {
+   "title": "First Visit Badge Incentive",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Adds a collectible 'Desktop Companion Pioneer' badge banner to the final home intro welcome screen.",
+   "why": "The finish step has the highest drop-off rate in the funnel, converting only 64.8% of users who reach home intro.",
+   "config": {
+    "home_intro": {
+     "headline": "Welcome to Your New Desktop Experience!",
+     "body": "You've unlocked the Pioneer Adoption Badge for completing setup.",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Desktop Companion Pioneer",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a pioneer badge to home_intro within onboarding without mentioning prices or gifts."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.02,
+   "score": 7.86,
+   "score_note": "Targets finish step which suffers the highest drop-off in the funnel",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 77.8
+  },
+  {
+   "title": "Sign In Retry Alert Notification",
+   "target_step": "sign_in",
+   "type": "notification",
+   "change": "Displays a timed status notification banner if sign-in response takes longer than 5 seconds.",
+   "why": "Support logged 2 emails explicitly describing the sign-in screen stalling or failing to appear.",
+   "config": {
+    "sign_in": {
+     "notify_when_ready": true,
+     "tip_delay_seconds": 5,
+     "hint": "Connecting to sign-in servers... Click retry if screen does not load."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds sign-in status notification and timing within onboarding, which is explicitly permitted by Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.044,
+   "score": 6.21,
+   "score_note": "sign_in notification previously showed a +4.4% positive signal"
+  }
+ ],
+ "picked": [
+  "Desktop Visibility Diagnostic Flow",
+  "First Visit Badge Incentive",
+  "Sign In Pet Protection Copy Clarification",
+  "Photo Upload Example Quality Hint",
+  "Choose Path Grid Selection Layout"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 537.0,
+ "decisions": [
+  {
+   "test": "sim-14",
+   "title": "Desktop Visibility Diagnostic Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 114.8,
+   "result": {
+    "step": {
+     "control": 0.8782,
+     "treatment": 0.8432,
+     "lift": -0.0398,
+     "lift_se": 0.0213,
+     "p": 0.066273
+    },
+    "finish": {
+     "control": 0.24,
+     "treatment": 0.24,
+     "lift": 0.0,
+     "lift_se": 0.065,
+     "p": 1.0
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.42,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": -0.0294,
+   "finishers_delta_hidden": -11.22
+  },
+  {
+   "test": "sim-15",
+   "title": "First Visit Badge Incentive",
+   "target_step": "finish",
+   "type": "incentive",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 77.8,
+   "result": {
+    "step": {
+     "control": 0.6187,
+     "treatment": 0.5918,
+     "lift": -0.0436,
+     "lift_se": 0.045,
+     "p": 0.343225
+    },
+    "finish": {
+     "control": 0.2467,
+     "treatment": 0.23,
+     "lift": -0.0676,
+     "lift_se": 0.0609,
+     "p": 0.284042
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.86,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": -0.034,
+   "finishers_delta_hidden": -12.98
+  },
+  {
+   "test": "sim-16",
+   "title": "Sign In Pet Protection Copy Clarification",
+   "target_step": "sign_in",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 114.8,
+   "result": {
+    "step": {
+     "control": 0.771,
+     "treatment": 0.7737,
+     "lift": 0.0035,
+     "lift_se": 0.0226,
+     "p": 0.87657
+    },
+    "finish": {
+     "control": 0.242,
+     "treatment": 0.256,
+     "lift": 0.0579,
+     "lift_se": 0.0671,
+     "p": 0.375282
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.76,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": -0.0165,
+   "finishers_delta_hidden": -6.3
+  },
+  {
+   "test": "sim-17",
+   "title": "Photo Upload Example Quality Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 114.8,
+   "result": {
+    "step": {
+     "control": 0.7367,
+     "treatment": 0.6949,
+     "lift": -0.0568,
+     "lift_se": 0.0279,
+     "p": 0.048003
+    },
+    "finish": {
+     "control": 0.2367,
+     "treatment": 0.2627,
+     "lift": 0.1099,
+     "lift_se": 0.0704,
+     "p": 0.099946
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: worse",
+   "score": 5.17,
+   "predicted_lift": -0.005,
+   "true_lift_hidden": -0.0754,
+   "finishers_delta_hidden": -28.78
+  },
+  {
+   "test": "sim-18",
+   "title": "Choose Path Grid Selection Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 114.8,
+   "result": {
+    "step": {
+     "control": 0.7567,
+     "treatment": 0.7687,
+     "lift": 0.0159,
+     "lift_se": 0.0207,
+     "p": 0.439853
+    },
+    "finish": {
+     "control": 0.2447,
+     "treatment": 0.266,
+     "lift": 0.0872,
+     "lift_se": 0.0679,
+     "p": 0.180296
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.62,
+   "predicted_lift": -0.01,
+   "true_lift_hidden": -0.0359,
+   "finishers_delta_hidden": -13.7
+  }
+ ],
+ "shipped": [],
+ "ends_week": 4,
+ "weights_next": {
+  "impact": 2.719,
+  "evidence": 0.383,
+  "confidence": 0.814,
+  "cost": 0.084
+ },
+ "lessons_next": [
+  "Evidence is still thin for adoption (hint, redesign), choose_path (copy, hint), finish (incentive, layout), and sign_in (copy, hint, notification, reorder) changes, as each has only 1 test so far.",
+  "finish new_screen changes have 2 tests agreeing that no clear effect was seen.",
+  "choose_path layout changes have 2 tests agreeing that no clear effect was seen.",
+  "home new_flow changes can be helpful since 1 test won, though 3 tests showed no clear effect.",
+  "No clear effect was seen for most changes tested so far (13 out of 18 tests).",
+  "Predictions generally overestimated impact for most tests, but underestimated the size of major wins."
+ ]
+}

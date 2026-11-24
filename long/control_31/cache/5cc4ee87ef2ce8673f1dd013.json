@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Interactive Pet Trait Sound and Motion Studio: Redesign the companion selection screen into an interactive preview studio where users can trigger pet movements and audio samples before choosing.\n   config: {\"pick_friend\": {\"layout\": \"stage\", \"headline\": \"Meet Your Companion in Action\", \"body\": \"Preview animations, sound effects, and behavioral traits live before adoption.\", \"replace\": {\"pet_choices\": [{\"role\": \"pet_choices\", \"type\": \"preview\", \"label\": \"Live Motion Preview\", \"style\": \"playful\", \"action\": \"play\"}, {\"role\": \"pet_choices\", \"type\": \"sound\", \"label\": \"Sound Effect Preview\", \"style\": \"rounded\", \"action\": \"play\"}]}}}\n1: [sign_in, redesign] Visual Cloud Restore Status & Account Link Portal: Overhaul the sign-in screen to feature prominent cloud pet recovery guarantees and a visual sync status preview before authentication.\n   config: {\"sign_in\": {\"layout\": \"split\", \"headline\": \"Sign In to Safeguard & Sync Your Desktop Pet\", \"body\": \"Your companion data and traits automatically bind to your account, preventing data loss across app updates.\", \"hint\": \"Existing pets are restored immediately upon login.\", \"components\": [{\"type\": \"badge\", \"text\": \"Cloud Restore Protection Active\", \"style\": \"highlight\"}, {\"type\": \"preview\", \"label\": \"Cloud Storage Sync Status\", \"style\": \"calm\"}]}}\n2: [finish, new_screen] Desktop Control & Taskbar Hide Interactive Sandbox: Add a new interactive practice screen right before onboarding completion where users try out hiding, summoning, and interacting with their pet on screen.\n   config: {\"home_intro\": {\"headline\": \"Your Desktop Companion is Ready!\"}, \"new_desktop_sandbox\": {\"layout\": \"spotlight\", \"headline\": \"Try Desktop Controls Now\", \"body\": \"Practice hiding your pet to the system tray and bringing it back to your screen.\", \"button_label\": \"Got It, Finish Setup\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Action Controls Test\", \"style\": \"playful\", \"action\": \"choose\"}, {\"type\": \"text\", \"text\": \"Shortcut: Press Alt+P to instantly show or hide your companion.\", \"style\": \"emphasis\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_desktop_sandbox\"]}\n3: [choose_path, reorder] Onboarding Story and Companion Path Swap: Reorder the flow so users immediately select their companion creation path on launch before reviewing background story details.\n   config: {\"choose_path\": {\"headline\": \"Choose How You Want to Create Your Pet\", \"body\": \"Pick a ready-made companion for instant setup or craft a custom pet from photos.\"}, \"_order\": [\"choose_path\", \"story\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n4: [home, wait_info] Desktop Rendering Readiness Live Diagnostic Card: Add a desktop display overlay diagnostic status block on the waiting screen showing GPU and screen overlay compatibility.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"headline\": \"Preparing Desktop Overlay\", \"body\": \"Setting up graphics rendering and screen bounds for your companion.\", \"components\": [{\"type\": \"checklist\", \"text\": \"Desktop Window Layer Verification\", \"style\": \"calm\"}, {\"type\": \"badge\", \"text\": \"Display Bounds Verified\", \"style\": \"highlight\"}]}}\n5: [adoption, layout] Split Canvas Custom Pet Photo Alignment Guide: Change photo upload screen layout to a split view with live pose alignment framing to prevent photo upload generation failures.\n   config: {\"upload_photos\": {\"layout\": \"split\", \"headline\": \"Upload Clear Pet Photos\", \"body\": \"Position your pet centered in bright lighting for optimal 3D desktop companion generation.\", \"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"photo_picker\", \"label\": \"Choose Front Pose Photo\", \"style\": \"rounded\", \"action\": \"choose\"}, {\"role\": \"photo_upload\", \"type\": \"image\", \"asset\": \"asset:photo_guide_overlay\", \"style\": \"plain\"}]}}}\n6: [finish, hint] Desktop Companion Hotkey & Tray Interaction Callout: Display a persistent hotkey reference banner and tray minimize reminder on the final setup completion screen.\n   config: {\"home_intro\": {\"hint\": \"Tip: Right-click your pet anytime on your desktop to access quick settings or minimize to tray.\", \"components\": [{\"type\": \"badge\", \"text\": \"Tray Control: Right-Click Pet Icon\", \"style\": \"highlight\"}, {\"type\": \"text\", \"text\": \"Double click pet to open companion chat window.\", \"style\": \"subtle\"}]}}\n7: [sign_in, copy] Account Persistence & Multi-Device Pet Recovery Reassurance: Update sign-in screen copy to explicitly guarantee existing pet recovery and data protection during account auth.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Protect Your Desktop Companion\", \"body\": \"Connecting your account saves your pet's personality, level, and items safely to the cloud.\", \"hint\": \"Signing in never deletes your current pet. Existing companion progress is automatically merged.\"}}\n8: [choose_path, new_flow] Interactive Companion Trait Discovery Questionnaire: Add an interactive personality quiz screen `new_trait_quiz` before path selection that recommends the ideal pet path based on desktop usage.\n   config: {\"choose_path\": {\"headline\": \"Find Your Ideal Companion Match\"}, \"new_trait_quiz\": {\"layout\": \"card\", \"headline\": \"What Do You Use Your Desktop For Most?\", \"body\": \"Answer 2 quick questions to get your recommended companion setup path.\", \"button_label\": \"See Recommended Path\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Primary Activity\", \"style\": \"playful\", \"action\": \"choose\"}]}, \"_order\": [\"story\", \"new_trait_quiz\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n9: [home, notification] Background Asset Render Completion Notification Sound: Enable sound alerts and a ready-to-launch visual notification banner when pet generation completes on the waiting screen.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"tip_delay_seconds\": 10, \"headline\": \"Generating Your Desktop Companion\", \"body\": \"You can minimize this window. We'll play a chime and notify you when your pet is ready!\", \"components\": [{\"type\": \"sound\", \"label\": \"Ready Chime Alert Enabled\", \"style\": \"calm\", \"action\": \"play\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replacing pet_choices with play-only preview components removes the ability for the user to choose a pet."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the sign-in screen with cloud restore reassurance while retaining all required functionality."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new practice sandbox screen after the home intro within onboarding."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering story and path selection is allowed, and path selection still offers both adopting and making a pet."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding diagnostic info to the waiting screen is permitted and maintains the screen's core job."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns photo upload layout with a guide while preserving the photo picker function."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful desktop interaction tips to the home intro screen."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates sign-in copy to reassure account persistence without violating fair design or onboarding rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid quiz screen prior to path selection without removing required steps or functions."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds completion notification and alert settings to the waiting screen within onboarding limits."
+   }
+  ]
+ }
+}

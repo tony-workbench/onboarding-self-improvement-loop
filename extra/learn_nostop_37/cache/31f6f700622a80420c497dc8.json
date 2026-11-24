@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, redesign] sign_in_account_recovery_redesign: Redesign the sign-in screen to emphasize cloud save and pet recovery options to reassure returning users.\n   config: {\"sign_in\": {\"layout\": \"two_column\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"badge\", \"text\": \"Cloud Save Enabled\", \"style\": \"emphasis\"}, {\"role\": \"sign_in_options\", \"type\": \"text\", \"text\": \"Sign in to keep your pet synchronized across desktop devices.\", \"style\": \"plain\"}]}}}\n1: [home, new_flow] waiting_stage_pet_companion_flow: Add an interactive sound effect preview and pet mood selector while waiting for pet generation on the waiting screen.\n   config: {\"waiting\": {\"components\": [{\"type\": \"sound\", \"label\": \"Preview Bark & Meow\", \"style\": \"playful\", \"action\": \"play\"}, {\"type\": \"choice_cards\", \"text\": \"Select initial pet mood\", \"style\": \"rounded\"}]}}\n2: [adoption, layout] pick_friend_grid_layout: Change the layout of the pick_friend adoption screen to grid view with desktop preview callouts.\n   config: {\"pick_friend\": {\"layout\": \"grid\", \"hint\": \"Select your companion to customize desktop appearance\"}}\n3: [finish, new_screen] new_desktop_controls_overview_screen: Insert a dedicated new desktop controls intro screen before completing onboarding showing hotkeys and tray icons.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_desktop_controls_overview\"], \"new_desktop_controls_overview\": {\"layout\": \"spotlight\", \"headline\": \"Desktop Pet Controls\", \"body\": \"Learn how to summon, minimize, and interact with your pet on your desktop.\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:desktop_tray_guide\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Got It!\", \"action\": \"next\"}]}}\n4: [sign_in, incentive] sign_in_cloud_sync_incentive: Highlight free cloud pet backup and multi-device sync directly on the sign in prompt.\n   config: {\"sign_in\": {\"hint\": \"Sign in now to lock in automatic cloud backups for your pet's memory and state.\"}}\n5: [adoption, new_flow] adoption_photo_validation_flow: Add real-time photo quality feedback animations on the photo upload screen during custom pet creation.\n   config: {\"upload_photos\": {\"components\": [{\"type\": \"badge\", \"text\": \"Lighting & clarity check active\", \"style\": \"highlight\"}, {\"type\": \"animation\", \"style\": \"calm\"}]}}\n6: [home, wait_info] waiting_desktop_visibility_status: Display real-time desktop render readiness status on the waiting screen.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"show_progress\": true, \"hint\": \"Initializing graphics engine and rendering your pet onto your desktop...\"}}\n7: [choose_path, reorder] choose_path_story_reorder: Reorder onboarding so choose_path comes before the story screen to let users set their preference immediately.\n   config: {\"_order\": [\"choose_path\", \"story\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n8: [finish, notification] home_intro_desktop_launch_notify: Add a desktop system notification option on the home intro screen when your pet spawns.\n   config: {\"home_intro\": {\"notify_when_ready\": true, \"headline\": \"Your companion is live on your desktop!\"}}\n9: [choose_path, copy] story_intro_quick_start_copy: Update headline and body on the story screen to emphasize lightweight desktop companion setup.\n   config: {\"story\": {\"headline\": \"Meet Your Desktop Companion in 60 Seconds\", \"body\": \"Choose how your pet lives alongside your daily workflow and games.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replacing sign-in options with static badges and text removes the sign-in functionality, causing the screen to lose its core job."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding sound previews and mood choices during the waiting screen is permitted inside onboarding."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the pick_friend screen layout to a grid while retaining pet selection preserves the step's function."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new onboarding screen after home_intro is explicitly allowed by Rule 4."
+   },
+   {
+    "index": 4,
+    "pass": false,
+    "rule": 5,
+    "reason": "Prompts telling users to sign in 'now to lock in' feature access introduce false urgency in violation of Rule 5."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding photo quality feedback components to the photo upload screen is allowed within onboarding."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating waiting screen status and info display is permitted within onboarding."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering onboarding screens without removing steps is explicitly allowed under Rule 4."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding desktop notification settings within home_intro is an allowed modification within onboarding."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating headline and body text on the story screen while introducing the pet preserves its core job."
+   }
+  ]
+ }
+}

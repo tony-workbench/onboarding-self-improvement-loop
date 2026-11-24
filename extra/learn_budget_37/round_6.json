@@ -1,0 +1,445 @@
+{
+ "round": 6,
+ "starts_week": 6,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.647976,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "Evidence for specific kinds of change is still thin, as no category has at least 2 tests yet.",
+  "Predictions were generally too high compared to noise-corrected results in Rounds 1 and 3.",
+  "Predictions were slightly too low in Round 4 compared to noise-corrected results.",
+  "The single test for 'adoption, new_flow' won (+2.7% after noise correction), but category evidence remains thin.",
+  "No clear effect was seen for 'adoption, redesign' or 'finish, new_screen' in their single tests."
+ ],
+ "carried_retests": [
+  "Grid Pet Selection Redesign"
+ ],
+ "candidates": [
+  {
+   "title": "Sign In Account Recovery Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in screen layout to split view, explicitly confirming pet save sync status and account recovery options.",
+   "why": "8 support emails cited missing or reset pets after signing in again, and 2 cited sign-in screen stalling.",
+   "config": {
+    "sign_in": {
+     "layout": "split",
+     "headline": "Sign In to Keep Your Pet Safe",
+     "body": "Your companion progress and custom assets are backed up automatically to your account.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "type": "button",
+        "label": "Continue with Google",
+        "style": "rounded",
+        "action": "next",
+        "role": "sign_in_options"
+       },
+       {
+        "type": "text",
+        "text": "Existing pets will sync automatically upon login.",
+        "style": "subtle",
+        "role": "sign_in_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Pet Personality Quiz Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Insert an interactive pet personality quiz screen before picking a friend to guide users to their ideal desktop companion.",
+   "why": "Adoption stage drops 35.2% of users and median duration is 89s; support noted custom pet generation fails or feels wrong.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "new_personality_quiz",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "pick_friend": {
+     "headline": "Matched Companion Suggestions",
+     "body": "Based on your quiz, here are the desktop pets that fit your workflow best."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_personality_quiz']"
+   }
+  },
+  {
+   "title": "Generation Progress and Background Notification Info",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Enable time estimates and desktop completion notification toggles on the waiting screen while pet assets render.",
+   "why": "The waiting step has a mean duration of 2336 seconds and 81.3% conversion, causing users to abandon during background load.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "notify_when_ready": true,
+     "headline": "Your Pet Is Arriving Soon",
+     "body": "We are preparing your pet on your desktop. You will receive a desktop alert when ready.",
+     "hint": "Feel free to minimize this window; we will notify you when setup finishes."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds time estimates and notification toggles to waiting screen without false urgency or dark patterns."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.02,
+   "score": 5.83,
+   "score_note": "High mean wait time (2336s) on home step; notifications help reduce drop-offs.",
+   "slot": "best score"
+  },
+  {
+   "title": "Interactive Pet Desktop Orientation Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign home intro into a split layout with interactive control tips showing how to summon, minimize, and command the pet on desktop.",
+   "why": "Finish conversion drops to 64.8% and support received multiple complaints about not knowing how to control or hide pets.",
+   "config": {
+    "home_intro": {
+     "layout": "split",
+     "headline": "Meet Your New Desktop Companion!",
+     "body": "Use quick shortcuts to interact, move, or hide your pet anytime from your system tray.",
+     "replace": {
+      "home_welcome": [
+       {
+        "type": "checklist",
+        "text": "Right-click pet for actions | Double-click to talk | Drag to reposition",
+        "style": "emphasis",
+        "role": "home_welcome"
+       },
+       {
+        "type": "button",
+        "label": "Start Interacting",
+        "style": "highlight",
+        "action": "next",
+        "role": "home_welcome"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.replace.home_welcome[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Deferred Sign-In Path Order",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Move sign-in after pet selection so users choose their companion before creating an account.",
+   "why": "Early drop-off at choose_path (76.2%) and sign_in (72.9%) creates upfront friction before emotional attachment.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in step after adoption certificate, which is explicitly allowed by Rule 4."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 5.42,
+   "score_note": "Reduces upfront friction by delaying sign-in until after companion selection.",
+   "slot": "big move"
+  },
+  {
+   "title": "Adoption Certificate Naming Clarification",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Clarify certificate customization fields with explicit hints on how pet names and traits appear on the desktop display.",
+   "why": "3 support tickets reported custom pet issues and adoption screen conversion drops to 64.8%.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Official Pet Adoption Certificate",
+     "body": "Give your desktop pet a unique name and title. These will appear on its desktop tag.",
+     "hint": "You can change your pet's name anytime later in settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Clarifies certificate customization copy while retaining official certificate role."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.03,
+   "score": 8.75,
+   "score_note": "Backed by 3 support tickets and 35.2% drop; cost-effective copy fix."
+  },
+  {
+   "title": "Path Options Spotlight Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Switch choose_path layout to spotlight to make path decisions immediate and clear.",
+   "why": "Mean time spent on choose_path is 514s despite 8s median, showing long tail confusion when picking options.",
+   "config": {
+    "choose_path": {
+     "layout": "spotlight",
+     "headline": "How Would You Like to Pick Your Pet?",
+     "body": "Choose a fast preset companion or create a custom pet from scratch."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates choose_path layout while continuing to offer both preset adoption and custom creation paths."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.025,
+   "score": 5.83,
+   "score_note": "Addresses large mean duration gap (514s vs 8s median) on choose_path."
+  },
+  {
+   "title": "Desktop Command Shortcut Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Add an explicit tray icon and hotkey command hint to the home intro screen.",
+   "why": "3 support emails reported post-onboarding confusion on how to control, hide, or talk to the pet.",
+   "config": {
+    "home_intro": {
+     "hint": "Tip: Press Ctrl+Shift+P anytime to summon or hide your desktop pet.",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Quick Shortcut: Ctrl+Shift+P",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds desktop shortcut hints to home_intro within allowed onboarding customization scope."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 7.92,
+   "score_note": "Directly resolves 3 support tickets about post-onboarding controls via simple hint.",
+   "slot": "best score"
+  },
+  {
+   "title": "Desktop Launch Verification Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Add a new desktop readiness confirmation screen after waiting to verify pet rendering before completing onboarding.",
+   "why": "Support logged 3 issues where pets failed to display on desktop or the desktop application did not open properly.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_check",
+     "home_intro"
+    ],
+    "waiting": {
+     "headline": "Preparing Desktop Engine...",
+     "body": "Verifying display overlay permissions and pet asset rendering."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_desktop_check']"
+   }
+  },
+  {
+   "title": "Instant Sign-In Failover Status Banner",
+   "target_step": "sign_in",
+   "type": "notification",
+   "change": "Add a fallback status banner and instant retry component to the sign-in screen to handle network stalls gracefully.",
+   "why": "Support noted sign-in screen failing to appear or stalling before authentication completes.",
+   "config": {
+    "sign_in": {
+     "components": [
+      {
+       "type": "badge",
+       "label": "Status: Authentication Service Active",
+       "style": "subtle"
+      },
+      {
+       "type": "text",
+       "text": "Stuck loading? Click below to refresh your sign-in session.",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds authentication status and session retry helper to sign-in screen without violating base rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.03,
+   "score": 6.67,
+   "score_note": "Fixes sign-in stalls reported in support emails with fallback status UI.",
+   "slot": "best score"
+  }
+ ],
+ "picked": [],
+ "held_by_harm_budget": [
+  "Deferred Sign-In Path Order",
+  "Desktop Command Shortcut Hint",
+  "Instant Sign-In Failover Status Banner",
+  "Generation Progress and Background Notification Info"
+ ],
+ "harm_budget": 113.8,
+ "planned_harm": 105.2,
+ "decisions": [
+  {
+   "test": "sim-4",
+   "title": "Grid Pet Selection Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 2,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 105.2,
+   "result": {
+    "step": {
+     "control": 0.661,
+     "treatment": 0.7116,
+     "lift": 0.0766,
+     "lift_se": 0.0251,
+     "p": 0.001539
+    },
+    "finish": {
+     "control": 0.204,
+     "treatment": 0.2037,
+     "lift": -0.0016,
+     "lift_se": 0.0509,
+     "p": 0.974435
+    },
+    "users_per_group": 3000,
+    "first_week": {
+     "step": {
+      "control": 0.6514,
+      "treatment": 0.715,
+      "lift": 0.0976,
+      "lift_se": 0.0366,
+      "p": 0.005226
+     },
+     "finish": {
+      "control": 0.2027,
+      "treatment": 0.1967,
+      "lift": -0.0296,
+      "lift_se": 0.071,
+      "p": 0.681037
+     },
+     "users_per_group": 1500
+    },
+    "retest": {
+     "step": {
+      "control": 0.6706,
+      "treatment": 0.7084,
+      "lift": 0.0564,
+      "lift_se": 0.0345,
+      "p": 0.092498
+     },
+     "finish": {
+      "control": 0.2053,
+      "treatment": 0.2107,
+      "lift": 0.026,
+      "lift_se": 0.0731,
+      "p": 0.718951
+     },
+     "users_per_group": 1500
+    }
+   },
+   "outcome": "won after re-test, shipped",
+   "score": 7.92,
+   "predicted_lift": 0.026,
+   "true_lift_hidden": 0.0832,
+   "finishers_delta_hidden": 48.93
+  }
+ ],
+ "shipped": [
+  "Grid Pet Selection Redesign"
+ ],
+ "ends_week": 6,
+ "weights_next": {
+  "impact": 1.494,
+  "evidence": 0.478,
+  "confidence": 1.014,
+  "cost": 1.014
+ },
+ "lessons_next": [
+  "Evidence is still thin for 'adoption, new_flow' and 'finish, new_screen', as each category has only 1 test.",
+  "For 'adoption, redesign', noise-corrected results consistently show ~+2.6% gain across 2 tests; it proved helpful when significant (Round 6), though Round 4 showed no clear effect.",
+  "Predictions were too high for 'finish, new_screen' and 'adoption, new_flow' compared to noise-corrected results.",
+  "Predictions for 'adoption, redesign' were accurate compared to noise-corrected results."
+ ]
+}

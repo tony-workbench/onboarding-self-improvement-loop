@@ -1,0 +1,481 @@
+{
+ "round": 8,
+ "starts_week": 8,
+ "funnel": {
+  "choose_path": 0.7904226000000001,
+  "sign_in": 0.729,
+  "adoption": 0.6470625,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.412,
+  "evidence": 0.313,
+  "confidence": 0.166,
+  "cost": 3.109
+ },
+ "lessons_used": [
+  "Choose_path redesign produced a winning test, but results across multiple tests remain mixed with no clear effect in subsequent attempts.",
+  "No clear effect was seen across multiple tests for home notifications, sign-in copy, choose_path copy, home wait info, and adoption redesigns.",
+  "Sign-in reordering and adoption new flows showed no clear effect or resulted in significant performance drops across multiple tests.",
+  "Evidence remains thin for change kinds tested only once, including all finish screen variations, home redesigns, sign-in hints/layouts, and adoption new screens.",
+  "Predictions systematically overestimated early tests and complex customizers while underestimating both winning tests, which were predicted to reduce performance."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Interactive Desktop Trait Preview Stage",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesign the waiting screen into an interactive preview stage where users can experiment with movement sounds and pet voice pitch while assets render in the background.",
+   "why": "The home waiting step has a 201s median and 2336s mean wait time causing drop-offs (81.3% step completion). Giving users active pet audio preview keeps them engaged.",
+   "config": {
+    "waiting": {
+     "layout": "stage",
+     "headline": "Your Pet is Awakening",
+     "body": "Test out your pet's voice pitch and desktop footsteps while background assets finish downloading.",
+     "replace": {
+      "wait_status": [
+       {
+        "type": "sound",
+        "label": "Play Voice Pitch Preview",
+        "style": "playful",
+        "action": "play",
+        "role": "wait_status"
+       },
+       {
+        "type": "progress",
+        "label": "Asset Download Progress",
+        "style": "rounded",
+        "action": "next",
+        "role": "wait_status"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.replace.wait_status[0]': a sound cannot do the wait_status job (use ['animation', 'mascot', 'preview', 'progress', 'text', 'timer', 'tip_carousel'])"
+   }
+  },
+  {
+   "title": "Desktop Pet Launcher Kickoff Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Introduce a dedicated launchpad screen right before home intro that verifies window overlay permissions and triggers the pet spawn animation.",
+   "why": "Support mail indicates 3 users reported pets failing to appear on desktop or app failing to open, causing drop-offs at the finish step (64.8%).",
+   "config": {
+    "new_desktop_launchpad": {
+     "headline": "Ready to Launch Desktop Pet",
+     "body": "Your companion is ready to step onto your desktop screen. Click below to verify display permissions and spawn.",
+     "button_label": "Spawn Pet on Desktop",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "badge",
+       "text": "System Ready",
+       "style": "highlight",
+       "action": "next"
+      },
+      {
+       "type": "button",
+       "label": "Test Window Overlay",
+       "style": "emphasis",
+       "action": "choose"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_launchpad",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new desktop launcher screen within onboarding without removing required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.001,
+   "score": 1.21,
+   "score_note": "Target step drops 35% with support tickets, but new screens cost a release and past finish new_screen tests showed negative lift.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": null
+  },
+  {
+   "title": "Single-Tap Archetype Adoption Stream",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Streamline pet selection by converting pick_friend into a single-tap archetype chooser that generates the companion immediately without photo upload friction.",
+   "why": "Adoption has a heavy drop-off (64.7% conversion, 89s median time) and 3 support emails reported custom pet creation failures.",
+   "config": {
+    "pick_friend": {
+     "layout": "split",
+     "headline": "Choose Your Companion Archetype",
+     "body": "Select a ready-to-spawn companion personality and skip photo upload wait times.",
+     "button_label": "Adopt Instantly",
+     "replace": {
+      "pet_choices": [
+       {
+        "type": "choice_cards",
+        "label": "Select Archetype",
+        "style": "playful",
+        "action": "choose",
+        "role": "pet_choices"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'pick_friend.body' suggests skipping a step"
+   }
+  },
+  {
+   "title": "Storybook Path Selection Split Layout",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign choose_path into a side-by-side storybook layout comparing preset companions with custom AI generated pets.",
+   "why": "21% of users abandon at choose_path (79% conversion). A clear visual split helps users instantly choose the right onboarding trajectory.",
+   "config": {
+    "choose_path": {
+     "layout": "split",
+     "headline": "How Would You Like to Create Your Pet?",
+     "body": "Pick a instant preset companion or create a custom visual pet from photos.",
+     "replace": {
+      "path_options": [
+       {
+        "type": "choice_cards",
+        "label": "Choose Instant vs Custom",
+        "style": "large",
+        "action": "choose",
+        "role": "path_options"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Existing Account Pet Recovery Warning Banner",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit data protection banner on the sign-in screen confirming existing pets are automatically bound to the account.",
+   "why": "Support mail showed 8 emails regarding missing or reset pets after signing in again, making this the top support issue.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in automatically restores previously adopted pets tied to your email.",
+     "components": [
+      {
+       "type": "text",
+       "text": "Your pet progress and personality data are saved securely to your account.",
+       "style": "subtle",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Real-Time Pet Behavior Assembly Status",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display explicit background assembly steps and live progress indicators on the waiting screen during initial load.",
+   "why": "The waiting step has a long mean duration (2336s) and median of 201s. Transparent behavior assembly info reassures waiting users.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "tip_delay_seconds": 10,
+     "hint": "Assembling desktop animations, sound effects, and behavioral loops."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds real-time load progress and tips to the waiting screen."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.0,
+   "score": 4.49,
+   "score_note": "High wait time in funnel, but home wait_info changes showed 0.0% lift across multiple past tests.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": null
+  },
+  {
+   "title": "Desktop Shortcut & Control Cheat Sheet Layout",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Transform home_intro into a checklist layout that displays shortcut key combinations for controlling and hiding the desktop pet.",
+   "why": "3 support tickets reported post-onboarding confusion about how to control, hide, or interact with the pet.",
+   "config": {
+    "home_intro": {
+     "layout": "checklist",
+     "headline": "Quick Desktop Pet Controls",
+     "body": "Master these quick key shortcuts to manage your pet while working.",
+     "replace": {
+      "home_welcome": [
+       {
+        "type": "checklist",
+        "label": "Controls Overview",
+        "style": "rounded",
+        "action": "next",
+        "role": "home_welcome"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  },
+  {
+   "title": "Instant Generation Guarantee Copy",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Update adoption certificate copy to clarify that custom companion generation includes automatic instant fallback rendering if photo synthesis encounters an error.",
+   "why": "3 support emails reported custom pet generation failures or visual bugs, leading to adoption drop-offs.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Official Pet Adoption Certificate",
+     "body": "Your companion is being registered. If custom generation takes extra time, high-quality fallback assets will ensure instant spawn.",
+     "button_label": "Finalize Adoption"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates adoption certificate copy without removing the official stamp or step functionality."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 9.79,
+   "score_note": "Target step drops 35.3% with direct support ticket alignment; quick copy change config.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": null
+  },
+  {
+   "title": "Starter Companion Trait Bonus Badge",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Add an instant starter trait badge to the preset companion path selection option on choose_path.",
+   "why": "Encourages users to select the faster preset path, mitigating the 21% loss at path selection.",
+   "config": {
+    "choose_path": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Bonus: 3 Free Starter Toys Included",
+       "style": "highlight",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions free extras ('3 Free Starter Toys Included'), which violates Rule 3."
+   }
+  },
+  {
+   "title": "First Desktop Spawn Audio Bell Signal",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Add an audio ready notification and chime trigger to home_intro that alerts users when their desktop pet has completed rendering.",
+   "why": "Helps users who minimized the app during long home wait times (201s median) notice that their pet is active.",
+   "config": {
+    "home_intro": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "label": "Play Ready Chime",
+       "style": "plain",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds audio chime component and notification readiness trigger to home intro."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.025,
+   "score": 5.3,
+   "score_note": "Addresses drop-offs from long waiting times; initial finish notification test showed +2.5% lift."
+  }
+ ],
+ "picked": [
+  "Desktop Pet Launcher Kickoff Screen",
+  "Instant Generation Guarantee Copy",
+  "Real-Time Pet Behavior Assembly Status"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-31",
+   "title": "Desktop Pet Launcher Kickoff Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.6112,
+     "treatment": 0.5945,
+     "lift": -0.0273,
+     "lift_se": 0.0522,
+     "p": 0.605185
+    },
+    "finish": {
+     "control": 0.196,
+     "treatment": 0.174,
+     "lift": -0.1122,
+     "lift_se": 0.0682,
+     "p": 0.12075
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 1.21,
+   "predicted_lift": -0.001,
+   "true_lift_hidden": -0.056,
+   "finishers_delta_hidden": -17.17
+  },
+  {
+   "test": "sim-32",
+   "title": "Instant Generation Guarantee Copy",
+   "target_step": "adoption",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.6429,
+     "treatment": 0.6636,
+     "lift": 0.0322,
+     "lift_se": 0.0362,
+     "p": 0.366203
+    },
+    "finish": {
+     "control": 0.19,
+     "treatment": 0.2093,
+     "lift": 0.1018,
+     "lift_se": 0.0807,
+     "p": 0.18534
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 9.79,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": 0.0332,
+   "finishers_delta_hidden": 10.18
+  },
+  {
+   "test": "sim-33",
+   "title": "Real-Time Pet Behavior Assembly Status",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.8026,
+     "treatment": 0.8532,
+     "lift": 0.0631,
+     "lift_se": 0.0291,
+     "p": 0.023993
+    },
+    "finish": {
+     "control": 0.188,
+     "treatment": 0.2247,
+     "lift": 0.195,
+     "lift_se": 0.086,
+     "p": 0.013086
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "won, shipped",
+   "score": 4.49,
+   "predicted_lift": 0.0,
+   "true_lift_hidden": 0.0398,
+   "finishers_delta_hidden": 12.2
+  }
+ ],
+ "shipped": [
+  "Real-Time Pet Behavior Assembly Status"
+ ],
+ "ends_week": 8,
+ "weights_next": {
+  "impact": 0.325,
+  "evidence": 0.276,
+  "confidence": 0.122,
+  "cost": 3.277
+ },
+ "lessons_next": [
+  "Adoption new screens, choose_path redesigns, and home wait_info updates each produced winning tests, though choose_path redesigns and home wait_info showed no clear effect in other tests.",
+  "No clear effect was seen across multiple tests for home notifications, sign-in copy, choose_path copy, adoption redesigns, and finish new screens.",
+  "Sign-in reordering and adoption new flows consistently failed to help, causing performance drops and severe rollbacks across multiple tests.",
+  "Evidence remains thin for change kinds tested only once, including adoption copy, home redesigns, sign-in hints/layouts, and all finish layout/copy/hint/incentive/notification/redesign variations.",
+  "Predictions systematically underestimated winning changes (predicting zero or negative impact) while overestimating complex multi-step customizers and sign-in reorders."
+ ]
+}

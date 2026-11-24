@@ -1,0 +1,371 @@
+{
+ "round": 1,
+ "starts_week": 1,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Move sign-in after pet adoption",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder the onboarding sequence so users select and customize their pet before signing in. The sign-in prompt is presented right before pet generation.",
+   "why": "Adoption has a 60.9% conversion rate and sign-in drops 27.1% of users before they build emotional investment with a pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ],
+    "sign_in": {
+     "headline": "Save Your New Desktop Pet",
+     "hint": "Sign in to bond this pet to your account permanently."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to occur after pet adoption is explicitly allowed under Rule 4."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.15,
+   "score": 5.83,
+   "score_note": "Delaying sign-in until after value delivery improves conversion, but flow reordering requires structural app changes.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Interactive tip carousel on waiting screen",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesign the waiting screen layout to a stage layout with a full interactive tip carousel explaining desktop controls, shortcuts, and hiding mechanisms while waiting.",
+   "why": "The waiting step has a mean duration of 2336s (median 201s), and support received multiple complaints about not knowing how to control or hide pets post-onboarding.",
+   "config": {
+    "waiting": {
+     "layout": "stage",
+     "headline": "Preparing Your Pet's New Desktop Home",
+     "body": "Your companion is getting ready. Browse quick tips below to learn how to interact with your pet.",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "style": "playful",
+       "action": "open_tip",
+       "text": "Controls Guide: Double click to talk, right click to hide or bring to front."
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the waiting screen layout while keeping pet preparation messaging retains the screen's core job."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.08,
+   "score": 5.42,
+   "score_note": "Addresses long wait time and control complaints, but requires creating a full new interactive UI layout.",
+   "slot": "big move"
+  },
+  {
+   "title": "Add dedicated desktop controls tutorial screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a new interactive tutorial screen right after home introduction demonstrating how to summon, position, hide, and interact with the desktop pet.",
+   "why": "Support mailbox received 3 themes of confusion post-onboarding specifically about controlling, hiding, and talking to desktop pets.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_controls_tutorial"
+    ],
+    "home_intro": {
+     "button_label": "Learn Pet Controls"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_controls_tutorial']"
+   }
+  },
+  {
+   "title": "Preset selection preview flow for custom pet photo upload",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Replace photo upload area with instant preset choices and a real-time preview card before photo upload to reduce custom pet generation errors.",
+   "why": "Adoption conversion is low (60.9%) and support received 3 emails about custom pet generation failing or looking wrong.",
+   "config": {
+    "upload_photos": {
+     "layout": "grid",
+     "headline": "Pick a Style or Upload a Photo",
+     "replace": {
+      "photo_upload": [
+       {
+        "type": "choice_cards",
+        "role": "photo_upload",
+        "style": "rounded",
+        "action": "choose"
+       },
+       {
+        "type": "preview",
+        "role": "photo_upload",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[0]': a choice_cards cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Account sign-in warning copy for pet sync",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Add clear helper text explaining that signing in with the original email restores existing pets and prevents account resets.",
+   "why": "Support received 8 emails regarding missing or reset pets after signing in again with different accounts.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Sync Your Desktop Pets",
+     "body": "Use your primary account email to automatically restore previous pets and keep your collection safe.",
+     "hint": "Using a different email creates a separate empty profile."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.body' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Progress indicator and desktop alert toggle on waiting screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Enable visual progress percentage, estimated timer, and system desktop notification switch on the waiting screen.",
+   "why": "Users wait a median of 201s and mean of 2336s on the home/waiting step with low feedback on progress.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "notify_when_ready": true,
+     "hint": "We will notify you on your desktop as soon as your pet is ready!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress indicators and desktop alert switches to a real waiting screen is allowed under Rules 4 and 5."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.1,
+   "score": 7.08,
+   "score_note": "High confidence fix for extreme wait times by providing clear feedback and progress indicators."
+  },
+  {
+   "title": "Desktop display shortcut hint on final intro screen",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Display a prominent hint on the intro screen detailing shortcut keys (e.g., Ctrl+Shift+P) to bring the pet to the top window.",
+   "why": "3 support emails reported that pets do not show on the desktop or users cannot tell if the app opened.",
+   "config": {
+    "home_intro": {
+     "hint": "Pet missing from desktop? Press Ctrl+Shift+P or check your system tray icon to reveal your pet."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding shortcut display hints to home_intro is allowed inside onboarding."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.12,
+   "score": 10.0,
+   "score_note": "Strong evidence from support emails and funnel drop-off; low effort text/hint change on final screen.",
+   "slot": "best score"
+  },
+  {
+   "title": "Split layout for choose path screen",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Reorganize choose_path screen into a split layout with interactive visual choice cards to speed up decision making.",
+   "why": "The choose_path step has a mean duration of 514s, indicating confusion or hesitation when picking an onboarding path.",
+   "config": {
+    "choose_path": {
+     "layout": "split",
+     "headline": "Select Your Adoption Journey",
+     "replace": {
+      "path_options": [
+       {
+        "type": "choice_cards",
+        "role": "path_options",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Adoption certificate starter accessory badge",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Add a prominent reward badge highlighting a bonus free desktop pet item upon completing the certificate step.",
+   "why": "Adoption is the biggest funnel bottleneck dropping conversion to 60.9%.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Complete Certificate & Unlock Starter Toy",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Bonus Desktop Toy Unlocked",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions a bonus free gift/toy, violating Rule 3."
+   }
+  },
+  {
+   "title": "Background notification permission switch on waiting screen",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Add a desktop notification prompt on the waiting screen allowing users to minimize the app without missing completion.",
+   "why": "The average waiting step takes over 30 minutes (2336s mean), causing users to abandon or close the app thinking it crashed.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "body": "Your pet is being crafted in the background. Enable notifications so you can freely use other desktop apps."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a desktop notification permission switch on the waiting screen is permitted under Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.06,
+   "score": 5.0,
+   "score_note": "Helps mitigate drop-offs during long mean wait times (38+ min), but lacks explicit support email backing."
+  }
+ ],
+ "picked": [
+  "Move sign-in after pet adoption"
+ ],
+ "held_by_harm_budget": [
+  "Interactive tip carousel on waiting screen",
+  "Desktop display shortcut hint on final intro screen"
+ ],
+ "harm_budget": 106.9,
+ "planned_harm": 102.7,
+ "decisions": [
+  {
+   "test": "sim-1",
+   "title": "Move sign-in after pet adoption",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.7506,
+     "treatment": 0.7911,
+     "lift": 0.0539,
+     "lift_se": 0.0241,
+     "p": 0.021661
+    },
+    "finish": {
+     "control": 0.196,
+     "treatment": 0.2127,
+     "lift": 0.085,
+     "lift_se": 0.0783,
+     "p": 0.257637
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "won, shipped",
+   "score": 5.83,
+   "predicted_lift": 0.15,
+   "true_lift_hidden": 0.0419,
+   "finishers_delta_hidden": 12.16
+  }
+ ],
+ "shipped": [
+  "Move sign-in after pet adoption"
+ ],
+ "ends_week": 1,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "Evidence is still thin for sign_in and reorder changes, as only one test has been completed so far."
+ ]
+}

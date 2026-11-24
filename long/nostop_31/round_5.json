@@ -1,0 +1,464 @@
+{
+ "round": 5,
+ "starts_week": 5,
+ "funnel": {
+  "choose_path": 0.7968996,
+  "sign_in": 0.8220932999999999,
+  "adoption": 0.6678902999999999,
+  "home": 0.9098873563199998,
+  "finish": 0.7855056
+ },
+ "weights_used": {
+  "impact": 0.284,
+  "evidence": 0.3,
+  "confidence": 1.105,
+  "cost": 2.311
+ },
+ "lessons_used": [
+  "home, wait_info changes are helpful, delivering consistent wins (+3.6% average after noise correction across 2 tests).",
+  "adoption, redesign changes did not work, showing a negative effect or no clear effect (-5.4% average across 2 tests).",
+  "finish, new_flow changes produced 1 significant win (+11.7%), but a second test showed no clear effect (+2.4%).",
+  "sign_in, reorder changes were inconsistent across 2 tests, yielding 1 significant win (+12.4%) and 1 test that performed worse (-7.1%).",
+  "Predictions remain inaccurate overall, frequently overestimating unsuccessful changes while underestimating unexpected wins.",
+  "Evidence is still thin for choose_path changes, adoption hints/copy, sign_in hints/notifications, and home notifications (only 1 test each)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop Pet Shortcut and Interaction Quick Start Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Adds an interactive quick start checklist component on home_intro that demonstrates how to drag, move, and summon the pet on the desktop before completing onboarding.",
+   "why": "Support mail reveals 3 complaints about user confusion on how to control, hide, or talk to the pet once onboarding finishes.",
+   "config": {
+    "home_intro": {
+     "headline": "Quick Desktop Pet Controls",
+     "body": "Learn how to move, summon, and interact with your new desktop pet in seconds.",
+     "components": [
+      {
+       "type": "animation",
+       "text": "Drag & Drop Pet Action",
+       "style": "playful"
+      },
+      {
+       "type": "checklist",
+       "text": "Try dragging your pet to the corner of your desktop",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds interactive quick-start controls to home_intro within allowed onboarding modifications."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.062,
+   "score": 2.35,
+   "score_note": "Addresses dropoff and support complaints on finish step, but interactive flow requires new screens and release.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Story Intro Card Deck Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesigns the story screen using a card layout with interactive mascot teasers to engage users prior to path selection.",
+   "why": "The choose_path step has a very high mean time (514s) relative to its median (8s), indicating high drop-off delay and hesitation on the intro story.",
+   "config": {
+    "story": {
+     "layout": "card",
+     "headline": "Welcome to Your Desktop Companion Journey",
+     "body": "Explore companion stories and choose the perfect path for your desktop friend.",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "mascot",
+        "style": "playful",
+        "text": "Preview Companion World"
+       },
+       {
+        "role": "intro_story",
+        "type": "choice_cards",
+        "style": "rounded",
+        "action": "choose",
+        "label": "Explore Story Paths"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'story.replace.intro_story[1]': a choice_cards cannot do the intro_story job (use ['animation', 'button', 'image', 'mascot', 'text', 'video'])"
+   }
+  },
+  {
+   "title": "Companion Naming and Bio Creation Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Inserts a dedicated companion naming step directly after friend selection so users name their pet before photo uploading.",
+   "why": "Adoption conversion drops to 66.8%; adding personal naming early increases emotional connection and completion likelihood.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "new_pet_naming",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "pick_friend": {
+     "headline": "Choose & Name Your Desktop Companion",
+     "hint": "Pick your companion species and give them a nickname to proceed."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_pet_naming']"
+   }
+  },
+  {
+   "title": "Account Benefits Split Screen Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesigns the sign-in screen into a split layout clearly highlighting persistent cloud saves and multi-device pet access.",
+   "why": "8 support emails complained about pets missing or reset after signing in again, highlighting the need for visual clarity around cloud account persistence.",
+   "config": {
+    "sign_in": {
+     "layout": "split",
+     "headline": "Secure Your Companion & Sync Progress",
+     "body": "Sign in to keep your pet saved safely to your account across all your desktop devices.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "badge",
+        "style": "highlight",
+        "text": "Cloud Account Protection Active"
+       },
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "style": "emphasis",
+        "action": "next",
+        "label": "Continue with Account"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Generation Stage Time Remaining Counter",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays an active estimated countdown timer and render stage progress breakdown on the waiting screen during pet rendering.",
+   "why": "The waiting step has an extremely long mean time of 2336s, and prior wait_info changes consistently delivered positive conversion gains (+3.6%).",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "headline": "Creating Your Custom Companion...",
+     "body": "Estimated completion time: under 2 minutes. Your pet is rendering in the background."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a countdown estimate during a real generation wait process."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.036,
+   "score": 6.39,
+   "score_note": "Consistent past wins for wait_info improvements; addresses extreme 2336s mean wait time on home step.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Photo Upload Verification Checklist Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Adds a clear photo quality checklist hint on upload_photos specifying lighting, angle, and face visibility requirements.",
+   "why": "3 support emails reported custom pet generation failures or unexpected visual results, contributing to lower adoption step conversion (66.8%).",
+   "config": {
+    "upload_photos": {
+     "hint": "For best generation quality: use 1 well-lit, front-facing photo without hats or heavy shadows.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Clear front angle | Bright lighting | Single face",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'upload_photos.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Completion Ready Audio Visual Prompt",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enables an optional completion notification trigger and audio chime when pet generation finishes while minimized.",
+   "why": "The waiting screen mean time is 2336s vs 201s median, proving users walk away or switch apps while pet generation takes place.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "text": "Play completion chime when pet is ready",
+       "style": "subtle",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an optional chime notification for when pet generation finishes."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.006,
+   "score": 4.76,
+   "score_note": "Targets AFK users during long home wait, but evidence is thin and prior test showed minimal +0.6% gain."
+  },
+  {
+   "title": "Path Decision Confidence Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Updates choose_path copy to explicitly reassure users that their chosen companion path can be modified or changed anytime.",
+   "why": "Mean time for path selection is 514s (median 8s), indicating strong user hesitation and fear of committing to the wrong path.",
+   "config": {
+    "choose_path": {
+     "headline": "Choose Your Starting Companion Path",
+     "body": "Select your initial playstyle. Don't worry—you can unlock and switch paths anytime later!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reassures users about path flexibility without breaking screen jobs or rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.002,
+   "score": 6.5,
+   "score_note": "Low-cost copy change targeting high path hesitation, though past choose_path copy test yielded almost no lift.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Welcome Accessory Unlock Milestone",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Displays a starter pet accessory unlock badge on home_intro as an immediate reward upon completing onboarding.",
+   "why": "Finish conversion is 78.6% with long average durations; offering an instant companion reward incentivizes reaching the end of setup.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Companion is Ready + Starter Collar Unlocked!",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Unlocked: Cozy Starter Ribbon Collar",
+       "style": "playful"
+      },
+      {
+       "type": "button",
+       "text": "Meet Companion on Desktop",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions free extras or unlocked rewards (Cozy Starter Ribbon Collar)."
+   }
+  },
+  {
+   "title": "Existing Account Recovery Guidance Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Adds explicit hint text on the sign_in screen detailing how returning users can sign into their original account to restore lost pets.",
+   "why": "8 support emails involved users reporting missing or reset pets after inadvertently signing into a new or different account.",
+   "config": {
+    "sign_in": {
+     "hint": "Returning user? Sign in with your original account email to automatically restore your existing pet."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  }
+ ],
+ "picked": [
+  "Desktop Pet Shortcut and Interaction Quick Start Flow",
+  "Path Decision Confidence Headline",
+  "Generation Stage Time Remaining Counter"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-17",
+   "title": "Desktop Pet Shortcut and Interaction Quick Start Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.8045,
+     "treatment": 0.8757,
+     "lift": 0.0885,
+     "lift_se": 0.0191,
+     "p": 1e-06
+    },
+    "finish": {
+     "control": 0.3457,
+     "treatment": 0.3477,
+     "lift": 0.0058,
+     "lift_se": 0.0357,
+     "p": 0.870706
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 2.35,
+   "predicted_lift": 0.062,
+   "true_lift_hidden": 0.0882,
+   "finishers_delta_hidden": 89.81
+  },
+  {
+   "test": "sim-18",
+   "title": "Path Decision Confidence Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.8067,
+     "treatment": 0.842,
+     "lift": 0.0438,
+     "lift_se": 0.0125,
+     "p": 0.000323
+    },
+    "finish": {
+     "control": 0.3443,
+     "treatment": 0.3467,
+     "lift": 0.0068,
+     "lift_se": 0.0358,
+     "p": 0.849278
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 6.5,
+   "predicted_lift": 0.002,
+   "true_lift_hidden": 0.0352,
+   "finishers_delta_hidden": 35.84
+  },
+  {
+   "test": "sim-19",
+   "title": "Generation Stage Time Remaining Counter",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.9265,
+     "treatment": 0.9535,
+     "lift": 0.0291,
+     "lift_se": 0.01,
+     "p": 0.003137
+    },
+    "finish": {
+     "control": 0.3353,
+     "treatment": 0.358,
+     "lift": 0.0676,
+     "lift_se": 0.0379,
+     "p": 0.065091
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 6.39,
+   "predicted_lift": 0.036,
+   "true_lift_hidden": 0.0319,
+   "finishers_delta_hidden": 32.48
+  }
+ ],
+ "shipped": [
+  "Desktop Pet Shortcut and Interaction Quick Start Flow",
+  "Path Decision Confidence Headline",
+  "Generation Stage Time Remaining Counter"
+ ],
+ "ends_week": 5,
+ "weights_next": {
+  "impact": 0.298,
+  "evidence": 0.35,
+  "confidence": 0.985,
+  "cost": 2.367
+ },
+ "lessons_next": [
+  "home, wait_info changes are consistently helpful, delivering wins across all 3 tests (+3.3% average after noise correction).",
+  "finish, new_flow changes are generally helpful (+6.7% average after noise correction across 3 tests), producing 2 significant wins (+11.8% and +7.3%) and 1 test with no clear effect (+2.4%).",
+  "adoption, redesign changes did not work (-5.4% average after noise correction across 2 tests), resulting in 1 guardrail rollback (-11.1%) and 1 test with no clear effect (+0.5%).",
+  "sign_in, reorder changes remain inconsistent across 2 tests, producing 1 significant win (+12.4%) and 1 significant loss (-7.2%).",
+  "Predictions remain inaccurate overall, frequently overestimating unsuccessful changes while underestimating unexpected wins.",
+  "Evidence is still thin for kinds of change with only 1 test (adoption copy/hint, choose_path redesign/reorder, home notification, sign_in hint/notification)."
+ ]
+}

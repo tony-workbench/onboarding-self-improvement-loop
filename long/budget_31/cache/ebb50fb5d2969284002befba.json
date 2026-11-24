@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, redesign] Finish Screen Companion Playbook Redesign: Redesign the home intro finish screen into a split layout featuring interactive quick references for pet desktop controls, hiding shortcuts, and interaction triggers.\n   config: {\"home_intro\": {\"layout\": \"split\", \"headline\": \"Your Desktop Companion is Ready!\", \"body\": \"Learn how to command, hide, or chat with your new pet anytime from your system tray or hotkeys.\", \"components\": [{\"type\": \"checklist\", \"label\": \"Essential Desktop Controls\", \"text\": \"Right-click pet for menu • Press Alt+P to hide • Drag anywhere to move\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Start Desktop Session\", \"action\": \"next\", \"style\": \"playful\"}]}}\n1: [adoption, new_screen] Pet Arrival Ritual Screen: Introduce a dedicated celebration screen right after pet choice to perform an interactive pet adoption ritual before printing the certificate.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_arrival_ritual\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_arrival_ritual\": {\"layout\": \"centered\", \"headline\": \"Welcome Your New Companion!\", \"body\": \"Give your new pet a warm welcome to prepare them for their new home on your desktop.\", \"components\": [{\"type\": \"mascot\", \"asset\": \"asset:welcome_pet\", \"style\": \"playful\"}, {\"type\": \"button\", \"label\": \"Complete Adoption Ritual\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n2: [home, redesign] Desktop Readiness Check Waiting Stage Redesign: Rebuild the waiting screen with a structured checklist layout verifying system overlay compatibility, asset compilation, and desktop tray setup.\n   config: {\"waiting\": {\"layout\": \"checklist\", \"headline\": \"Preparing Your Desktop Workspace\", \"body\": \"We are calibrating screen overlays and loading pet animations for your desktop environment.\", \"show_progress\": true, \"components\": [{\"type\": \"checklist\", \"label\": \"System Check Status\", \"text\": \"Desktop Overlay Engine • System Tray Integration • Pet Animation Assets\", \"style\": \"rounded\"}, {\"type\": \"progress\", \"text\": \"Finalizing desktop integration...\", \"style\": \"highlight\"}]}}\n3: [choose_path, new_flow] Interactive Story Journey Flow: Add an introductory story overview screen and update path selection to a carousel layout displaying interactive companion journey previews.\n   config: {\"_order\": [\"story\", \"new_journey_overview\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_journey_overview\": {\"layout\": \"stage\", \"headline\": \"Choose Your Companion Experience\", \"body\": \"Explore different pet personalities and play styles before selecting your path.\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Experience Types\", \"text\": \"Relaxed Desktop Companion vs Active Play Buddy\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Continue to Path Selection\", \"action\": \"next\", \"style\": \"playful\"}]}, \"choose_path\": {\"layout\": \"carousel\", \"headline\": \"Select Your Journey Path\", \"body\": \"Pick the path that best matches how you want to interact with your pet on your desktop.\"}}\n4: [sign_in, notification] Sign In Account Sync Status Banner: Display an explicit cloud sync reassurance notification on the sign-in screen informing returning users that their adopted pets will automatically restore.\n   config: {\"sign_in\": {\"hint\": \"Signing in automatically syncs and restores your saved pets and progress from cloud storage.\", \"components\": [{\"type\": \"badge\", \"label\": \"Cloud Sync Active\", \"text\": \"Your existing pets and items are safe and ready to restore.\", \"style\": \"highlight\"}]}}\n5: [adoption, wait_info] Custom Pet Generation Status Tracker: Add explicit estimated generation times and photo processing status feedback on the photo upload screen.\n   config: {\"upload_photos\": {\"show_time_estimate\": true, \"tip_delay_seconds\": 5, \"hint\": \"Photo analysis takes about 30 seconds. Ensure high contrast and clear lighting for best visual outcome.\", \"components\": [{\"type\": \"tip_carousel\", \"label\": \"Generation Tips\", \"text\": \"Clear front-facing photos produce the sharpest 3D pet models.\", \"style\": \"calm\"}]}}\n6: [finish, hint] Desktop Pet Quick Shortcut Hint: Add a dedicated tray icon tip and hotkey summary banner on the finish screen.\n   config: {\"home_intro\": {\"hint\": \"Tip: Look for the pet icon in your system tray to adjust visibility, volume, or open pet chat anytime.\", \"components\": [{\"type\": \"badge\", \"label\": \"Quick Tip\", \"text\": \"Right-click system tray icon to hide pet or access settings instantly.\", \"style\": \"subtle\"}]}}\n7: [choose_path, copy] Path Selection Clarity Headline Update: Update headline and subtext on the path screen to reassure users that path choices can easily be adjusted later in app settings.\n   config: {\"choose_path\": {\"headline\": \"Select Your Preferred Experience (Change Anytime)\", \"body\": \"Don't worry—you can adjust your pet's play style and notification frequency later in Settings.\"}}\n8: [home, notification] Desktop Pet Launch Notification Prompt: Enable desktop readiness notifications on the waiting screen so users are alerted when pet initialization finishes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"hint\": \"Feel free to minimize this window. We'll alert you as soon as your pet is ready on your desktop.\", \"components\": [{\"type\": \"badge\", \"label\": \"Background Ready\", \"text\": \"We will notify you on desktop when complete.\", \"style\": \"plain\"}]}}\n9: [adoption, incentive] Adoption Certificate Starter Accessory Perk: Add a bonus starter item badge to the adoption certificate screen to reward completion of the adoption step.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Adoption Certificate & Starter Gift\", \"components\": [{\"type\": \"badge\", \"label\": \"Bonus Unlocked\", \"text\": \"Free Starter Toy Pack included with your adoption certificate!\", \"style\": \"playful\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesign of home_intro inside onboarding complies with all rules."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new celebration screen inside onboarding maintains all required steps and rules."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesign of waiting screen retains its core job of showing the pet is being prepared."
+   },
+   {
+    "index": 3,
+    "pass": false,
+    "rule": 2,
+    "reason": "The choose_path screen no longer offers adopting and making your own pet."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a sign-in sync status banner inside onboarding is permitted."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding photo processing status feedback on the upload screen is allowed."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding tray hotkey hints on the home_intro screen complies with all rules."
+   },
+   {
+    "index": 7,
+    "pass": false,
+    "rule": 2,
+    "reason": "Updating choose_path to focus on play style/notifications removes the job of choosing between adopting and making your own."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling notification prompts on the waiting screen is permitted."
+   },
+   {
+    "index": 9,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions 'Free' and 'Gift', which violates the prohibition on mentioning gifts or free extras."
+   }
+  ]
+ }
+}

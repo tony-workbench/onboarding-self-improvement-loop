@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_screen] Finish Setup Desktop Interactions Guide Screen: Adds a new guidance screen right before finishing onboarding that visualizes basic desktop pet gestures, system tray controls, and hotkeys.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_desktop_interactions\"], \"new_desktop_interactions\": {\"headline\": \"How to Interact With Your Desktop Pet\", \"body\": \"Learn simple shortcuts and gestures to command, chat with, or hide your companion anytime.\", \"layout\": \"centered\", \"components\": [{\"type\": \"text\", \"text\": \"Right-click your pet to open quick actions. Press Ctrl+Shift+P to hide or summon them.\", \"style\": \"emphasis\"}, {\"type\": \"button\", \"label\": \"Got It!\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n1: [choose_path, redesign] Choose Path Mascot Stage Redesign: Redesigns the path choice screen into a central interactive mascot stage highlighting pre-made vs custom companion options.\n   config: {\"choose_path\": {\"layout\": \"stage\", \"headline\": \"Choose Your Companion Journey\", \"body\": \"Select whether you want to adopt an instant starter pet or create a unique custom companion from your photos.\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"label\": \"Starter Pet vs Custom Creation\", \"style\": \"playful\", \"action\": \"choose\"}]}}}\n2: [home, new_screen] Waiting Step Desktop Spawning Progress Screen: Adds an animated companion spawning screen during the home waiting step with real-time initialization steps.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_spawning_progress\", \"waiting\", \"home_intro\"], \"new_spawning_progress\": {\"headline\": \"Preparing Your Pet for the Desktop\", \"body\": \"We are calibrating window transparency, placement, and animations so your pet arrives smoothly.\", \"layout\": \"spotlight\", \"show_progress\": true, \"components\": [{\"type\": \"progress\", \"label\": \"Initializing companion desktop engine...\", \"style\": \"highlight\"}, {\"type\": \"animation\", \"asset\": \"asset:pet_spawn_anim\", \"style\": \"playful\"}]}}\n3: [adoption, new_flow] Custom Photo Upload Assistance Flow: Introduces a guided photo guidelines screen before photo selection to ensure users upload photos that render correctly.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_photo_guidelines\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_photo_guidelines\": {\"headline\": \"Photo Upload Best Practices\", \"body\": \"For best custom pet results, use clear, well-lit photos with distinct subject edges.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"label\": \"Ensure clear lighting, front-facing subject, and high resolution.\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Continue to Upload\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n4: [sign_in, hint] Sign-In Existing Pet Account Warning Hint: Displays a clear hint on the sign-in screen reminding users to log in with their original account to preserve existing pets.\n   config: {\"sign_in\": {\"hint\": \"Please sign in with your original account to access existing pets and progress.\", \"components\": [{\"type\": \"text\", \"text\": \"Note: Using a different login will create a new profile and won't carry over current pets.\", \"style\": \"subtle\"}]}}\n5: [adoption, wait_info] Adoption Certificate Final Verification Info: Adds a progress indicator and live status updates on the adoption certificate screen while pet assets generate.\n   config: {\"adoption_certificate\": {\"show_progress\": true, \"show_time_estimate\": true, \"hint\": \"Generating official adoption records and assembling pet assets...\", \"components\": [{\"type\": \"progress\", \"label\": \"Finalizing adoption papers...\", \"style\": \"emphasis\"}]}}\n6: [home, notification] Desktop Pet Spawn Ready Desktop Notification: Enables readiness notifications and delay tips on the waiting screen when the pet is ready to spawn on desktop.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"tip_delay_seconds\": 15, \"hint\": \"Your pet is rendering in the background. You will receive a notification as soon as it lands on your screen!\"}}\n7: [choose_path, copy] Story Screen Path Clarity Headline Copy: Updates headline and body on the initial story screen to clearly set expectations for the desktop companion setup.\n   config: {\"story\": {\"headline\": \"Welcome to Your Desktop Companion Adventure\", \"body\": \"In just 2 minutes, pick a ready-to-play pet or turn your favorite photos into a unique virtual friend.\", \"button_label\": \"Start Setup\"}}\n8: [finish, incentive] Completion Desktop Shortcut & Tray Menu Incentive: Highlights system tray toggles and shortcut tips on the home intro screen to help users easily locate their pet.\n   config: {\"home_intro\": {\"headline\": \"Your Companion is Ready on Your Desktop!\", \"body\": \"Check your system tray near the clock anytime to hide, summon, or customize your companion.\", \"components\": [{\"type\": \"badge\", \"label\": \"Pro Tip: Look for the pet icon in your system tray\", \"style\": \"highlight\"}]}}\n9: [adoption, layout] Pick Friend Compact Companion Layout: Changes the layout of the pick friend screen to a compact view with instant visual companion previews.\n   config: {\"pick_friend\": {\"layout\": \"compact\", \"headline\": \"Select Your Starter Pet\", \"body\": \"Choose your favourite virtual companion to start playing right away.\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:starter_pet_preview\", \"style\": \"rounded\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new guidance screen after home_intro while keeping all required onboarding steps intact."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns choose_path while continuing to offer both adopting and creating a custom pet."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid progress screen during onboarding without removing any required steps."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a photo upload guidelines step before upload_photos without removing required steps."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful account context hint on the sign_in screen within rule limits."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds progress and status info to the adoption certificate screen without losing its core function."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds notification and timing options to the waiting screen as permitted by rule 4."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates story copy to introduce the pet journey clearly without violating pricing or fair design rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds system tray usage tips to home_intro within onboarding boundaries."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns pick_friend layout to compact while preserving companion selection."
+   }
+  ]
+ }
+}

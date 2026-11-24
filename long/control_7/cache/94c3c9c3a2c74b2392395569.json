@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [home, redesign] Stage Waiting Progress Redesign: Redesign the waiting screen into a dynamic stage layout with real-time render progress indicators and visual pet previews.\n   config: {\"waiting\": {\"layout\": \"stage\", \"headline\": \"Creating Your Desktop Pet\", \"show_progress\": true, \"show_time_estimate\": true, \"components\": [{\"type\": \"preview\", \"asset\": \"asset:pet_render_preview\", \"style\": \"rounded\"}, {\"type\": \"progress\", \"style\": \"highlight\"}]}}\n1: [finish, new_screen] Interactive Pet Desktop Sandbox Screen: Add a dedicated desktop controls sandbox screen after home intro guiding users through dragging, hiding, and right-clicking their pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_desktop_sandbox\"], \"new_desktop_sandbox\": {\"layout\": \"centered\", \"headline\": \"Mastering Your Desktop Companion\", \"body\": \"Try moving, dragging, and using the right-click menu to interact with your pet on screen.\", \"components\": [{\"type\": \"checklist\", \"style\": \"playful\"}, {\"type\": \"button\", \"label\": \"Got It!\", \"action\": \"next\"}]}}\n2: [sign_in, reorder] Post Adoption Certificate Sign In Shift: Move sign-in to take place immediately after completing the adoption certificate step to tie account registration directly to pet ownership.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"], \"sign_in\": {\"headline\": \"Save Your New Pet to Your Account\", \"body\": \"Sign in now to safeguard your companion and prevent progress resets.\", \"layout\": \"centered\"}}\n3: [adoption, new_flow] Dual Photo Fallback Creation Flow: Introduce a two-column creation screen layout with photo uploads alongside preset style choices as a fallback.\n   config: {\"upload_photos\": {\"layout\": \"two_column\", \"headline\": \"Customize Your Pet Appearance\", \"hint\": \"Upload a photo or select a preset style to ensure successful creation.\", \"components\": [{\"type\": \"photo_picker\", \"style\": \"rounded\"}, {\"type\": \"choice_cards\", \"style\": \"playful\"}]}}\n4: [sign_in, copy] Existing Account Pet Sync Warning Copy: Update the sign-in headline and body copy to assure returning users that their existing pets will be automatically synced.\n   config: {\"sign_in\": {\"headline\": \"Welcome Back to Your Desktop Pet\", \"body\": \"Sign in with your account to automatically sync and restore all your saved pets and progress.\", \"hint\": \"Using your original sign-in method guarantees instant pet data recovery.\"}}\n5: [adoption, hint] Adoption Certificate Account Protection Hint: Add an explicit sync guarantee hint on the adoption certificate screen to reduce anxiety about losing pet creation details.\n   config: {\"adoption_certificate\": {\"hint\": \"Your pet certificate details will be automatically backed up when you log in.\", \"show_step_counter\": true}}\n6: [home, notification] Desktop Pet Spawn Ready Alert: Enable desktop notification toggle on the waiting screen so users can be notified when their pet finishes loading.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"headline\": \"Generating Your Pet...\", \"hint\": \"You will receive a notification as soon as your pet is ready on your desktop.\"}}\n7: [adoption, incentive] Adopt Certificate Welcome Bonus Badge: Add an exclusive starter pack reward badge to the adoption certificate screen.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Adoption Certificate\", \"components\": [{\"type\": \"badge\", \"text\": \"Unlocks Starter Toy & Snack Pack!\", \"style\": \"highlight\"}]}}\n8: [finish, layout] Home Intro Split Screen Controls Layout: Redesign the home intro layout into a split screen featuring video guidance on controlling desktop pet features.\n   config: {\"home_intro\": {\"layout\": \"split\", \"headline\": \"Welcome Home!\", \"body\": \"Here is how to interact with your pet on your desktop screen.\", \"components\": [{\"type\": \"video\", \"asset\": \"asset:desktop_controls_demo\", \"style\": \"rounded\"}]}}\n9: [home, wait_info] Waiting Screen Generation Stage Timer: Display an active timer and rotating tip carousel on the waiting screen to keep users informed during rendering.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"tip_delay_seconds\": 15, \"components\": [{\"type\": \"timer\", \"style\": \"calm\"}, {\"type\": \"tip_carousel\", \"style\": \"plain\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns waiting screen while maintaining its job and showing real-time progress."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new interactive sandbox screen following home intro as allowed by Rule 4."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in to after adoption certificate without dropping required steps."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Enhances upload photos step with fallback choices inside onboarding."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates sign-in screen copy within onboarding guidelines."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an informational sync hint to the adoption certificate screen."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds optional notification toggle on the waiting screen."
+   },
+   {
+    "index": 7,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions unlockable gifts/extras (Starter Toy & Snack Pack), violating Rule 3."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns home intro overlay layout with video guidance."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds progress timer and tips for a real wait on the waiting screen, complying with Rule 5."
+   }
+  ]
+ }
+}

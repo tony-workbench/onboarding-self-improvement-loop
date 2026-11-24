@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [choose_path, redesign] Interactive story pet stage preview: Redesign the story intro screen into a stage layout featuring animated previews of interactive pets before selecting a path.\n   config: {\"story\": {\"layout\": \"stage\", \"components\": [{\"type\": \"animation\", \"asset\": \"asset:mascot_preview\", \"style\": \"playful\"}]}}\n1: [finish, new_screen] Interactive desktop control guide screen: Insert a dedicated tutorial screen after home_intro demonstrating how to summon, minimize, and control the desktop pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_desktop_controls_preview\"], \"new_desktop_controls_preview\": {\"headline\": \"How to Interact with Your Pet\", \"body\": \"Learn the tray icon shortcuts and mouse gestures to summon or hide your pet anytime.\", \"layout\": \"centered\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Desktop Controls Overview\", \"style\": \"rounded\"}]}}\n2: [adoption, new_flow] Photo preview verification flow: Replace standard photo upload with an interactive preview player and validation checklist before adoption confirmation.\n   config: {\"upload_photos\": {\"replace\": {\"photo_upload\": [{\"type\": \"preview\", \"asset\": \"asset:photo_preview\", \"style\": \"rounded\", \"role\": \"photo_upload\"}, {\"type\": \"checklist\", \"label\": \"Photo Quality Checklist\", \"role\": \"photo_upload\"}]}}}\n3: [home, redesign] Spotlight desktop positioning preview waiting screen: Redesign the waiting screen into a spotlight layout demonstrating where and how the pet will spawn on the user's screen.\n   config: {\"waiting\": {\"layout\": \"spotlight\", \"headline\": \"Preparing Your Pet Desktop Overlay\", \"body\": \"Your pet is initializing and will appear near your taskbar shortly.\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:desktop_spawn_demo\", \"style\": \"rounded\"}]}}\n4: [sign_in, hint] Account pet sync identifier hint: Add an explicit explanatory hint on sign_in clarifying that signing into an existing email account restores prior pets.\n   config: {\"sign_in\": {\"hint\": \"Make sure to sign in with your primary email to automatically sync and restore any existing desktop pets.\"}}\n5: [finish, layout] Full bleed mascot welcome hero: Change home_intro layout to full_bleed spotlight with a clear badge indicating how to access pet settings.\n   config: {\"home_intro\": {\"layout\": \"full_bleed\", \"headline\": \"Your Desktop Pet is Active!\", \"components\": [{\"type\": \"badge\", \"text\": \"Right-click the pet tray icon to open controls\", \"style\": \"highlight\"}]}}\n6: [home, wait_info] Desktop engine initialization status text: Display a structured progress bar and detailed step descriptions on the waiting screen.\n   config: {\"waiting\": {\"replace\": {\"wait_status\": [{\"type\": \"progress\", \"text\": \"Initializing desktop graphics overlay...\", \"role\": \"wait_status\"}]}}}\n7: [adoption, incentive] Pet trait starter kit reward badge: Add a starter accessory pack highlight badge and choice cards to pick_friend screen.\n   config: {\"pick_friend\": {\"components\": [{\"type\": \"badge\", \"text\": \"Includes Starter Accessory Bundle\", \"style\": \"playful\"}, {\"type\": \"choice_cards\", \"label\": \"Choose Personality Trait\", \"style\": \"rounded\"}]}}\n8: [home, incentive] Background waiting bonus incentive badge: Show a desktop bonus unlock callout on the waiting screen while pet assets render.\n   config: {\"waiting\": {\"components\": [{\"type\": \"badge\", \"text\": \"Bonus Desktop Toy Unlocked Upon Setup\", \"style\": \"playful\"}]}}\n9: [choose_path, hint] Path decision comparison summary hint: Add a decision aid hint directly explaining the difference between premade and photo-generated pets.\n   config: {\"choose_path\": {\"hint\": \"Pick 'Custom Pet' to build from photos, or 'Ready Companion' to start playing immediately.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the story screen while maintaining its pet introduction function within onboarding limits."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid tutorial screen after home_intro without removing any onboarding steps."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates photo_upload components while maintaining the photo upload requirement."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the waiting screen layout while maintaining its core job of showing pet creation progress."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an explanatory hint to sign_in without violating any rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns home_intro layout within allowed onboarding bounds."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates waiting status components while fulfilling the waiting screen job."
+   },
+   {
+    "index": 7,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions a starter accessory bundle (gift/free extra), violating Rule 3."
+   },
+   {
+    "index": 8,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions a bonus toy (gift/free extra), violating Rule 3."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a decision hint to choose_path explaining both options without violating rules."
+   }
+  ]
+ }
+}

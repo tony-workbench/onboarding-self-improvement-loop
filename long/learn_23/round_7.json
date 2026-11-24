@@ -1,0 +1,540 @@
+{
+ "round": 7,
+ "starts_week": 7,
+ "funnel": {
+  "choose_path": 0.831342,
+  "sign_in": 0.7595451,
+  "adoption": 0.7646115070714049,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.003,
+  "evidence": 1.155,
+  "confidence": 1.743,
+  "cost": 0.1
+ },
+ "lessons_used": [
+  "Evidence is still thin for single-test change kinds (adoption layout, finish copy/hint/layout, home layout/redesign, sign_in hint/redesign).",
+  "Redesigning adoption screens (adoption, redesign) proved helpful and delivered multiple winning tests.",
+  "Copy changes on the path selection screen (choose_path, copy) consistently hurt performance.",
+  "Adding new screens at the finish step (finish, new_screen) showed no clear positive effect and hurt performance.",
+  "Notification toggles (home, notification) and waiting screen info (home, wait_info) showed no clear effect.",
+  "Predictions were consistently higher than the noise-corrected measured results."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Full bleed adoption certificate preview redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen using a full bleed layout featuring an interactive pet certificate preview with official adoption stamp animation.",
+   "why": "Adoption screens have proven responsive to redesigns in past tests, and adoption completion time remains high (median 89s, mean 1017s).",
+   "config": {
+    "adoption_certificate": {
+     "layout": "full_bleed",
+     "components": [
+      {
+       "type": "preview",
+       "asset": "asset:cert_preview",
+       "style": "large",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesign keeps the required adoption certificate functionality and official stamp intact within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.035,
+   "score": 7.95,
+   "score_note": "Adoption redesigns have proven successful (+3.7% across 4 tests) addressing high completion duration.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 162.8
+  },
+  {
+   "title": "Pet personality quiz screen before friend pick",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Insert a new interactive quiz screen before friend selection to recommend the best matching pet type based on user preferences.",
+   "why": "Users take an average of 1017 seconds in adoption and 3 support emails reported difficulty or failure in custom pet selection. A quick quiz streamlines decision-making.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "new_pet_quiz",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_pet_quiz": {
+     "headline": "Find Your Ideal Desktop Pet",
+     "body": "Answer two quick questions to discover which pet personality matches your desktop style.",
+     "layout": "card",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Select your play style",
+       "style": "playful",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a personality quiz screen within onboarding order is allowed and retains all required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.02,
+   "score": 4.56,
+   "score_note": "Adding new screens consistently hurts funnel conversion despite support email complaints."
+  },
+  {
+   "title": "Pet accessories customization screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Add a new screen after pet friend selection where users pick initial starter accessories for their pet before completing adoption.",
+   "why": "Redesigning and expanding the adoption flow drives higher user involvement, addressing the drop-off between adoption (76.5%) and final completion.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "new_pet_accessories",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_pet_accessories": {
+     "headline": "Style Your Desktop Pet",
+     "body": "Pick starting accessories to personalize your companion.",
+     "layout": "grid",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Choose starter items",
+       "style": "rounded",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an accessories customization screen during onboarding is allowed and mentions no pricing or free gifts."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.03,
+   "score": 2.63,
+   "score_note": "Inserting extra steps adds friction and historically lowers conversion."
+  },
+  {
+   "title": "Custom pet photo validation preview flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Replace photo upload components with a multi-stage upload flow that validates image quality and shows a real-time pet rendering preview.",
+   "why": "3 support emails reported custom pet creation failing or looking wrong. Live validation prevents bad uploads and reduces adoption drop-offs.",
+   "config": {
+    "upload_photos": {
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "label": "Upload Photo",
+        "style": "emphasis",
+        "action": "next"
+       },
+       {
+        "role": "photo_upload",
+        "type": "preview",
+        "asset": "asset:photo_preview",
+        "style": "rounded",
+        "action": "play"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[1]': a preview cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Stage layout redesign for choose path screen",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the choose path screen into a stage layout with animated path showcases highlighting quick preset versus custom paths.",
+   "why": "Users take a long mean duration (514s) on path selection. A visually structured stage layout helps users compare paths quickly.",
+   "config": {
+    "choose_path": {
+     "layout": "stage"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning choose path layout inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.014,
+   "score": 3.98,
+   "score_note": "Path selection redesigns show small positive lift (+1.4% across 3 tests).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 162.8
+  },
+  {
+   "title": "Full bleed layout redesign for waiting screen",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesign the loading waiting screen into a full bleed progress dashboard featuring dynamic asset loading animations.",
+   "why": "The waiting step has a very long mean time (2336s) and 81.3% conversion. A full bleed dashboard engages users during desktop pet compilation.",
+   "config": {
+    "waiting": {
+     "layout": "full_bleed"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the waiting screen layout inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.005,
+   "score": 3.98,
+   "score_note": "Home screen redesigns have thin evidence and minimal measured impact (+0.5%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 162.8
+  },
+  {
+   "title": "Compact layout redesign for sign-in screen",
+   "target_step": "sign_in",
+   "type": "layout",
+   "change": "Switch the sign-in screen to a compact layout with streamlined single-click authentication options.",
+   "why": "Sign-in step conversion is 76.0% with an average time of 567s. A compact layout simplifies sign-in and reduces user fatigue.",
+   "config": {
+    "sign_in": {
+     "layout": "compact"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the sign in screen layout inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.005,
+   "score": 2.63,
+   "score_note": "Sign-in modifications have trended negative or neutral in previous tests.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 162.8
+  },
+  {
+   "title": "Split layout redesign for home intro screen",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Reorganize the final home intro screen into a split layout separating pet welcome visuals from desktop controls.",
+   "why": "The final step has the lowest conversion rate (64.8%), and 3 support emails reported confusion on how to control or open the pet.",
+   "config": {
+    "home_intro": {
+     "layout": "split"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro screen layout inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.019,
+   "score": 5.39,
+   "score_note": "High drop-off step with support emails, but layout changes at finish previously dropped performance (-1.9%)."
+  },
+  {
+   "title": "Custom photo guideline hint on photo upload screen",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Display a helpful hint detailing lighting and photo framing best practices on the photo upload screen.",
+   "why": "Support received 3 emails about custom pet generation failing or producing bad visual results.",
+   "config": {
+    "upload_photos": {
+     "hint": "For best results, upload a clear front-facing photo with good lighting and a single subject."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Asks for personal information (photo)"
+   }
+  },
+  {
+   "title": "Desktop pet visibility hint on home intro screen",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Add an explicit status hint on the home intro screen explaining how to locate and summon the pet via the system tray.",
+   "why": "3 support emails reported that the pet does not show up on desktop or the app fails to launch visually after onboarding.",
+   "config": {
+    "home_intro": {
+     "hint": "If your pet does not appear on screen immediately, click the pet icon in your system tray to summon it."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a system tray hint on home intro inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.028,
+   "score": 7.7,
+   "score_note": "Targets the highest drop-off step supported by complaints; hints at finish showed positive lift (+2.8%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 107.5
+  }
+ ],
+ "picked": [
+  "Full bleed adoption certificate preview redesign",
+  "Stage layout redesign for choose path screen",
+  "Desktop pet visibility hint on home intro screen",
+  "Full bleed layout redesign for waiting screen",
+  "Compact layout redesign for sign-in screen"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 758.7,
+ "decisions": [
+  {
+   "test": "sim-27",
+   "title": "Stage layout redesign for choose path screen",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": 56,
+   "share": 1.0,
+   "planned_harm": 162.8,
+   "result": {
+    "step": {
+     "control": 0.8195,
+     "treatment": 0.7605,
+     "lift": -0.072,
+     "lift_se": 0.0199,
+     "p": 0.000459
+    },
+    "finish": {
+     "control": 0.2156,
+     "treatment": 0.2164,
+     "lift": 0.004,
+     "lift_se": 0.0791,
+     "p": 0.959918
+    },
+    "users_per_group": 1169
+   },
+   "outcome": "stopped early: choose_path worse",
+   "score": 3.98,
+   "predicted_lift": 0.014,
+   "true_lift_hidden": -0.0443,
+   "finishers_delta_hidden": -11.29
+  },
+  {
+   "test": "sim-26",
+   "title": "Full bleed adoption certificate preview redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 162.8,
+   "result": {
+    "step": {
+     "control": 0.7462,
+     "treatment": 0.7725,
+     "lift": 0.0352,
+     "lift_se": 0.0193,
+     "p": 0.063614
+    },
+    "finish": {
+     "control": 0.2357,
+     "treatment": 0.2417,
+     "lift": 0.0255,
+     "lift_se": 0.0473,
+     "p": 0.585652
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.95,
+   "predicted_lift": 0.035,
+   "true_lift_hidden": 0.017,
+   "finishers_delta_hidden": 11.86
+  },
+  {
+   "test": "sim-28",
+   "title": "Desktop pet visibility hint on home intro screen",
+   "target_step": "finish",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 107.5,
+   "result": {
+    "step": {
+     "control": 0.6434,
+     "treatment": 0.6752,
+     "lift": 0.0494,
+     "lift_se": 0.0318,
+     "p": 0.111709
+    },
+    "finish": {
+     "control": 0.24,
+     "treatment": 0.2543,
+     "lift": 0.0597,
+     "lift_se": 0.0478,
+     "p": 0.198125
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.7,
+   "predicted_lift": 0.028,
+   "true_lift_hidden": 0.0358,
+   "finishers_delta_hidden": 24.99
+  },
+  {
+   "test": "sim-29",
+   "title": "Full bleed layout redesign for waiting screen",
+   "target_step": "home",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 162.8,
+   "result": {
+    "step": {
+     "control": 0.7979,
+     "treatment": 0.7701,
+     "lift": -0.0349,
+     "lift_se": 0.0191,
+     "p": 0.071542
+    },
+    "finish": {
+     "control": 0.2427,
+     "treatment": 0.2207,
+     "lift": -0.0907,
+     "lift_se": 0.0428,
+     "p": 0.043427
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.98,
+   "predicted_lift": 0.005,
+   "true_lift_hidden": -0.0416,
+   "finishers_delta_hidden": -29.03
+  },
+  {
+   "test": "sim-30",
+   "title": "Compact layout redesign for sign-in screen",
+   "target_step": "sign_in",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 162.8,
+   "result": {
+    "step": {
+     "control": 0.7474,
+     "treatment": 0.7226,
+     "lift": -0.0331,
+     "lift_se": 0.0166,
+     "p": 0.049967
+    },
+    "finish": {
+     "control": 0.222,
+     "treatment": 0.2293,
+     "lift": 0.033,
+     "lift_se": 0.0494,
+     "p": 0.496861
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 2.63,
+   "predicted_lift": -0.005,
+   "true_lift_hidden": -0.0323,
+   "finishers_delta_hidden": -22.54
+  }
+ ],
+ "shipped": [],
+ "ends_week": 7,
+ "weights_next": {
+  "impact": 0.919,
+  "evidence": 1.042,
+  "confidence": 1.948,
+  "cost": 0.091
+ },
+ "lessons_next": [
+  "Evidence is still thin for single-test change kinds (adoption layout, finish copy/layout, home layout, sign_in hint/layout/redesign).",
+  "Redesigning adoption screens (adoption, redesign) is helpful and delivered multiple winning tests.",
+  "Copy changes on the path selection screen (choose_path, copy) consistently hurt performance.",
+  "Adding new screens at the finish step (finish, new_screen) showed no positive effect and hurt performance.",
+  "Notification toggles (home, notification), waiting screen info (home, wait_info), waiting redesigns (home, redesign), and finish hints (finish, hint) showed no clear effect.",
+  "Predictions were consistently higher than the noise-corrected measured results."
+ ]
+}

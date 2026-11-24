@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [home, new_flow] waiting_pet_controls_preview_flow: Adds an interactive flow on the waiting screen showing users how to hide, summon, and talk to their pet while background rendering completes.\n   config: {\"waiting\": {\"layout\": \"checklist\", \"components\": [{\"type\": \"text\", \"text\": \"Preview your desktop pet controls while your pet gets ready!\", \"style\": \"emphasis\"}, {\"type\": \"checklist\", \"label\": \"Desktop Pet Controls\", \"style\": \"plain\"}]}}\n1: [finish, redesign] home_intro_desktop_visibility_guide_redesign: Redesigns the final home intro screen into a focused visual guide demonstrating desktop tray toggles and pet summoning shortcuts.\n   config: {\"home_intro\": {\"layout\": \"split\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"image\", \"asset\": \"asset:desktop_tray_guide\", \"style\": \"rounded\"}, {\"role\": \"home_welcome\", \"type\": \"text\", \"text\": \"Find your pet in the desktop system tray or use double-click to summon anytime.\", \"style\": \"emphasis\"}]}}}\n2: [finish, new_screen] new_screen_desktop_visibility_basics: Adds a dedicated onboarding screen at the end of setup explaining system tray controls, desktop visibility, and pet interaction shortcuts.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_screen_desktop_visibility_basics\"], \"new_screen_desktop_visibility_basics\": {\"headline\": \"Desktop Pet Visibility & Controls\", \"body\": \"Your pet lives on your desktop! Use the system tray icon to show, hide, or access pet settings at any time.\", \"button_label\": \"Got It!\", \"layout\": \"centered\"}}\n3: [adoption, redesign] upload_photos_preview_check_redesign: Redesigns photo uploading with an instant visual check component that highlights lighting and angle quality before submission.\n   config: {\"upload_photos\": {\"layout\": \"two_column\", \"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"preview\", \"style\": \"rounded\"}, {\"role\": \"photo_upload\", \"type\": \"badge\", \"text\": \"Photo Quality Check: Good Lighting\", \"style\": \"highlight\"}]}}}\n4: [home, wait_info] waiting_render_completion_countdown_info: Displays a live rendering timer badge alongside an interactive progress checklist on the waiting screen.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"components\": [{\"type\": \"timer\", \"text\": \"Estimated completion: under 2 minutes\", \"style\": \"emphasis\"}]}}\n5: [adoption, incentive] adoption_certificate_desktop_badge_incentive: Displays an exclusive desktop companion badge on the adoption certificate screen upon finalizing your pet's name.\n   config: {\"adoption_certificate\": {\"components\": [{\"type\": \"badge\", \"text\": \"Unlocked: Founder Companion Badge\", \"style\": \"playful\"}]}}\n6: [finish, hint] home_intro_pet_toggle_shortcut_hint: Adds a clear hint banner explaining system tray pet toggling and summon shortcuts on the home intro screen.\n   config: {\"home_intro\": {\"hint\": \"Tip: Click your system tray icon anytime to bring your pet to the front or hide it.\"}}\n7: [home, notification] waiting_screen_render_alert_notification: Enables a system readiness notification toggle on the wait screen to notify users when rendering finishes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"badge\", \"text\": \"We will notify you on your desktop when your pet is ready!\", \"style\": \"subtle\"}]}}\n8: [adoption, new_flow] pick_friend_customization_preview_flow: Introduces a trait customization preview flow on the companion selection screen before moving to adoption.\n   config: {\"pick_friend\": {\"layout\": \"stage\", \"components\": [{\"type\": \"preview\", \"style\": \"large\"}, {\"type\": \"choice_cards\", \"label\": \"Select Trait & Personality\", \"style\": \"rounded\"}]}}\n9: [adoption, copy] upload_photos_clarity_check_copy: Updates copy on photo upload to explicitly instruct users on bright lighting and clear front-facing angles.\n   config: {\"upload_photos\": {\"headline\": \"Upload a Clear, Well-Lit Photo\", \"body\": \"For the best custom pet results, ensure your photo has good lighting and a clear view of the face.\", \"hint\": \"Avoid dark or blurry photos for optimal 3D generation.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of an interactive controls preview during the waiting screen."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of the home intro screen within onboarding."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a new onboarding screen following home intro."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid visual redesign of the photo upload preview component."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid completion estimate timer for a real background rendering wait."
+   },
+   {
+    "index": 5,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions unlocked free extra/gift (Founder Companion Badge)."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid shortcut hint added to the home intro screen."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid notification toggle added to the waiting screen."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid customization preview flow added to the companion selection screen."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update for photo upload guidance."
+   }
+  ]
+ }
+}

@@ -1,0 +1,521 @@
+{
+ "round": 16,
+ "starts_week": 16,
+ "funnel": {
+  "choose_path": 0.8696246555883237,
+  "sign_in": 0.9299383355959924,
+  "adoption": 0.68923510446,
+  "home": 0.9146336270753486,
+  "finish": 0.8229113595972
+ },
+ "weights_used": {
+  "impact": 0.848,
+  "evidence": 0.449,
+  "confidence": 2.064,
+  "cost": 0.639
+ },
+ "lessons_used": [
+  "Sign-in & account: Post-adoption sign-in timing, account recovery copy, and multi-device sync banners won; moving sign-in post-waiting hurt, while sync hints and notices showed no clear effect.",
+  "Path selection: Headline clarity updates, spotlight layouts, and story stage visual redesigns won; checklist layouts and story scroll redesigns hurt, while value refreshes and copy simplifications showed no clear effect.",
+  "Waiting room: Interactive waiting rooms, readiness/visibility status checks, and spawn location hints won; 3D trackers, completion timers, progress indicators, and sound notifications showed no clear effect.",
+  "Adoption flow: Split upload companion previews paired with photo quality guides won; compact grids, guidelines banners, stamp redesigns, and multi-step inspection or fallback flows hurt, while pre-adoption reviews showed no clear effect.",
+  "Finish & placement: Interactive spawn placement flows, desktop placement verification screens, and system tray location tips won; direct controls guides, guided spawn stages, and first interaction tips hurt, while welcome stage redesigns and retrieval callouts showed no clear effect.",
+  "Predictions accuracy: Predictions underpredicted counter-intuitive flow wins (such as placement verification screens and interactive spawn flows) and overpredicted outcomes on severe failures (such as stamp redesigns, direct controls guides, and guided spawn stages)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Post-Placement Account Binding Sequence",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder the sign-in step to take place right after desktop onboarding completion, ensuring users see their pet running on their desktop first before securing account data.",
+   "why": "8 support emails complained about missing or reset pets after signing in again. Securing account state after pet creation ensures session safety.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "sign_in"
+    ],
+    "sign_in": {
+     "headline": "Secure Your Pet Cloud Backup",
+     "body": "Sign in now to save your pet companion and enable seamless syncing across devices."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "home_intro must come after every existing screen, sign_in included"
+   }
+  },
+  {
+   "title": "Adoption Certificate Companion Customization Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen using a stage layout with pet preview and name verification components to make pet adoption feel official.",
+   "why": "Adoption step has the lowest conversion rate at 68.9% with mean time over 1000s. Enhancing adoption confirmation increases user commitment.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "headline": "Official Pet Adoption Certificate",
+     "body": "Verify your companion's details and seal your adoption record.",
+     "components": [
+      {
+       "type": "preview",
+       "asset": "asset:pet_preview",
+       "style": "highlight"
+      },
+      {
+       "type": "name_input",
+       "text": "Pet Name",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.components[1]': inputs may only ask for the pet's name"
+   }
+  },
+  {
+   "title": "Desktop Environment Compatibility Verification Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Introduce a dedicated desktop readiness verification screen before waiting room that checks display resolution and desktop layer compatibility.",
+   "why": "3 support tickets reported pets failing to appear on the desktop or the app stalling. Verifying system environment early reduces launch failures.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_desktop_check",
+     "waiting",
+     "home_intro"
+    ],
+    "new_desktop_check": {
+     "headline": "Verifying Desktop Workspace",
+     "body": "Checking screen resolution and overlay compatibility for your desktop pet.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "progress",
+       "text": "Screen compatibility check in progress...",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a desktop readiness screen inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.015,
+   "score": 3.66,
+   "score_note": "Requires new screen release; desktop verification shows positive precedent but low support mail volume.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 188.8
+  },
+  {
+   "title": "Interactive Path Discovery Stage Flow",
+   "target_step": "choose_path",
+   "type": "new_flow",
+   "change": "Transform the path selection step into a two-column interactive discovery flow with choice cards comparing premade vs custom pets.",
+   "why": "Mean time spent on path selection is 514s, indicating significant user hesitation when choosing an adoption path.",
+   "config": {
+    "choose_path": {
+     "layout": "two_column",
+     "headline": "Discover Your Companion Path",
+     "body": "Select standard adoption for instant pairing or custom creation for a unique companion.",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "text": "Instant Pet Pair vs Custom Creation",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Cloud Sync Account Safety Notice",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit cloud sync preservation badge and hint on the sign-in screen reassuring returning users that existing pets will not be overwritten.",
+   "why": "8 support emails were received about pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in connects your companion to secure cloud storage so your pet progress is never lost.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Cloud Pet Preservation Active",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding cloud sync badge and hint on sign-in screen is permitted."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.011,
+   "score": 5.63,
+   "score_note": "Good support email evidence, but hints historically have minor positive impact.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 188.8
+  },
+  {
+   "title": "Photo Upload Layout Verification Focus",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch the photo upload screen to a centered layout featuring an interactive preview component and photo upload controls.",
+   "why": "3 support tickets reported custom pet generation failures or unexpected visual results.",
+   "config": {
+    "upload_photos": {
+     "layout": "centered",
+     "headline": "Companion Creation Photo Upload",
+     "body": "Ensure your image is well-lit and front-facing for best custom pet generation.",
+     "components": [
+      {
+       "type": "photo_picker",
+       "label": "Select Companion Photo",
+       "style": "large"
+      },
+      {
+       "type": "preview",
+       "asset": "asset:photo_guide",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Asks for personal information (photo of the user)"
+   }
+  },
+  {
+   "title": "Background Desktop Hatching Activity Banner",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display background rendering time estimates and progress indicators on the waiting room screen.",
+   "why": "Waiting stage mean time is 2336s; users need clear feedback while assets render in the background.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "hint": "Your desktop pet is actively preparing in the background. You can minimize this window anytime."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Progress indicators and time estimates for real rendering waits are allowed on the waiting screen."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.018,
+   "score": 5.17,
+   "score_note": "Addresses long wait stage duration; wait info shows steady +1.8% historical lift."
+  },
+  {
+   "title": "Desktop Tray Launcher Notification Prompt",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Add a delayed notification tip carousel on the final welcome screen explaining system tray controls.",
+   "why": "3 support tickets reported confusion on how to control, hide, or interact with the pet after setup.",
+   "config": {
+    "home_intro": {
+     "tip_delay_seconds": 5,
+     "hint": "Look for the pet icon in your system tray to adjust visibility or bring your pet to the front.",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "System Tray Controls",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding delayed tip carousel to home intro is permitted within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.013,
+   "score": 2.59,
+   "score_note": "Finish notifications and control prompts have negative historical performance."
+  },
+  {
+   "title": "Story Experience Value Proposition Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update the story intro headline and body text to clearly explain the benefits of having an interactive desktop companion.",
+   "why": "13% of users drop off before path choice, with high mean time (514s) spent contemplating.",
+   "config": {
+    "story": {
+     "headline": "Welcome to Your Desktop Companion Journey",
+     "body": "Bring an intelligent, interactive companion directly to your desktop workspace in just a few steps."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updated copy continues to introduce the pet companion as required."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.014,
+   "score": 8.92,
+   "score_note": "Headline clarity updates won in lessons, low cost copy change targeting 13% drop-off.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 188.8
+  },
+  {
+   "title": "Home Intro Desktop Placement Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign the home intro screen into a full-bleed layout featuring an animated mascot welcome and immediate interaction instructions.",
+   "why": "Finish stage mean duration is 5815s with 17.7% drop-off; clear final guidance ensures smooth transition into active app usage.",
+   "config": {
+    "home_intro": {
+     "layout": "full_bleed",
+     "headline": "Your Desktop Companion is Ready!",
+     "body": "Your pet is now active on your desktop. Click and drag or use the system tray to manage controls.",
+     "components": [
+      {
+       "type": "mascot",
+       "asset": "asset:mascot_welcome",
+       "style": "large",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home intro layout and components inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.012,
+   "score": 4.74,
+   "score_note": "Targets 17.7% drop-off at finish step, but redesign requires full release.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 102.6
+  }
+ ],
+ "picked": [
+  "Home Intro Desktop Placement Redesign",
+  "Desktop Environment Compatibility Verification Screen",
+  "Story Experience Value Proposition Headline",
+  "Cloud Sync Account Safety Notice"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 669.0,
+ "decisions": [
+  {
+   "test": "sim-70",
+   "title": "Home Intro Desktop Placement Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 102.6,
+   "result": {
+    "step": {
+     "control": 0.8405,
+     "treatment": 0.8444,
+     "lift": 0.0046,
+     "lift_se": 0.016,
+     "p": 0.775567
+    },
+    "finish": {
+     "control": 0.4147,
+     "treatment": 0.4123,
+     "lift": -0.0056,
+     "lift_se": 0.0306,
+     "p": 0.854401
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.74,
+   "predicted_lift": 0.012,
+   "true_lift_hidden": 0.0244,
+   "finishers_delta_hidden": 29.47
+  },
+  {
+   "test": "sim-71",
+   "title": "Desktop Environment Compatibility Verification Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 188.8,
+   "result": {
+    "step": {
+     "control": 0.9085,
+     "treatment": 0.9197,
+     "lift": 0.0123,
+     "lift_se": 0.0109,
+     "p": 0.255187
+    },
+    "finish": {
+     "control": 0.3897,
+     "treatment": 0.4167,
+     "lift": 0.0693,
+     "lift_se": 0.0336,
+     "p": 0.033026
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.66,
+   "predicted_lift": 0.015,
+   "true_lift_hidden": -0.0026,
+   "finishers_delta_hidden": -3.14
+  },
+  {
+   "test": "sim-72",
+   "title": "Story Experience Value Proposition Headline",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 188.8,
+   "result": {
+    "step": {
+     "control": 0.8543,
+     "treatment": 0.8917,
+     "lift": 0.0437,
+     "lift_se": 0.0103,
+     "p": 1.4e-05
+    },
+    "finish": {
+     "control": 0.3873,
+     "treatment": 0.415,
+     "lift": 0.0714,
+     "lift_se": 0.0338,
+     "p": 0.028802
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 8.92,
+   "predicted_lift": 0.014,
+   "true_lift_hidden": 0.0252,
+   "finishers_delta_hidden": 30.44
+  },
+  {
+   "test": "sim-73",
+   "title": "Cloud Sync Account Safety Notice",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 188.8,
+   "result": {
+    "step": {
+     "control": 0.9216,
+     "treatment": 0.9191,
+     "lift": -0.0028,
+     "lift_se": 0.0082,
+     "p": 0.737114
+    },
+    "finish": {
+     "control": 0.4,
+     "treatment": 0.3857,
+     "lift": -0.0358,
+     "lift_se": 0.031,
+     "p": 0.255676
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.63,
+   "predicted_lift": 0.011,
+   "true_lift_hidden": -0.0008,
+   "finishers_delta_hidden": -0.97
+  }
+ ],
+ "shipped": [
+  "Story Experience Value Proposition Headline"
+ ],
+ "ends_week": 16,
+ "weights_next": {
+  "impact": 0.791,
+  "evidence": 0.427,
+  "confidence": 2.089,
+  "cost": 0.692
+ },
+ "lessons_next": [
+  "Sign-in & account: Post-adoption sign-in timing, account recovery copy, and multi-device sync banners won; moving sign-in post-waiting hurt, while account sync hints and safety notices showed no clear effect.",
+  "Path selection: Headline updates (clarity and value proposition), spotlight layouts, and visual story stage redesigns won; checklist layouts and story scroll redesigns hurt, while hints and copy simplifications showed no clear effect.",
+  "Waiting room: Interactive waiting rooms, desktop visibility/readiness status checks, and spawn location hints won; progress trackers, timers, sound notifications, and compatibility screens showed no clear effect.",
+  "Adoption flow: Split photo upload previews with quality guides won; compact grids, guidelines banners, stamp redesigns, and fallback or multi-step inspection flows hurt, while pre-adoption reviews, incentives, and layout customizations showed no clear effect.",
+  "Finish & placement: Interactive spawn placement flows, desktop placement verification screens, and system tray location tips won; direct controls guides, guided spawn stages, and first interaction tips hurt, while welcome redesigns, docking hints, and retrieval callouts showed no clear effect.",
+  "Predictions accuracy: Predictions underpredicted counter-intuitive flow wins (such as placement verification screens and spawn placement flows) and overpredicted gains on severe flow failures (such as stamp redesigns, direct controls guides, multi-step inspection, and guided spawn stages)."
+ ]
+}

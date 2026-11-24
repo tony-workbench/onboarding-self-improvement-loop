@@ -1,0 +1,524 @@
+{
+ "round": 2,
+ "starts_week": 2,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.6270873,
+  "home": 0.850398,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.926,
+  "evidence": 0.435,
+  "confidence": 1.152,
+  "cost": 0.486
+ },
+ "lessons_used": [
+  "Adding fallback flows during adoption (new_flow) was helpful (+8.0%), though the predicted +10.0% was slightly too high.",
+  "Interactive wait screen tips and status updates (wait_info) were helpful (+5.1%), but the predicted +12.0% significantly overestimated the impact.",
+  "Account sync reassurance warnings and hints at sign-in showed no clear effect (+0.2%).",
+  "Copy updates at the finish step showed no clear effect, despite leaning positive (+5.9%, p=0.119)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Pet Personality Spotlight Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the pick_friend screen using a split layout to showcase pet personality animations and sound previews alongside choices.",
+   "why": "Adoption drop-off is high (62.7% conversion, 89s median), showing users struggle or hesitate during pet selection.",
+   "config": {
+    "pick_friend": {
+     "layout": "split",
+     "headline": "Meet Your New Companion",
+     "body": "Select a pet to see their unique animations and personality traits in real-time.",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "text": "Choose pet personality",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns pick_friend while retaining the pet selection functionality."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.08,
+   "score": 6.62,
+   "score_note": "Adoption step loses 37.3% of users; major layout redesign requires significant release effort.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 147.9
+  },
+  {
+   "title": "Guided Desktop Controls Checklist",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign home_intro screen into a checklist layout demonstrating how to wake, move, and hide the desktop pet.",
+   "why": "3 support tickets noted confusion over how to control, hide, or talk to the pet after onboarding, and finish step conversion is only 64.8%.",
+   "config": {
+    "home_intro": {
+     "layout": "checklist",
+     "headline": "Master Your Desktop Pet Controls",
+     "body": "Try out these simple gestures to interact with your pet on your desktop.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Click pet to interact | Drag pet to move | Right-click to hide",
+       "style": "rounded",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Interactive Path Preview Screen",
+   "target_step": "choose_path",
+   "type": "new_screen",
+   "change": "Add a dedicated interactive preview screen (new_path_preview) before choose_path to let users sample adoption routes.",
+   "why": "choose_path conversion is 76.2% with high mean duration (514s), indicating users are uncertain which path to select.",
+   "config": {
+    "_order": [
+     "story",
+     "new_path_preview",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_path_preview": {
+     "layout": "carousel",
+     "headline": "Explore Your Journey Options",
+     "body": "Swipe to preview custom photo generation versus instant preset adoption.",
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Preview Path Types",
+       "style": "playful",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new preview screen within onboarding while keeping all required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.03,
+   "score": 3.57,
+   "score_note": "Choose_path has high completion time, but inserting a new screen introduces extra friction."
+  },
+  {
+   "title": "Sign-In Trust and Recovery Split Layout",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign sign_in screen with a split layout displaying account restoration guidance and pet avatar preview.",
+   "why": "8 support emails reported missing or reset pets after signing in again, causing drop-off (72.9% conversion).",
+   "config": {
+    "sign_in": {
+     "layout": "split",
+     "headline": "Sign In to Keep Your Pet Safe",
+     "body": "Link your account to save your companion across desktop restarts and devices.",
+     "hint": "Already have a pet? Sign in with your previous account to restore them.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "text": "Continue with Account",
+        "style": "emphasis",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Live Generation Progress Bar with Mascot",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add a progress bar component and mascot animation to the waiting screen to reduce perceived wait time.",
+   "why": "Home waiting step has a median duration of 201s and mean of 2336s, causing hesitation before home_intro.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "headline": "Crafting Your Pet...",
+     "body": "Your pet is getting ready to land on your desktop!",
+     "components": [
+      {
+       "type": "progress",
+       "text": "Generating assets...",
+       "style": "highlight",
+       "action": "next"
+      },
+      {
+       "type": "mascot",
+       "asset": "asset:mascot_waiting",
+       "style": "playful",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enhances the waiting screen with progress information without violating rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 5.82,
+   "score_note": "Wait_info changes previously yielded +5.1% lift; directly targets high wait duration.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 147.9
+  },
+  {
+   "title": "Desktop Launcher Verification Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a new screen (new_desktop_verify) right before home_intro that confirms pet rendering on screen.",
+   "why": "3 support tickets complained that the pet does not appear on the desktop or the app will not open after setup.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_verify",
+     "home_intro"
+    ],
+    "new_desktop_verify": {
+     "layout": "centered",
+     "headline": "Verifying Desktop Visibility",
+     "body": "Can you see your pet floating on your desktop screen?",
+     "components": [
+      {
+       "type": "preview",
+       "text": "Desktop Pet Rendering Test",
+       "style": "emphasis",
+       "action": "next"
+      },
+      {
+       "type": "button",
+       "label": "Yes, I see my pet!",
+       "style": "rounded",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a new verification screen inside onboarding prior to home_intro."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.02,
+   "score": 4.3,
+   "score_note": "Strong support evidence, but creating an entirely new verification screen adds step friction.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 95.3
+  },
+  {
+   "title": "Photo Upload Quality Tip Banner",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add a tip carousel component to the upload_photos screen explaining optimal photo lighting and angles.",
+   "why": "Support received 3 emails about custom pet generation failing or looking wrong during adoption.",
+   "config": {
+    "upload_photos": {
+     "hint": "Use well-lit, clear front-facing photos for best 3D pet generation results.",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Tip 1: Good lighting | Tip 2: Clear face | Tip 3: Single subject",
+       "style": "subtle",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'upload_photos.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Adoption Certificate Name Confirmation Card",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Change layout of adoption_certificate to card with an interactive name input and confirmation badge.",
+   "why": "Adoption step drop-off is 62.7%, and adding clear ownership milestones builds emotional connection.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "card",
+     "headline": "Official Adoption Certificate",
+     "body": "Give your new desktop companion a name to make it official!",
+     "components": [
+      {
+       "type": "name_input",
+       "text": "Pet Name",
+       "style": "playful",
+       "action": "next"
+      },
+      {
+       "type": "badge",
+       "text": "Official Pet License",
+       "style": "highlight",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.components[0]': inputs may only ask for the pet's name"
+   }
+  },
+  {
+   "title": "Choose Path Story Scroll Experience",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the story screen to story_scroll layout with animated mascot choices leading into path selection.",
+   "why": "choose_path drop-off is 23.8% (76.2% conversion) with long mean time (514s), showing weak narrative hook.",
+   "config": {
+    "story": {
+     "layout": "story_scroll",
+     "headline": "Welcome to Desktop Pets",
+     "body": "Scroll through to discover how your desktop companion brings your workspace to life.",
+     "replace": {
+      "intro_story": [
+       {
+        "role": "intro_story",
+        "type": "mascot",
+        "asset": "asset:story_mascot",
+        "style": "playful",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'story.intro_story' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'video'] with an asset:story/ asset"
+   }
+  },
+  {
+   "title": "Finish Screen Desktop Shortcut Reminder",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Add a highlight button and preview banner on home_intro encouraging users to pin the pet to the system tray.",
+   "why": "4 support tickets noted desktop features misbehaving after setup and 35.2% drop off at finish.",
+   "config": {
+    "home_intro": {
+     "hint": "Pin Desktop Pet to your taskbar for quick access anytime!",
+     "components": [
+      {
+       "type": "button",
+       "label": "Pin to Taskbar",
+       "style": "emphasis",
+       "action": "next"
+      },
+      {
+       "type": "badge",
+       "text": "Quick Access Enabled",
+       "style": "rounded",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a taskbar shortcut reminder to home_intro within onboarding without violating rules."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.06,
+   "score": 7.95,
+   "score_note": "High drop-off (35.2%) backed by 4 support tickets; low-cost banner on existing screen."
+  }
+ ],
+ "picked": [
+  "Pet Personality Spotlight Redesign",
+  "Desktop Launcher Verification Screen",
+  "Live Generation Progress Bar with Mascot"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 391.1,
+ "decisions": [
+  {
+   "test": "sim-5",
+   "title": "Pet Personality Spotlight Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 147.9,
+   "result": {
+    "step": {
+     "control": 0.6365,
+     "treatment": 0.6124,
+     "lift": -0.0379,
+     "lift_se": 0.0257,
+     "p": 0.148295
+    },
+    "finish": {
+     "control": 0.199,
+     "treatment": 0.198,
+     "lift": -0.005,
+     "lift_se": 0.0516,
+     "p": 0.922648
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.62,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": -0.0403,
+   "finishers_delta_hidden": -23.87
+  },
+  {
+   "test": "sim-6",
+   "title": "Desktop Launcher Verification Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 95.3,
+   "result": {
+    "step": {
+     "control": 0.6259,
+     "treatment": 0.5906,
+     "lift": -0.0564,
+     "lift_se": 0.0352,
+     "p": 0.118998
+    },
+    "finish": {
+     "control": 0.1963,
+     "treatment": 0.1803,
+     "lift": -0.0815,
+     "lift_se": 0.0493,
+     "p": 0.11298
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.3,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": -0.1162,
+   "finishers_delta_hidden": -68.83
+  },
+  {
+   "test": "sim-7",
+   "title": "Live Generation Progress Bar with Mascot",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 147.9,
+   "result": {
+    "step": {
+     "control": 0.8492,
+     "treatment": 0.8541,
+     "lift": 0.0058,
+     "lift_se": 0.018,
+     "p": 0.745981
+    },
+    "finish": {
+     "control": 0.202,
+     "treatment": 0.2077,
+     "lift": 0.0281,
+     "lift_se": 0.0523,
+     "p": 0.586575
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.82,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": -0.0019,
+   "finishers_delta_hidden": -1.13
+  }
+ ],
+ "shipped": [],
+ "ends_week": 2,
+ "weights_next": {
+  "impact": 1.568,
+  "evidence": 0.408,
+  "confidence": 1.458,
+  "cost": 0.566
+ },
+ "lessons_next": [
+  "Fallback flows during adoption (new_flow) were helpful (+8.0%), though the +10.0% prediction was slightly overestimated.",
+  "Interactive wait screen tips (wait_info) were helpful (+5.1%), but adding a progress bar with mascot to the wait screen showed no clear effect.",
+  "Sign-in reassurance hints and copy updates at the finish step showed no clear effect.",
+  "Adoption step redesigns and new verification screens at the finish step showed no clear effect.",
+  "Predictions consistently overestimate the actual measured impact across tests."
+ ]
+}

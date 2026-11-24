@@ -1,0 +1,527 @@
+{
+ "round": 5,
+ "starts_week": 5,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7663977,
+  "adoption": 0.6958434,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Interactive Desktop Pet Mini Game Waiting Screen",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesign the waiting screen into a centered interactive card with a tip carousel and desktop control shortcuts to keep users engaged during generation.",
+   "why": "The home waiting step has an extremely high mean wait time of 2336s and 201s median, causing user drop-off while waiting for pet rendering.",
+   "config": {
+    "waiting": {
+     "layout": "centered",
+     "headline": "Your Pet is Coming to Life!",
+     "body": "While your companion generates in the background, learn quick desktop controls.",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Tip: Press Alt+P anytime on your desktop to hide or show your pet.",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the waiting screen while retaining its core function and staying within onboarding rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.08,
+   "score": 3.75,
+   "score_note": "High mean wait time causes drop-off at home step, but interactive mini-game requires significant code effort.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 109.3
+  },
+  {
+   "title": "Desktop Pet Quick Controls Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a new interactive quick controls screen right before home_intro that demonstrates desktop shortcuts, context menus, and hiding features.",
+   "why": "Support received multiple tickets from users confused about how to control, hide, or talk to their pet after finishing onboarding.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_controls_guide",
+     "home_intro"
+    ],
+    "new_controls_guide": {
+     "headline": "How to Control Your Desktop Pet",
+     "body": "Master these simple desktop actions before meeting your pet.",
+     "layout": "grid",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Right-click pet for menu; Drag to move; Alt+P to hide",
+       "style": "emphasis"
+      },
+      {
+       "type": "button",
+       "label": "Got It!",
+       "action": "next",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new guide screen within the onboarding flow without removing any required steps."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.1,
+   "score": 6.25,
+   "score_note": "Finish step has lowest conversion (64.8%) and explicit support tickets, but requires a new guide screen.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 71.9
+  },
+  {
+   "title": "Move Story Intro After Path Selection",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Reorder the onboarding flow so users pick their pet creation path immediately upon opening the app before viewing the backstory.",
+   "why": "The initial choose_path step has a long mean time (514s); letting users take action first boosts momentum before story exposition.",
+   "config": {
+    "_order": [
+     "choose_path",
+     "story",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "existing screens must keep their order; only sign_in may move"
+   }
+  },
+  {
+   "title": "Live Pet Preview Customization Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Replace the standard photo upload area with a live 3D preview component showing instant feedback on uploaded photo features.",
+   "why": "3 support emails reported custom pet creation failing or looking wrong; real-time preview lets users adjust photo quality before submitting.",
+   "config": {
+    "upload_photos": {
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "preview",
+        "text": "Live 3D Companion Render Preview",
+        "style": "highlight"
+       },
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "label": "Select Photo",
+        "action": "choose",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[0]': a preview cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Existing Account Email Verification Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit hint banner on the sign-in screen urging returning users to use their original sign-in email to preserve pets.",
+   "why": "8 support emails reported pets missing or reset after signing in with a different or new account.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing back in? Make sure to use your original account email so your pet profile is safely restored!"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Estimated Time Countdown on Waiting Screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display progress and time estimate indicators on the waiting screen with a timer component.",
+   "why": "The median waiting time is 201s (mean 2336s); clear progress transparency reduces anxiety and drop-off during rendering.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "tip_delay_seconds": 10,
+     "components": [
+      {
+       "type": "timer",
+       "text": "Rendering desktop companion model (~2 min remaining)",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'waiting.components[0].text' has characters outside the allowed set: ['~']"
+   }
+  },
+  {
+   "title": "Clear Path Selection Benefit Headlines",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Rewrite headline and body on the choose_path screen to contrast quick ready-to-adopt pets against custom avatar creation.",
+   "why": "The mean time on choose_path is 514s, indicating confusion between preset options and custom generation.",
+   "config": {
+    "choose_path": {
+     "headline": "Select Your Desktop Companion Path",
+     "body": "Choose a fast pre-made companion (30 seconds) or build a unique pet custom generated from your own photos."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates copy on choose_path while continuing to offer both pre-made adoption and custom pet creation."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.05,
+   "score": 6.67,
+   "score_note": "Long mean duration on path choice targeted with simple copy changes that can be configured without a new release.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 109.3
+  },
+  {
+   "title": "First Companion Accessory Welcome Gift",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Display an unlocked starter accessory badge on the final home_intro screen as a completion reward.",
+   "why": "The finish step has a drop-off rate of 35.2%; rewarding completion incentivizes finalizing onboarding.",
+   "config": {
+    "home_intro": {
+     "headline": "Welcome Home! Here is Your Free Starter Accessory",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Unlocked: Golden Companion Bell",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions 'Free Starter Accessory', violating rule 3 which forbids mentioning free extras, gifts, or prices."
+   }
+  },
+  {
+   "title": "Adoption Certificate Split Layout with Mascot",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch adoption_certificate screen layout to split view and include a cheerful pet mascot component.",
+   "why": "Adoption conversion drops to 69.6%; elevating visual celebration reinforces the emotional payoff of adopting a pet.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "split",
+     "headline": "Official Pet Adoption Certificate",
+     "components": [
+      {
+       "type": "mascot",
+       "asset": "asset:mascot_happy",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the adoption certificate layout while retaining its official certificate branding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.06,
+   "score": 5.0,
+   "score_note": "Adoption step drops to 69.6%; split layout and visual updates require UI rework.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 109.3
+  },
+  {
+   "title": "Sign In Stalling Troubleshooter Button",
+   "target_step": "sign_in",
+   "type": "notification",
+   "change": "Add a sign-in troubleshooter action button on the sign_in screen to resolve freeze or webview loading delays.",
+   "why": "Support received reports of sign-in screens stalling or failing to load before users could authenticate.",
+   "config": {
+    "sign_in": {
+     "body": "Sign in to sync your pet and settings across desktop devices.",
+     "components": [
+      {
+       "type": "button",
+       "label": "Stuck? Troubleshoot Sign-In",
+       "action": "open_tip",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a troubleshooter button to the sign-in screen without violating any onboarding limits."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.07,
+   "score": 5.83,
+   "score_note": "Sign-in drop-off aligns directly with support reports of webview stalling; action button offers quick recovery.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 109.3
+  }
+ ],
+ "picked": [
+  "Desktop Pet Quick Controls Guide Screen",
+  "Interactive Desktop Pet Mini Game Waiting Screen",
+  "Clear Path Selection Benefit Headlines",
+  "Sign In Stalling Troubleshooter Button",
+  "Adoption Certificate Split Layout with Mascot"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 509.1,
+ "decisions": [
+  {
+   "test": "sim-15",
+   "title": "Desktop Pet Quick Controls Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 71.9,
+   "result": {
+    "step": {
+     "control": 0.666,
+     "treatment": 0.6457,
+     "lift": -0.0304,
+     "lift_se": 0.0448,
+     "p": 0.503825
+    },
+    "finish": {
+     "control": 0.218,
+     "treatment": 0.2127,
+     "lift": -0.0245,
+     "lift_se": 0.068,
+     "p": 0.722343
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.25,
+   "predicted_lift": 0.1,
+   "true_lift_hidden": -0.0154,
+   "finishers_delta_hidden": -5.02
+  },
+  {
+   "test": "sim-16",
+   "title": "Interactive Desktop Pet Mini Game Waiting Screen",
+   "target_step": "home",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 109.3,
+   "result": {
+    "step": {
+     "control": 0.8292,
+     "treatment": 0.7686,
+     "lift": -0.073,
+     "lift_se": 0.0264,
+     "p": 0.007393
+    },
+    "finish": {
+     "control": 0.236,
+     "treatment": 0.1993,
+     "lift": -0.1554,
+     "lift_se": 0.0587,
+     "p": 0.014959
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: worse",
+   "score": 3.75,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": -0.0362,
+   "finishers_delta_hidden": -11.79
+  },
+  {
+   "test": "sim-17",
+   "title": "Clear Path Selection Benefit Headlines",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 109.3,
+   "result": {
+    "step": {
+     "control": 0.744,
+     "treatment": 0.7667,
+     "lift": 0.0305,
+     "lift_se": 0.0214,
+     "p": 0.148744
+    },
+    "finish": {
+     "control": 0.2027,
+     "treatment": 0.21,
+     "lift": 0.0362,
+     "lift_se": 0.0742,
+     "p": 0.619696
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.67,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": -0.0218,
+   "finishers_delta_hidden": -7.1
+  },
+  {
+   "test": "sim-18",
+   "title": "Sign In Stalling Troubleshooter Button",
+   "target_step": "sign_in",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 109.3,
+   "result": {
+    "step": {
+     "control": 0.7637,
+     "treatment": 0.7712,
+     "lift": 0.0098,
+     "lift_se": 0.0232,
+     "p": 0.671342
+    },
+    "finish": {
+     "control": 0.2053,
+     "treatment": 0.208,
+     "lift": 0.013,
+     "lift_se": 0.0725,
+     "p": 0.856871
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.83,
+   "predicted_lift": 0.07,
+   "true_lift_hidden": 0.0056,
+   "finishers_delta_hidden": 1.82
+  },
+  {
+   "test": "sim-19",
+   "title": "Adoption Certificate Split Layout with Mascot",
+   "target_step": "adoption",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 109.3,
+   "result": {
+    "step": {
+     "control": 0.6965,
+     "treatment": 0.6724,
+     "lift": -0.0346,
+     "lift_se": 0.0316,
+     "p": 0.2817
+    },
+    "finish": {
+     "control": 0.2027,
+     "treatment": 0.2227,
+     "lift": 0.0987,
+     "lift_se": 0.0773,
+     "p": 0.18072
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.0,
+   "predicted_lift": 0.06,
+   "true_lift_hidden": -0.0123,
+   "finishers_delta_hidden": -4.01
+  }
+ ],
+ "shipped": [],
+ "ends_week": 5,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

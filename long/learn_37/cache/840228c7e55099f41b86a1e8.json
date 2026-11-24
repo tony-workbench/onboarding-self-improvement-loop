@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [home, wait_info] Desktop Renderer Launch Status Counter: Display a real-time status counter for desktop rendering engine setup on the waiting screen so users know the app is actively loading.\n   config: {\"waiting\": {\"hint\": \"Initializing graphics renderer and background desktop layer...\", \"components\": [{\"type\": \"progress\", \"text\": \"Preparing desktop engine...\", \"style\": \"calm\"}]}}\n1: [finish, new_screen] Interactive Desktop Pet Voice and Command Cheat Sheet Screen: Add a dedicated end-of-onboarding screen explaining how to summon, move, and talk to your desktop pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_pet_controls_overview\"], \"new_pet_controls_overview\": {\"headline\": \"How to Interact with Your Desktop Pet\", \"body\": \"Learn how to summon, move, and talk with your new desktop companion.\", \"components\": [{\"type\": \"checklist\", \"text\": \"Right-click pet for context menu options\", \"style\": \"rounded\"}]}}\n2: [home, wait_info] Desktop Display Mode Compatibility Wait Card: Show a display mode setup card on the waiting screen explaining background rendering checks.\n   config: {\"waiting\": {\"components\": [{\"type\": \"text\", \"text\": \"Optimizing desktop display overlay for your monitor...\", \"style\": \"subtle\"}]}}\n3: [finish, new_screen] Desktop Companion Quick Command Overview Screen: Introduce a final onboarding screen highlighting key shortcuts and desktop interaction gestures.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_pet_shortcuts_screen\"], \"new_pet_shortcuts_screen\": {\"headline\": \"Quick Shortcuts & Gestures\", \"body\": \"Double-click to activate chat, hold Ctrl+Shift to drag your pet anywhere.\", \"components\": [{\"type\": \"badge\", \"text\": \"Shortcuts ready\", \"style\": \"highlight\"}]}}\n4: [adoption, notification] Photo Generation Quality Alert Badge: Add a real-time quality alert badge on the photo upload screen explaining photo constraints to prevent pet generation failures.\n   config: {\"upload_photos\": {\"components\": [{\"type\": \"badge\", \"text\": \"For best results, use well-lit front-facing photos\", \"style\": \"emphasis\"}]}}\n5: [choose_path, new_flow] Guided Pet Companion Goal Selection Flow: Introduce an interactive goal selection step where users pick their primary use case before choosing a pet path.\n   config: {\"_order\": [\"story\", \"new_goal_selection\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_goal_selection\": {\"headline\": \"What brings you to Desktop Pet?\", \"body\": \"Choose your primary goal to help us tailor your pet experience.\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Select goal\", \"style\": \"playful\"}]}}\n6: [sign_in, reorder] Post Adoption Certificate Account Sign In Reorder: Reorder sign-in step to occur immediately after adoption certificate confirmation.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n7: [adoption, new_flow] Interactive Pet Personality Trait Selector Flow: Add a dedicated pet trait selection sub-flow during friend selection to customize pet behavior upfront.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_trait_picker\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_trait_picker\": {\"headline\": \"Choose Your Pet's Personality\", \"body\": \"Select traits like Playful, Calm, or Focused.\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Personality Traits\", \"style\": \"rounded\"}]}}\n8: [finish, new_screen] Desktop Docking & Placement Tutorial Screen: Add a post-adoption visual tutorial screen demonstrating how the pet sits on taskbars and multi-monitor setups.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_docking_tutorial\"], \"new_docking_tutorial\": {\"headline\": \"Desktop Placement Guide\", \"body\": \"Your pet can rest on your taskbar or float across monitors.\", \"components\": [{\"type\": \"text\", \"text\": \"Multi-monitor desktop placement overview\", \"style\": \"plain\"}]}}\n9: [choose_path, hint] Story Scroll Desktop Companion Highlight Hint: Add an overlay hint on the story screen highlighting how desktop pets run unobtrusively in the background.\n   config: {\"story\": {\"hint\": \"Desktop pets stay lightweight and won't slow down your computer.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding status/progress info to the waiting screen is allowed within onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interaction overview screen after home_intro is explicitly allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding rendering check information to the waiting screen is allowed."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a shortcuts screen after home_intro is allowed."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a photo quality guidance badge on the photo upload screen is allowed."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a goal selection step within onboarding is allowed."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to occur after the adoption certificate is explicitly allowed."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a personality trait selector sub-flow inside onboarding is allowed."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a docking tutorial screen after home_intro is allowed."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a hint overlay on the story screen is allowed."
+   }
+  ]
+ }
+}

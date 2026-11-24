@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [home, wait_info] Pet Preparation Progress Checklist Wait Display: Replaces the waiting screen layout with an active checklist showing real-time pet rendering milestones like asset generation, behavioral scripting, and desktop integration.\n   config: {\"waiting\": {\"layout\": \"checklist\", \"show_progress\": true, \"headline\": \"Creating Your Desktop Pet\", \"body\": \"We are assembling your pet's 3D model, animations, and desktop interaction scripts.\", \"components\": [{\"type\": \"checklist\", \"text\": \"Generating character model and textures\", \"style\": \"emphasis\"}, {\"type\": \"checklist\", \"text\": \"Configuring desktop companion movement physics\", \"style\": \"plain\"}, {\"type\": \"checklist\", \"text\": \"Finalizing voice and interaction responses\", \"style\": \"plain\"}]}}\n1: [finish, new_screen] Desktop Pet Controls Setup Screen: Adds a dedicated setup screen right before home_intro that demonstrates hotkeys, hiding/showing, and dragging the pet on the desktop.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_controls_guide\", \"home_intro\"], \"home_intro\": {\"headline\": \"Your Pet is Ready for Your Desktop\", \"body\": \"Your companion is ready to live on your screen.\", \"button_label\": \"Start Desktop Experience\"}}\n2: [adoption, redesign] Pet Selection Stage Layout Redesign: Redesigns the friend selection screen into a full stage layout highlighting companion personalities and animation previews.\n   config: {\"pick_friend\": {\"layout\": \"stage\", \"headline\": \"Choose Your Ideal Desktop Companion\", \"replace\": {\"pet_choices\": [{\"type\": \"choice_cards\", \"label\": \"Select your companion persona\", \"style\": \"playful\", \"role\": \"pet_choices\"}, {\"type\": \"preview\", \"label\": \"Live Motion Preview\", \"asset\": \"asset:pet_preview_stage\", \"style\": \"large\", \"role\": \"pet_choices\"}]}}}\n3: [sign_in, notification] Account Sync Restore Safety Banner: Adds a clear notification badge to the sign-in screen reassuring returning users that logging in restores existing pets and account progress.\n   config: {\"sign_in\": {\"components\": [{\"type\": \"badge\", \"text\": \"Signing into your account safely restores all your previously adopted pets and data.\", \"style\": \"emphasis\"}]}}\n4: [adoption, new_flow] Pet Naming and Trait Personalization Flow: Introduces a rich custom pet personalization sequence on the adoption certificate screen where users set custom names, voice types, and desktop behavioral habits.\n   config: {\"adoption_certificate\": {\"layout\": \"spotlight\", \"headline\": \"Official Pet Adoption & Personalization\", \"components\": [{\"type\": \"name_input\", \"label\": \"Give your desktop pet a name\", \"style\": \"large\"}, {\"type\": \"choice_cards\", \"label\": \"Select companion behavior style\", \"style\": \"rounded\"}]}}\n5: [home, wait_info] Desktop Companion Tip Carousel Stream: Displays an automatic rotating carousel of interactive desktop feature tips on the waiting screen while background generation finishes.\n   config: {\"waiting\": {\"layout\": \"carousel\", \"tip_delay_seconds\": 12, \"components\": [{\"type\": \"tip_carousel\", \"text\": \"Tip: Right-click your pet anytime on the desktop to open quick interactions or send it to sleep.\", \"style\": \"playful\"}]}}\n6: [finish, redesign] Desktop Pet Welcome Spotlight Layout: Rebuilds the home_intro screen into a centered spotlight view featuring a prominent companion introduction card and desktop launch button.\n   config: {\"home_intro\": {\"layout\": \"spotlight\", \"headline\": \"Welcome Your New Companion to Your Desktop\", \"replace\": {\"home_welcome\": [{\"type\": \"mascot\", \"asset\": \"asset:welcome_mascot\", \"style\": \"large\", \"role\": \"home_welcome\"}, {\"type\": \"button\", \"label\": \"Place Pet on Desktop\", \"action\": \"next\", \"style\": \"emphasis\", \"role\": \"home_welcome\"}]}}}\n7: [adoption, hint] Custom Photo Quality Clarity Hint: Displays explicit photo quality recommendations for lighting and facial positioning on the photo upload screen.\n   config: {\"upload_photos\": {\"hint\": \"Use bright, front-facing lighting with clear facial visibility for best custom pet generation.\", \"components\": [{\"type\": \"badge\", \"text\": \"Best results: Bright room, straight-on camera angle\", \"style\": \"highlight\"}]}}\n8: [sign_in, layout] Sign In Two Column Layout Restructure: Reorganizes the sign-in screen into a two-column layout separating fast authentication options from account data sync assistance.\n   config: {\"sign_in\": {\"layout\": \"two_column\", \"headline\": \"Sign In to Keep Your Pet Safe\", \"replace\": {\"sign_in_options\": [{\"type\": \"button\", \"label\": \"Continue with Google\", \"action\": \"choose\", \"style\": \"emphasis\", \"role\": \"sign_in_options\"}, {\"type\": \"text\", \"text\": \"Syncing saves pet progress across devices.\", \"style\": \"subtle\", \"role\": \"sign_in_options\"}]}}}\n9: [choose_path, copy] Desktop Companion Onboarding Concept Copy: Updates story screen copy to clearly describe that the app places a living, interactive companion directly onto the user's desktop screen.\n   config: {\"story\": {\"headline\": \"Adopt a Companion That Lives On Your Desktop\", \"body\": \"Choose or build a pet that walks around your screen, responds to your clicks, and keeps you company while you work.\", \"button_label\": \"Start Adoption Journey\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid change: waiting screen still shows the pet is being created."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid change: adding a new setup screen within onboarding is allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid change: pick_friend screen retains its core function of letting the user choose a pet."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid change: adds account sync notification to sign-in screen without violating rules."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid change: adds pet naming and behavior options on the certificate screen."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid change: waiting screen displays tips while keeping pet creation status."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid change: home_intro screen redesign stays within allowed onboarding modifications."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid change: adds photo clarity hints to photo upload screen."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid change: restructures sign-in layout while preserving authentication functionality."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid change: updates story screen copy to introduce the desktop companion."
+   }
+  ]
+ }
+}

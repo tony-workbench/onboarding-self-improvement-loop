@@ -1,0 +1,560 @@
+{
+ "round": 6,
+ "starts_week": 6,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7698969,
+  "adoption": 0.74298,
+  "home": 0.8740562999999999,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 2.879,
+  "evidence": 0.337,
+  "confidence": 0.695,
+  "cost": 0.088
+ },
+ "lessons_used": [
+  "Evidence is still thin for adoption (copy, hint, redesign), choose_path (copy, hint, new_screen), finish (incentive, layout), home (wait_info), and sign_in (copy, hint, layout, notification, reorder) changes, as each has only 1 test.",
+  "finish new_screen changes have 2 tests agreeing that no clear effect was seen.",
+  "choose_path layout changes have 2 tests agreeing that no clear effect was seen.",
+  "home new_flow changes can be helpful since 1 test won, though 3 tests showed no clear effect.",
+  "Most changes tested so far (18 out of 22 tests) showed no clear effect.",
+  "Predictions generally overestimated impact for most tests, but underestimated the size of major wins."
+ ],
+ "carried_retests": [
+  "Desktop Pet Summon Redesign"
+ ],
+ "candidates": [
+  {
+   "title": "Desktop Launch Confirmation Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Adds a dedicated desktop launch confirmation screen after home_intro where users verify pet desktop placement before exiting onboarding.",
+   "why": "The finish step has the highest drop-off in the funnel (64.8% conversion) and support reported 3 complaints about pets failing to show on desktop.",
+   "config": {
+    "home_intro": {
+     "headline": "Ready to launch your pet!",
+     "body": "Your pet is ready to leap onto your desktop. Click below to complete setup."
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_desktop_launch_pad"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_desktop_launch_pad']"
+   }
+  },
+  {
+   "title": "Full Bleed Desktop Playground Intro",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesigns the final home_intro screen into a full bleed interactive desktop preview showcasing pet interactions and controls.",
+   "why": "Finish conversion drops to 64.8% (mean 5815s) and support received 3 emails about confusion on how to control or hide pets.",
+   "config": {
+    "home_intro": {
+     "layout": "full_bleed",
+     "headline": "Meet Your New Desktop Companion",
+     "body": "Right-click your pet anytime to hide, drag, or interact on your desktop screen.",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:pet_desktop_demo",
+       "style": "playful",
+       "action": "play"
+      },
+      {
+       "type": "button",
+       "label": "Start Exploring",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns home_intro into an interactive preview without removing its required function."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.035,
+   "score": 8.63,
+   "score_note": "Finish step has highest drop (35.2%) and support evidence, but new screen/redesign changes on finish have shown minimal prior lift."
+  },
+  {
+   "title": "Pet Personality Trait Selector Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Introduces a trait selection step into the adoption certificate flow allowing users to pick personality habits for their pet.",
+   "why": "Adoption has a 74.3% conversion rate and high mean duration (1017s). Adding trait selection builds emotional investment before pet generation.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Customize Pet Personality",
+     "body": "Select traits to define how your pet behaves on your desktop.",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Playful, Calm, Energetic",
+       "style": "rounded",
+       "action": "choose"
+      }
+     ]
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_personality_flow",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_personality_flow']"
+   }
+  },
+  {
+   "title": "Story Scroll Path Experience Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesigns the intro story screen using a story_scroll layout with full visuals introducing pet paths.",
+   "why": "Choose path takes a long average time (mean 514s) with 76.2% conversion; a visual scroll layout clarifies options earlier.",
+   "config": {
+    "story": {
+     "layout": "story_scroll",
+     "headline": "Choose Your Desktop Journey",
+     "body": "Scroll through pet companion styles to find the path that suits your workspace best.",
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "The story screen loses its job of introducing the pet."
+   }
+  },
+  {
+   "title": "Background Pet Hatching Status Updates",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays live dynamic status updates and animated milestones during the pet assembly wait step.",
+   "why": "Home wait step has median duration of 201s and mean of 2336s. Dynamic milestones keep users engaged during compilation.",
+   "config": {
+    "waiting": {
+     "headline": "Hatching Your Pet...",
+     "body": "Preparing animations, desktop behaviors, and sound effects.",
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "progress",
+       "label": "Building pet assets",
+       "style": "highlight",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates waiting screen status details while continuing to show the pet being made."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.028,
+   "score": 3.66,
+   "score_note": "Home step already has high conversion (87.4%), though wait_info showed +2.8% lift in a previous test.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 114.8
+  },
+  {
+   "title": "Cloud Save Status Alert Banner",
+   "target_step": "sign_in",
+   "type": "notification",
+   "change": "Adds a cloud persistence badge banner above sign-in options explicitly explaining account pet linking.",
+   "why": "8 support emails complained about missing or reset pets after signing in again on duplicate accounts.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Preserve Your Pet",
+     "hint": "Signing in secures your pet state across all your desktop devices.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Cloud Save Active",
+       "style": "highlight",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an explanatory cloud save badge to sign in within allowed onboarding changes."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.043,
+   "score": 7.49,
+   "score_note": "Strong evidence from 8 support emails and prior sign_in notification test showed +4.3% lift.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 114.8
+  },
+  {
+   "title": "Desktop Pet First Interaction Reward Callout",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Displays an instant completion badge callout on the home_intro screen rewarding users for finishing onboarding.",
+   "why": "Finish conversion drops to 64.8%. Prompting a completion badge gives users immediate gratification.",
+   "config": {
+    "home_intro": {
+     "headline": "Onboarding Complete!",
+     "body": "You have unlocked your official Desktop Explorer Badge.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Explorer Badge Unlocked",
+       "style": "playful",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions unlocked badge rewards/gifts, violating copy pricing rules."
+   }
+  },
+  {
+   "title": "Custom Pet Creation Assurance Copy",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Updates adoption certificate hint text explaining that pet names and attributes can be changed later in desktop settings.",
+   "why": "Support logged 3 issues regarding custom pet generation errors or worries about finalized details.",
+   "config": {
+    "adoption_certificate": {
+     "hint": "Don't worry! You can edit your pet's name and details anytime from the tray menu."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates hint copy on the adoption certificate screen without removing its required core job."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.014,
+   "score": 5.58,
+   "score_note": "Copy change is very low cost, but previous adoption copy test resulted in -1.4% lift.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 114.8
+  },
+  {
+   "title": "Two Column Path Selection Card View",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Changes choose_path screen layout to two_column for side-by-side comparison of quick adopt versus custom adoption.",
+   "why": "Choose path drops 23.8% of users with an 8s median / 514s mean time. Side-by-side structural comparison reduces decision latency.",
+   "config": {
+    "choose_path": {
+     "layout": "two_column",
+     "headline": "Select Your Adoption Method",
+     "body": "Compare pre-made quick pets against fully custom creation."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns choose_path layout while still offering both adopting and making your own pet."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.006,
+   "score": 5.19,
+   "score_note": "Two prior tests on choose_path layout changes consistently showed no positive effect (-0.6%).",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 114.8
+  },
+  {
+   "title": "Account Persistence Safeguard Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Adds an explicit explanatory hint under sign in buttons clarifying existing account linking to prevent fresh reset accounts.",
+   "why": "Largest single support complaint cluster (8 emails) is users logging into wrong accounts and thinking pets were deleted.",
+   "config": {
+    "sign_in": {
+     "hint": "Use your existing social or email login to reload existing pets automatically."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  }
+ ],
+ "picked": [
+  "Cloud Save Status Alert Banner",
+  "Custom Pet Creation Assurance Copy",
+  "Two Column Path Selection Card View",
+  "Background Pet Hatching Status Updates"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 537.0,
+ "decisions": [
+  {
+   "test": "sim-24",
+   "title": "Cloud Save Status Alert Banner",
+   "target_step": "sign_in",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 114.8,
+   "result": {
+    "step": {
+     "control": 0.7947,
+     "treatment": 0.7786,
+     "lift": -0.0202,
+     "lift_se": 0.0211,
+     "p": 0.344125
+    },
+    "finish": {
+     "control": 0.258,
+     "treatment": 0.2533,
+     "lift": -0.0181,
+     "lift_se": 0.0612,
+     "p": 0.769548
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.49,
+   "predicted_lift": 0.043,
+   "true_lift_hidden": 0.0025,
+   "finishers_delta_hidden": 0.98
+  },
+  {
+   "test": "sim-25",
+   "title": "Custom Pet Creation Assurance Copy",
+   "target_step": "adoption",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 114.8,
+   "result": {
+    "step": {
+     "control": 0.7786,
+     "treatment": 0.7475,
+     "lift": -0.04,
+     "lift_se": 0.0253,
+     "p": 0.121225
+    },
+    "finish": {
+     "control": 0.264,
+     "treatment": 0.256,
+     "lift": -0.0303,
+     "lift_se": 0.0597,
+     "p": 0.617441
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.58,
+   "predicted_lift": -0.014,
+   "true_lift_hidden": 0.0067,
+   "finishers_delta_hidden": 2.63
+  },
+  {
+   "test": "sim-26",
+   "title": "Two Column Path Selection Card View",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 114.8,
+   "result": {
+    "step": {
+     "control": 0.7527,
+     "treatment": 0.752,
+     "lift": -0.0009,
+     "lift_se": 0.0209,
+     "p": 0.966263
+    },
+    "finish": {
+     "control": 0.2593,
+     "treatment": 0.25,
+     "lift": -0.036,
+     "lift_se": 0.0602,
+     "p": 0.557414
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.19,
+   "predicted_lift": -0.006,
+   "true_lift_hidden": -0.0423,
+   "finishers_delta_hidden": -16.61
+  },
+  {
+   "test": "sim-27",
+   "title": "Background Pet Hatching Status Updates",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 114.8,
+   "result": {
+    "step": {
+     "control": 0.8853,
+     "treatment": 0.9072,
+     "lift": 0.0247,
+     "lift_se": 0.0188,
+     "p": 0.182171
+    },
+    "finish": {
+     "control": 0.2787,
+     "treatment": 0.2647,
+     "lift": -0.0502,
+     "lift_se": 0.0568,
+     "p": 0.388722
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.66,
+   "predicted_lift": 0.028,
+   "true_lift_hidden": 0.0286,
+   "finishers_delta_hidden": 11.23
+  },
+  {
+   "test": "sim-19",
+   "title": "Desktop Pet Summon Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "weeks": 2,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 77.8,
+   "result": {
+    "step": {
+     "control": 0.6346,
+     "treatment": 0.7394,
+     "lift": 0.1653,
+     "lift_se": 0.0329,
+     "p": 0.0
+    },
+    "finish": {
+     "control": 0.246,
+     "treatment": 0.2857,
+     "lift": 0.1612,
+     "lift_se": 0.05,
+     "p": 0.000506
+    },
+    "users_per_group": 3000,
+    "first_week": {
+     "step": {
+      "control": 0.6227,
+      "treatment": 0.7376,
+      "lift": 0.1846,
+      "lift_se": 0.0491,
+      "p": 3.3e-05
+     },
+     "finish": {
+      "control": 0.2267,
+      "treatment": 0.2887,
+      "lift": 0.2735,
+      "lift_se": 0.0797,
+      "p": 0.000103
+     },
+     "users_per_group": 1500
+    },
+    "retest": {
+     "step": {
+      "control": 0.6451,
+      "treatment": 0.7413,
+      "lift": 0.1491,
+      "lift_se": 0.0445,
+      "p": 0.000333
+     },
+     "finish": {
+      "control": 0.2653,
+      "treatment": 0.2827,
+      "lift": 0.0653,
+      "lift_se": 0.0634,
+      "p": 0.287187
+     },
+     "users_per_group": 1500
+    }
+   },
+   "outcome": "won after re-test, shipped",
+   "score": 8.77,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.1561,
+   "finishers_delta_hidden": 119.53
+  }
+ ],
+ "shipped": [
+  "Desktop Pet Summon Redesign"
+ ],
+ "ends_week": 6,
+ "weights_next": {
+  "impact": 3.022,
+  "evidence": 0.295,
+  "confidence": 0.597,
+  "cost": 0.086
+ },
+ "lessons_next": [
+  "Evidence is still thin for adoption (hint, redesign), choose_path (copy, hint, new_screen), finish (incentive, layout, redesign), and sign_in (copy, hint, layout, reorder) changes, as each has only 1 test.",
+  "adoption copy, choose_path layout, finish new_screen, and home wait_info changes each have at least 2 tests agreeing that no clear effect was seen.",
+  "home new_flow and sign_in notification changes can be helpful since at least 1 test won for each kind, though other tests showed no clear effect.",
+  "Most changes tested so far (23 out of 27 tests) showed no clear effect.",
+  "Predictions generally overestimated impact for most tests, but underestimated the size of major wins."
+ ]
+}

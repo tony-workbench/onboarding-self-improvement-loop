@@ -1,0 +1,408 @@
+{
+ "round": 8,
+ "starts_week": 8,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7932978,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 0.355,
+  "evidence": 0.188,
+  "confidence": 0.132,
+  "cost": 3.325
+ },
+ "lessons_used": [
+  "Predictions were mostly too high compared to actual noise-corrected results, except for sign_in notification where the prediction was too low.",
+  "No effect was seen for adoption redesign changes across 2 tests.",
+  "Evidence is still thin for adoption new_flow, finish new_screen, home new_flow, sign_in notification, and sign_in reorder, as each has only 1 test."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Waiting Screen Progress Checklist Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Adds a live multi-step rendering checklist and an animated mascot onto the waiting screen during generation.",
+   "why": "Home / waiting stage has a long mean completion time (2336s) and 3 support tickets reported custom pet rendering confusion.",
+   "config": {
+    "waiting": {
+     "headline": "Creating Your Desktop Companion",
+     "layout": "checklist",
+     "show_progress": true,
+     "show_time_estimate": true,
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Analyzing preferences and model",
+       "style": "plain"
+      },
+      {
+       "type": "checklist",
+       "text": "Rendering desktop sprite animations",
+       "style": "plain"
+      },
+      {
+       "type": "mascot",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Valid enhancement to the waiting screen with no rule violations."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.01,
+   "score": 0.77,
+   "score_note": "High evidence from wait time and support tickets, but historical new_flow test on home yielded -1.3% lift.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 106.0
+  },
+  {
+   "title": "Sign In After Story Intro",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves sign_in directly after story intro so users sync their account before selecting paths or adopting pets.",
+   "why": "8 support emails complained about lost pets or account resets after signing in later in the journey.",
+   "config": {
+    "_order": [
+     "story",
+     "sign_in",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "sign_in": {
+     "headline": "Sign In to Save Progress",
+     "hint": "Sync your account early so your pet selection and custom creations are saved safely."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "sign_in may move later, not before choose_path"
+   }
+  },
+  {
+   "title": "Choose Path Welcome Onboarding Screen",
+   "target_step": "choose_path",
+   "type": "new_screen",
+   "change": "Inserts a dedicated onboarding intro screen before path choice explaining ready-made versus photo-created pets.",
+   "why": "Choose path drops off to 76.2% conversion and has a high mean duration of 514s due to user hesitation.",
+   "config": {
+    "_order": [
+     "story",
+     "new_path_welcome",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_path_welcome": {
+     "headline": "Choose Your Journey",
+     "body": "Select whether to adopt an instant ready-made desktop pet or upload photos to generate a custom companion.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "text",
+       "text": "Ready-made or Custom Creation",
+       "style": "large"
+      },
+      {
+       "type": "button",
+       "label": "Continue to Path Selection",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new onboarding screen before path selection is allowed by Rule 4."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.03,
+   "score": 0.45,
+   "score_note": "Adding a new screen adds friction, similar to prior new_screen tests (-6.0%), with no support mail backing.",
+   "slot": "big move"
+  },
+  {
+   "title": "Home Intro Onboarding Stage Redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesigns the home intro screen into a focused stage layout featuring a prominent mascot preview and call-to-action.",
+   "why": "Finish step conversion drops to 64.8% and 3 support tickets report confusion on how to launch or interact with pets.",
+   "config": {
+    "home_intro": {
+     "layout": "stage",
+     "headline": "Welcome Your Pet to the Desktop!",
+     "body": "Your companion is ready! Click below to summon it onto your desktop screen.",
+     "replace": {
+      "home_welcome": [
+       {
+        "type": "mascot",
+        "style": "playful",
+        "role": "home_welcome"
+       },
+       {
+        "type": "button",
+        "label": "Release Pet to Desktop",
+        "style": "emphasis",
+        "action": "next",
+        "role": "home_welcome"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'home_intro.home_welcome' does not do the job: needs 1 of ['animation', 'image', 'mascot', 'text'] with real words"
+   }
+  },
+  {
+   "title": "Sign In Recovery Account Guidance",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Clarifies sign-in headline and body copy to emphasize account restoration for returning users.",
+   "why": "Support received 8 emails from users whose pets went missing or reset when signing in with another account.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Access Your Pets",
+     "body": "Use your existing account to restore all previously adopted desktop companions and settings automatically.",
+     "hint": "Make sure to sign in with the same email or provider you used previously."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Path Decision Time Helper Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Adds explicit hint copy informing users that path choice is flexible and additional pets can be added later.",
+   "why": "Choose path median completion time is 8s while mean time is 514s, showing a long tail of stalled users.",
+   "config": {
+    "choose_path": {
+     "hint": "Unsure? You can always create or adopt additional pets later from your desktop menu.",
+     "tip_delay_seconds": 10
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding helpful decision hints to path selection is compliant with all rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 8.93,
+   "score_note": "Low cost copy fix for stalled users; mild positive expectation without major flow disruption."
+  },
+  {
+   "title": "Background Pet Readiness Notification",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enables system notifications on the waiting screen so users know they can minimize the app while pet generation completes.",
+   "why": "Waiting stage mean time is 2336s (over 38 minutes), leading users to close or abandon the app during generation.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "headline": "We'll Notify You When Ready",
+     "body": "Feel free to minimize this window. We will send a desktop notification as soon as your pet is generated."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding background notifications to the waiting screen is allowed under Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 5.23,
+   "score_note": "Addresses 38-minute wait abandonment; notifications are the only change type with positive historical precedent (+7.6%)."
+  },
+  {
+   "title": "Waiting Screen Estimated Time & Carousel",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays time estimates and a tips carousel explaining desktop controls while pet generation finishes.",
+   "why": "Mean time waiting is 2336s and 3 users wrote support because they did not know how to control desktop features.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Tip: Right-click your pet anytime on the desktop to hide, move, or chat with it.",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding tips and real wait estimates to the waiting screen complies with Rules 4 and 5."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.02,
+   "score": 5.09,
+   "score_note": "Strong evidence from support and wait duration; informative carousel provides minor clarity without adding flow friction."
+  },
+  {
+   "title": "Upload Photos Checklist Layout",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switches the upload photos screen to a structured checklist layout with explicit photo requirements.",
+   "why": "3 support emails mentioned custom pet generation failing or looking wrong, and adoption conversion is low at 60.9%.",
+   "config": {
+    "upload_photos": {
+     "layout": "checklist",
+     "headline": "Upload Clear Pet Photos",
+     "show_step_counter": true,
+     "hint": "For best results, upload high-resolution, front-facing photos with good lighting."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the photo upload layout is permitted inside onboarding under Rule 4."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.01,
+   "score": 5.51,
+   "score_note": "Targets the highest funnel drop-off (39.1% lost) with support mail backing, but prior adoption redesigns consistently showed negative lift (-1.3%).",
+   "slot": "best score"
+  },
+  {
+   "title": "Pick Friend Character Selection Badge",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Adds a starter care package badge to pet choices to increase motivation during character selection.",
+   "why": "Adoption stage drops to 60.9% conversion with a median time of 89s.",
+   "config": {
+    "pick_friend": {
+     "headline": "Pick Your Companion & Claim Bonus",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Includes Free Starter Toy Pack",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions 'Free Starter Toy Pack', violating Rule 3 which prohibits mentioning free extras or gifts."
+   }
+  }
+ ],
+ "picked": [
+  "Waiting Screen Progress Checklist Flow"
+ ],
+ "held_by_harm_budget": [
+  "Choose Path Welcome Onboarding Screen",
+  "Upload Photos Checklist Layout"
+ ],
+ "harm_budget": 116.4,
+ "planned_harm": 106.0,
+ "decisions": [
+  {
+   "test": "sim-8",
+   "title": "Waiting Screen Progress Checklist Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 106.0,
+   "result": {
+    "step": {
+     "control": 0.8221,
+     "treatment": 0.786,
+     "lift": -0.044,
+     "lift_se": 0.0284,
+     "p": 0.129594
+    },
+    "finish": {
+     "control": 0.1887,
+     "treatment": 0.192,
+     "lift": 0.0177,
+     "lift_se": 0.0766,
+     "p": 0.816118
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 0.77,
+   "predicted_lift": -0.01,
+   "true_lift_hidden": -0.0172,
+   "finishers_delta_hidden": -5.04
+  }
+ ],
+ "shipped": [],
+ "ends_week": 8,
+ "weights_next": {
+  "impact": 0.206,
+  "evidence": 0.12,
+  "confidence": 0.084,
+  "cost": 3.591
+ },
+ "lessons_next": [
+  "Predictions were mostly too high compared to actual noise-corrected results, except for sign_in notification where the prediction was too low.",
+  "No effect was seen for adoption redesign changes across 2 tests.",
+  "No effect was seen for home new_flow changes across 2 tests.",
+  "Evidence is still thin for adoption new_flow, finish new_screen, sign_in notification, and sign_in reorder, as each has only 1 test."
+ ]
+}

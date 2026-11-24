@@ -1,0 +1,465 @@
+{
+ "round": 8,
+ "starts_week": 8,
+ "funnel": {
+  "choose_path": 0.8377650427800002,
+  "sign_in": 0.9010686905374499,
+  "adoption": 0.6315329999999999,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Certificate First Companion Customizer",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen into a stage layout featuring live companion preview animations and verified pet badges.",
+   "why": "Adoption has a high drop-off rate (63.2% conversion, 89s median / 1017s mean). Redesigning the certificate stage builds emotional connection and momentum.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "headline": "Personalize Your Official Adoption Certificate",
+     "body": "Customize your pet's official name, personality traits, and registry badge before bringing them to your desktop.",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "preview",
+        "asset": "asset:pet_live_stage",
+        "style": "playful"
+       },
+       {
+        "role": "certificate",
+        "type": "badge",
+        "label": "Official Desktop Companion Certificate",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'adoption_certificate.certificate' does not do the job: needs 1 of ['animation', 'image', 'preview'] with an asset:certificate/ asset"
+   }
+  },
+  {
+   "title": "Story First Auth Reordering",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder the onboarding flow so users pick their pet and path first before signing in to back up their creation.",
+   "why": "Asking for sign-in before picking a pet causes friction early. Placing sign_in after pet selection leverages commitment.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "sign_in",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "sign_in": {
+     "headline": "Save Your Companion To Cloud",
+     "body": "Sign in now so your newly picked companion is safely saved to your account and synced across devices."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign in within onboarding is permitted and all steps remain present."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.06,
+   "score": 3.75,
+   "score_note": "Reordering auth builds user commitment before requiring account creation.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 163.5
+  },
+  {
+   "title": "Desktop Dock Placement Setup Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Introduce a dedicated new setup screen before finishing where users choose their pet's default screen anchor point (Taskbar, Top Dock, Floating).",
+   "why": "Support logs show 3 emails regarding pets not showing up on desktop or app failing to open, and 3 emails confused about controls.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_dock_setup",
+     "home_intro"
+    ],
+    "new_dock_setup": {
+     "headline": "Choose Your Pet's Screen Habitat",
+     "body": "Select where your companion sits on your screen and how it anchors to your desktop windows.",
+     "layout": "split",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Select Dock Location (Taskbar, Screen Top, Free Float)",
+       "style": "rounded",
+       "action": "choose"
+      },
+      {
+       "type": "button",
+       "label": "Confirm Habitat Location",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'new_dock_setup.components[0].label' must be text up to 40 characters"
+   }
+  },
+  {
+   "title": "Companion Desktop Readiness Diagnostic Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Transform the waiting screen into a dynamic readiness diagnostic flow that verifies graphics hardware and audio drivers while generating.",
+   "why": "Home wait time is very high (median 201s / mean 2336s) and support received multiple complaints about pets failing to show on desktop.",
+   "config": {
+    "waiting": {
+     "layout": "split",
+     "headline": "Preparing Desktop Engine & Verifying Display",
+     "body": "While your pet is being generated, we are verifying display anchors and graphics driver compatibility.",
+     "replace": {
+      "wait_status": [
+       {
+        "role": "wait_status",
+        "type": "checklist",
+        "label": "Desktop Render Anchor Check",
+        "style": "highlight"
+       },
+       {
+        "role": "wait_status",
+        "type": "progress",
+        "label": "Pet Generation Progress",
+        "style": "calm"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.replace.wait_status[0]': a checklist cannot do the wait_status job (use ['animation', 'mascot', 'preview', 'progress', 'text', 'timer', 'tip_carousel'])"
+   }
+  },
+  {
+   "title": "Account Sync Safeguard Warning",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit safeguard hint and guarantee badge explaining that signing into an existing account restores pets without losing data.",
+   "why": "8 emails (the largest support theme) reported pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing into an existing account automatically restores all saved pets without overwriting data.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "badge",
+        "label": "Safe Account Restore Guaranteed",
+        "style": "highlight"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Spotlight Path Discovery View",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Switch choose_path layout to 'spotlight' featuring high-impact hero cards comparing custom photo pet creation vs preset companion adoption.",
+   "why": "choose_path has a wide variance (median 8s vs mean 514s), indicating some users get stuck contemplating paths.",
+   "config": {
+    "choose_path": {
+     "layout": "spotlight",
+     "headline": "Choose How You Want to Create Your Pet",
+     "body": "Turn a real photo into an animated companion or adopt from our handcrafted virtual species.",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Custom Photo Creation vs Handcrafted Preset Adoption",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'choose_path.replace.path_options[0].label' must be text up to 40 characters"
+   }
+  },
+  {
+   "title": "Companion Trait Discovery Carousel",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add an interactive tip carousel with sound previews on the waiting screen to keep users engaged while generation occurs.",
+   "why": "Home wait time is very long (mean 2336s / median 201s), causing users to abandon the application during render.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "tip_delay_seconds": 12,
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Did you know? You can right-click your pet on the desktop to access quick commands and feeding options!",
+       "style": "calm"
+      },
+      {
+       "type": "sound",
+       "label": "Test Companion Vocal Sound",
+       "style": "small",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding tip carousels and audio previews to the waiting screen is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.05,
+   "score": 5.42,
+   "score_note": "Interactive content engages users during the extreme wait time on the home step."
+  },
+  {
+   "title": "Starter Desktop Care Package Unlocked",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Display a prominent welcome gift badge showing unlocked starter toys and treats on the final onboarding screen.",
+   "why": "Finish conversion drops to 64.8%. Offering an immediate reward encourages users to complete the final click.",
+   "config": {
+    "home_intro": {
+     "headline": "Welcome Home! Starter Care Bundle Unlocked",
+     "body": "Your new desktop pet has arrived with 3 starter toys and a welcome pack of food ready on your desktop.",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "badge",
+        "label": "Unlocked: 3 Desktop Toys & 50 Treats",
+        "style": "highlight"
+       },
+       {
+        "role": "home_welcome",
+        "type": "button",
+        "label": "Meet Your Pet On Desktop",
+        "style": "emphasis",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.replace.home_welcome[0]': a badge cannot do the home_welcome job (use ['animation', 'button', 'checklist', 'image', 'mascot', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Background Ready Chime Prompt",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable ready notifications and display a background completion audio chime setting on the waiting screen.",
+   "why": "Long wait times (mean 2336s) lead to users leaving the computer or missing when generation completes.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "hint": "We'll play a gentle sound chime when your companion is ready to spawn on your desktop.",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Sound Alert When Ready Enabled",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding notification prompts and chime settings to the waiting screen is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.08,
+   "score": 6.67,
+   "score_note": "Background audio chimes bring users back after long generation delays.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 163.5
+  },
+  {
+   "title": "Custom Photo Quality Guidance Checklist",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add clear photo uploading tips and lighting suggestions to the upload_photos screen to prevent broken custom pet outputs.",
+   "why": "3 support emails reported custom pet generation failing or looking wrong, causing adoption step dropoffs.",
+   "config": {
+    "upload_photos": {
+     "headline": "Upload Clear Photo For Best 3D Results",
+     "hint": "For best results, use a bright, front-facing photo with your pet's face fully visible.",
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "label": "Select Front-Facing Pet Photo",
+        "style": "rounded",
+        "action": "choose"
+       },
+       {
+        "role": "photo_upload",
+        "type": "tip_carousel",
+        "text": "Tip: Avoid dark shadows, side angles, or blurry photos for accurate 3D model creation.",
+        "style": "calm"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[1]': a tip_carousel cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  }
+ ],
+ "picked": [
+  "Story First Auth Reordering",
+  "Desktop Background Ready Chime Prompt"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 327.0,
+ "decisions": [
+  {
+   "test": "sim-30",
+   "title": "Story First Auth Reordering",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 163.5,
+   "result": {
+    "step": {
+     "control": 0.9014,
+     "treatment": 0.876,
+     "lift": -0.0281,
+     "lift_se": 0.0097,
+     "p": 0.004122
+    },
+    "finish": {
+     "control": 0.261,
+     "treatment": 0.2423,
+     "lift": -0.0715,
+     "lift_se": 0.0414,
+     "p": 0.095731
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 3.75,
+   "predicted_lift": 0.06,
+   "true_lift_hidden": -0.0289,
+   "finishers_delta_hidden": -21.93
+  },
+  {
+   "test": "sim-31",
+   "title": "Desktop Background Ready Chime Prompt",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 163.5,
+   "result": {
+    "step": {
+     "control": 0.8056,
+     "treatment": 0.8219,
+     "lift": 0.0201,
+     "lift_se": 0.0181,
+     "p": 0.262005
+    },
+    "finish": {
+     "control": 0.2687,
+     "treatment": 0.239,
+     "lift": -0.1104,
+     "lift_se": 0.0395,
+     "p": 0.008288
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "rolled back: guardrail",
+   "score": 6.67,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": 0.0083,
+   "finishers_delta_hidden": 6.3
+  }
+ ],
+ "shipped": [],
+ "ends_week": 8,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

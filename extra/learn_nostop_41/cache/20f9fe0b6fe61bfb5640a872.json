@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [home, redesign] Stage Waiting Status Redesign: Redesign the waiting screen into a stage layout featuring live setup status, time estimates, and step counters.\n   config: {\"waiting\": {\"layout\": \"stage\", \"headline\": \"Preparing Your Pet's Desktop Arrival\", \"body\": \"We are calibrating your companion's rendering engine and desktop overlay.\", \"show_progress\": true, \"show_time_estimate\": true, \"show_step_counter\": true}}\n1: [finish, new_screen] First Desk Interaction Welcome Screen: Add a new screen following onboarding completion to introduce desktop hotkeys and window interaction controls.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_controls_intro\"], \"new_controls_intro\": {\"layout\": \"card\", \"headline\": \"Desktop Pet Control Basics\", \"body\": \"Learn the quick shortcuts to move, toggle visibility, and interact with your new desktop companion.\"}}\n2: [adoption, new_flow] Guided Photo Upload Companion Flow: Rebuild the photo upload screen with a split layout detailing photo lighting requirements and upload progress indicators.\n   config: {\"upload_photos\": {\"layout\": \"split\", \"headline\": \"Upload Clear Pet Photos\", \"body\": \"For best 3D pet rendering, upload bright, well-lit photos showing your pet's face clearly.\", \"show_progress\": true}}\n3: [sign_in, reorder] Post-Adoption Account Sign-In Placement: Move sign-in step after adoption certificate creation so users design their pet before registering an account.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n4: [choose_path, layout] Carousel Path Selection Layout: Switch the path choice layout to an interactive card carousel displaying featured companion personalities.\n   config: {\"choose_path\": {\"layout\": \"carousel\", \"headline\": \"Choose Your Companion Journey\", \"body\": \"Swipe to explore distinct companion archetypes tailored to your desktop workspace.\"}}\n5: [sign_in, hint] Existing Account Pet Sync Hint: Display an informative hint on the sign-in screen assuring users that logging in restores their existing desktop pets.\n   config: {\"sign_in\": {\"hint\": \"Logging into your existing account automatically restores your previously saved pets and items.\"}}\n6: [home, wait_info] Desktop Environment Readiness Wait Status: Add real-time environment readiness status text to the waiting screen while desktop pet assets load.\n   config: {\"waiting\": {\"headline\": \"Initializing Desktop Companion Engine\", \"body\": \"Configuring window overlay layers and desktop collision bounds...\", \"show_time_estimate\": true}}\n7: [finish, notification] Desktop Launch Completion Notification: Add a system notification opt-in toggle on the home intro screen so users are notified when pet spawning finishes.\n   config: {\"home_intro\": {\"notify_when_ready\": true, \"headline\": \"Your Pet is Almost Ready\", \"body\": \"Get notified the moment your desktop pet finishes spawning and settles onto your screen.\"}}\n8: [adoption, incentive] Certificate Name Personalization Incentive: Add an official adoption badge and visual component to the certificate screen to highlight companion naming.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Desktop Adoption Certificate\", \"body\": \"Name your custom companion to seal your adoption record.\", \"components\": [{\"type\": \"badge\", \"label\": \"Official Adoption\", \"style\": \"highlight\"}]}}\n9: [choose_path, copy] Story Scroll Companion Narrative Copy: Update the story screen to a story_scroll layout with copy focusing on interactive desktop presence.\n   config: {\"story\": {\"layout\": \"story_scroll\", \"headline\": \"A Virtual Companion Living On Your Screen\", \"body\": \"Build a personalized pet that reacts, plays, and stays by your side while you work and browse.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns waiting screen while preserving its job of showing the pet being made."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new screen after the home intro, which is explicitly allowed by rule 4."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns photo upload layout while keeping its original function."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in step after adoption certificate, which is explicitly allowed by rule 4."
+   },
+   {
+    "index": 4,
+    "pass": false,
+    "rule": 2,
+    "reason": "Choose path screen fails to offer both adopting and making your own, losing its required job."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an informative hint to sign-in without breaking any onboarding rules."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds readiness status and time estimate to the waiting screen while keeping its job."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an opt-in notification toggle on the home intro screen inside onboarding."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an official adoption badge and retains the official certificate stamp job."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns story layout while continuing to introduce the pet."
+   }
+  ]
+ }
+}

@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [choose_path, new_screen] Interactive Pet Path Discovery Screen: Insert a interactive pet path preview screen right after the story screen to let users test path choices visually before committing.\n   config: {\"new_path_discovery\": {\"headline\": \"Discover Your Ideal Desktop Companion Experience\", \"body\": \"Select how you want your pet to live on your desktop: casual companion, active assistant, or playful friend.\", \"layout\": \"centered\", \"components\": [{\"type\": \"choice_cards\", \"text\": \"Choose your companion style\", \"style\": \"playful\", \"action\": \"choose\"}, {\"type\": \"button\", \"label\": \"Continue with Selection\", \"style\": \"emphasis\", \"action\": \"next\"}]}, \"_order\": [\"story\", \"new_path_discovery\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n1: [sign_in, new_screen] Account Sign-In Data Safety Verification Screen: Add an explicit data safety and account verification screen before sign-in options to clarify pet progress saving.\n   config: {\"new_account_safety\": {\"headline\": \"Keep Your Companion Safe\", \"body\": \"Signing in ensures your pet data, custom looks, and memories are backed up permanently to your account.\", \"layout\": \"compact\", \"components\": [{\"type\": \"badge\", \"text\": \"Cloud Save Active\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Proceed to Sign In\", \"style\": \"emphasis\", \"action\": \"next\"}]}, \"_order\": [\"story\", \"choose_path\", \"new_account_safety\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n2: [sign_in, reorder] Reorder Sign-In After Pet Customization: Move sign-in to take place after pet selection and customization so users invest in their pet before creating an account.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n3: [adoption, redesign] Adoption Certificate Companion Preview Redesign: Redesign the adoption certificate layout into a two-column interactive summary showing real-time customization options.\n   config: {\"adoption_certificate\": {\"headline\": \"Meet Your New Companion\", \"body\": \"Review your pet's attributes and official adoption certificate details.\", \"layout\": \"two_column\", \"replace\": {\"certificate\": [{\"type\": \"preview\", \"text\": \"Pet Live Preview\", \"style\": \"rounded\", \"role\": \"certificate\"}, {\"type\": \"badge\", \"text\": \"Official Companion Pass\", \"style\": \"highlight\", \"role\": \"certificate\"}]}}}\n4: [home, wait_info] Desktop Engine Initialization Diagnostic Feed: Display an active render diagnostic engine feed on the waiting screen to verify desktop display capability while waiting.\n   config: {\"waiting\": {\"headline\": \"Preparing Desktop Environment\", \"body\": \"Verifying screen overlay drivers and graphics settings for optimal pet behavior.\", \"tip_delay_seconds\": 3, \"components\": [{\"type\": \"checklist\", \"text\": \"Screen Overlay Driver: Ready | Graphics Engine: Active\", \"style\": \"calm\"}]}}\n5: [finish, new_flow] Pet Controls Quick Action Interactive Flow: Add an interactive quick-action simulator component on the finish intro screen demonstrating how to summon and hide the pet.\n   config: {\"home_intro\": {\"headline\": \"Master Desktop Controls in Seconds\", \"body\": \"Try hiding, calling, and interacting with your pet right now using the quick access panel.\", \"layout\": \"spotlight\", \"components\": [{\"type\": \"button\", \"label\": \"Test Summon Pet\", \"style\": \"playful\", \"action\": \"play\"}, {\"type\": \"tip_carousel\", \"text\": \"Right-click pet for instant menu options | Press Cmd/Ctrl+Shift+P to call pet\", \"style\": \"subtle\"}]}}\n6: [adoption, redesign] Pick Friend Visual Gallery Redesign: Redesign the companion selection screen into a full-bleed carousel showcase highlighting distinct personality traits.\n   config: {\"pick_friend\": {\"headline\": \"Choose Your Companion Avatar\", \"body\": \"Swipe through available desktop buddies to find your perfect match.\", \"layout\": \"carousel\", \"replace\": {\"pet_choices\": [{\"type\": \"preview\", \"text\": \"Featured Pet Avatar\", \"style\": \"large\", \"role\": \"pet_choices\"}]}}}\n7: [home, new_screen] Interactive Desktop Readiness Verification Screen: Insert a dedicated desktop verification screen right before home intro to ensure the window overlay permissions are working.\n   config: {\"new_desktop_verification\": {\"headline\": \"Desktop Display Check\", \"body\": \"Checking multi-monitor support and system tray integration.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"progress\", \"text\": \"System Integration Check\", \"style\": \"emphasis\"}, {\"type\": \"button\", \"label\": \"Launch Pet to Desktop\", \"style\": \"playful\", \"action\": \"next\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_verification\", \"home_intro\"]}\n8: [choose_path, layout] Choose Path Value Proposition Card Highlights: Reorganize the path selection page into a structured grid layout with highlighted feature badges on each option.\n   config: {\"choose_path\": {\"headline\": \"Select Your Companion Journey\", \"body\": \"Pick the path that best matches how you work and play on your desktop.\", \"layout\": \"grid\", \"components\": [{\"type\": \"badge\", \"text\": \"Most Popular Choice\", \"style\": \"highlight\"}]}}\n9: [finish, hint] First Interaction Quick Reference Bar on Home Intro: Display a fixed hint bar on the completion screen listing key shortcuts for hiding and talking to the companion.\n   config: {\"home_intro\": {\"hint\": \"Pro tip: Double-click your pet to open settings, or drag anywhere to relocate on screen.\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new path discovery screen inside onboarding without removing steps is permitted."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an account safety screen prior to sign-in is allowed within onboarding."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to occur after pet adoption is explicitly allowed."
+   },
+   {
+    "index": 3,
+    "pass": false,
+    "rule": 2,
+    "reason": "The replacement component removes the official stamp from the adoption certificate."
+   },
+   {
+    "index": 4,
+    "pass": false,
+    "rule": 2,
+    "reason": "The waiting screen loses its required job of showing that the pet is being made."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Modifying home_intro to include interactive pet controls is allowed within onboarding."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning pick_friend into a carousel maintains the job of letting the user select a pet."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserting a desktop readiness verification screen before home_intro is permitted."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorganizing choose_path into a grid layout preserves its required job and follows fair design rules."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a shortcut reference hint to home_intro is permitted inside onboarding."
+   }
+  ]
+ }
+}

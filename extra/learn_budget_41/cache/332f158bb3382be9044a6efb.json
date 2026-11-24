@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, redesign] Account Sync Persistence Redesign: Redesign the sign-in screen to prominently emphasize account backup and preventing pet data loss across sessions.\n   config: {\"sign_in\": {\"headline\": \"Sync & Secure Your Companion\", \"body\": \"Sign in to save your pet safely in the cloud so your progress is never lost.\", \"layout\": \"two_column\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"badge\", \"text\": \"Cloud Save Active\", \"style\": \"highlight\"}]}}}\n1: [adoption, hint] Photo Quality Guidance Hint: Add clear image requirements and lighting tips directly on the photo upload view.\n   config: {\"upload_photos\": {\"hint\": \"Use well-lit, clear front-facing photos for best pet generation results.\", \"show_time_estimate\": true}}\n2: [finish, new_screen] Desktop Controls Guide Screen: Insert a dedicated desktop pet interaction guide screen before onboarding completes.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_controls_guide\"], \"new_controls_guide\": {\"headline\": \"Desktop Pet Controls\", \"body\": \"Click your pet to play, right-click for settings, and drag to reposition anytime.\", \"layout\": \"centered\", \"components\": [{\"type\": \"text\", \"text\": \"Left-click: Interact | Right-click: Options | Drag: Move\", \"style\": \"emphasis\"}]}}\n3: [home, wait_info] Creation Status and Delay Tracker: Display progress indicators and accurate estimated completion times on the waiting screen.\n   config: {\"waiting\": {\"headline\": \"Assembling Your Desktop Companion\", \"body\": \"We are generating custom assets and preparing your pet.\", \"show_progress\": true, \"show_time_estimate\": true, \"tip_delay_seconds\": 15}}\n4: [choose_path, reorder] Deferred Sign-In Sequence: Reorder onboarding so users select their pet creation path before being asked to sign in.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n5: [finish, layout] Desktop Visibility Setup Layout: Update the home intro screen layout to split view focusing on desktop window positioning.\n   config: {\"home_intro\": {\"headline\": \"Companion Active on Desktop\", \"body\": \"Your companion is live on your screen. Check your desktop background or system tray.\", \"layout\": \"split\"}}\n6: [sign_in, copy] One-Click Sign-In Copy Refresh: Rewrite sign-in copy to emphasize fast account protection and instant setup.\n   config: {\"sign_in\": {\"headline\": \"Quick Account Connection\", \"body\": \"Link your account in seconds to sync companion progress across all your devices.\", \"button_label\": \"Continue to Pet Setup\"}}\n7: [adoption, new_flow] Interactive Certificate Builder Flow: Add a certificate personalization sub-flow allowing users to pick companion badges and names before finalizing adoption.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_cert_builder\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_cert_builder\": {\"headline\": \"Personalize Adoption Badge\", \"body\": \"Name your companion and select your official adoption seal.\", \"layout\": \"card\", \"components\": [{\"type\": \"name_input\", \"label\": \"Pet Name\", \"style\": \"rounded\"}]}}\n8: [choose_path, incentive] Starter Accessory Choice Incentive: Highlight a free starter accessory bonus on the path selection screen.\n   config: {\"choose_path\": {\"headline\": \"Choose Your Companion Path\", \"body\": \"Pick a path to unlock a free starter hat accessory for your desktop pet!\", \"components\": [{\"type\": \"badge\", \"text\": \"Includes Free Accessory\", \"style\": \"playful\"}]}}\n9: [home, notification] Background Generation Notification: Enable desktop system alerts when pet generation finishes while minimized.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"body\": \"Feel free to minimize this window. We will send a desktop alert when your pet is ready!\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replacing sign-in options with a static badge removes the ability to sign in, failing the screen's core job."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds image requirement hints to photo upload within onboarding rules."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new controls guide screen after home_intro, which is explicitly allowed."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds accurate progress and estimated completion time to the waiting screen."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Reorders sign-in step after path selection, which is explicitly allowed."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates home intro layout within onboarding without breaking rules."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Refreshes copy and button text on the sign-in screen without losing functionality."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a certificate builder step inside onboarding without removing required steps."
+   },
+   {
+    "index": 8,
+    "pass": false,
+    "rule": 3,
+    "reason": "Mentions a 'free starter hat accessory' and 'Includes Free Accessory' in onboarding copy."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Enables desktop alerts for completion on the waiting screen."
+   }
+  ]
+ }
+}

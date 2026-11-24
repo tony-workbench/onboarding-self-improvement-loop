@@ -1,0 +1,66 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Pet Personality Audio Preview: Redesign the pick_friend screen with playable audio soundbites of pet chirps and personality tags so users can listen before deciding.\n   config: {\"pick_friend\": {\"headline\": \"Listen and Choose Your Companion\", \"body\": \"Select a pet to hear their unique sounds and personality style.\", \"layout\": \"grid\", \"components\": [{\"type\": \"sound\", \"label\": \"Preview Sound\", \"style\": \"playful\", \"action\": \"play\"}, {\"type\": \"choice_cards\", \"label\": \"Select Pet\", \"style\": \"rounded\", \"action\": \"choose\"}]}}\n1: [finish, new_screen] First Desk Toy Unboxing Screen: Add a new_toy_unboxing screen before home_intro where users unwrap an interactive starter toy for their new pet.\n   config: {\"new_toy_unboxing\": {\"headline\": \"Unbox Your Companion's First Toy!\", \"body\": \"Your companion brought a desk toy to play with when resting.\", \"layout\": \"centered\", \"button_label\": \"Open Gift Box\", \"components\": [{\"type\": \"animation\", \"asset\": \"asset:gift_box\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Unwrap Toy\", \"style\": \"emphasis\", \"action\": \"next\"}]}, \"home_intro\": {\"headline\": \"Welcome to Your New Desktop Partner\"}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_toy_unboxing\", \"home_intro\"]}\n2: [sign_in, incentive] Multi-Device Sync Benefit Prompt: Add a prominent account backup guarantee hint and multi-device sync callout directly above the sign-in options.\n   config: {\"sign_in\": {\"headline\": \"Secure Your Pet Data & Cloud Save\", \"hint\": \"Signing in anchors your pet to your cloud account so progress is never lost across reinstalls.\", \"components\": [{\"type\": \"badge\", \"label\": \"Automatic Cloud Restore Enabled\", \"style\": \"highlight\"}]}}\n3: [home, new_flow] Background Pet Creation Activity Feed: Transform the waiting screen into a dynamic visual activity stream showing sprite rendering, audio synthesis, and animation compilation.\n   config: {\"waiting\": {\"headline\": \"Crafting Your Companion's Desktop Assets\", \"layout\": \"checklist\", \"show_progress\": true, \"show_time_estimate\": true, \"components\": [{\"type\": \"progress\", \"label\": \"Rigging Animations\", \"style\": \"highlight\"}, {\"type\": \"checklist\", \"label\": \"Rendering Sprites & Sound Effects\", \"style\": \"plain\"}]}}\n4: [choose_path, redesign] Interactive Path Archetype Quiz: Redesign the choose_path screen into a 3-question visual habit quiz that suggests the optimal pet path based on daily work style.\n   config: {\"choose_path\": {\"headline\": \"Which Desktop Companion Fits Your Workflow?\", \"layout\": \"card\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Focus Companion vs Playful Desktop Buddy\", \"style\": \"playful\", \"action\": \"choose\"}]}}\n5: [adoption, hint] Photo Silhouette Validation Preview: Add a live photo framing silhouette preview and instant clarity check hint on upload_photos screen.\n   config: {\"upload_photos\": {\"headline\": \"Upload Photo for Custom Pet Creation\", \"hint\": \"Ensure your face/pet photo is well-lit inside the central ring for crisp 2D sprite rendering.\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:silhouette_frame\", \"style\": \"rounded\"}]}}\n6: [finish, redesign] Pet Habit & Sleep Schedule Selector: Redesign home_intro with a desktop activity schedule control card allowing users to configure active hours and tray hide hotkeys.\n   config: {\"home_intro\": {\"headline\": \"Configure Your Desktop Companion Habits\", \"body\": \"Set active hours, quiet study mode, and quick desktop hide hotkeys.\", \"layout\": \"split\", \"components\": [{\"type\": \"checklist\", \"label\": \"Active Work Hours & Auto-Hide Rules\", \"style\": \"rounded\"}]}}\n7: [sign_in, redesign] Quick Guest Auth Switcher: Redesign sign_in with clear single-click passkeys and account recovery explanation to prevent loss-prevention anxiety.\n   config: {\"sign_in\": {\"headline\": \"Choose Express Account Protection\", \"body\": \"Sign in in 1 click using device credentials to lock in your pet's memory.\", \"layout\": \"centered\", \"replace\": {\"sign_in_options\": [{\"type\": \"button\", \"label\": \"Continue with Passkey\", \"style\": \"emphasis\", \"action\": \"next\", \"role\": \"sign_in_options\"}, {\"type\": \"button\", \"label\": \"Continue with Email\", \"style\": \"plain\", \"action\": \"next\", \"role\": \"sign_in_options\"}]}}}\n8: [home, wait_info] Desktop Docking Sound Indicator: Add audio chime alert toggle and countdown visual timer on the waiting screen when rendering finishes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"hint\": \"A gentle chime will play when your pet is ready to land on your desktop taskbar.\", \"components\": [{\"type\": \"timer\", \"label\": \"Estimated Completion\", \"style\": \"calm\"}]}}\n9: [choose_path, new_screen] Welcome Story Prologue Screen: Add a new screen new_prologue_lore before story to introduce the world of desktop pets and build emotional attachment early.\n   config: {\"new_prologue_lore\": {\"headline\": \"Welcome to the World of Desktop Pets\", \"body\": \"Little digital creatures that live right on your desktop, helping you work and keep you company.\", \"layout\": \"story_scroll\", \"button_label\": \"Begin Companion Journey\", \"components\": [{\"type\": \"mascot\", \"asset\": \"asset:welcoming_pet\", \"style\": \"playful\"}]}, \"_order\": [\"new_prologue_lore\", \"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}",
+ "answer": [
+  {
+   "index": 0,
+   "pass": true,
+   "rule": null,
+   "reason": "Redesigns pick_friend with playable audio preview while retaining the pet selection functionality."
+  },
+  {
+   "index": 1,
+   "pass": false,
+   "rule": 3,
+   "reason": "Onboarding copy mentions a 'Gift Box', violating the rule against mentioning gifts or free extras."
+  },
+  {
+   "index": 2,
+   "pass": true,
+   "rule": null,
+   "reason": "Adds sign-in cloud save hint without removing required steps or violating design guidelines."
+  },
+  {
+   "index": 3,
+   "pass": true,
+   "rule": null,
+   "reason": "Redesigns the waiting screen with a visual activity feed while preserving its core job."
+  },
+  {
+   "index": 4,
+   "pass": false,
+   "rule": 2,
+   "reason": "Replaces choose_path with a companion style quiz, losing the required options of adopting vs making your own."
+  },
+  {
+   "index": 5,
+   "pass": true,
+   "rule": null,
+   "reason": "Enhances upload_photos with framing guidance and validation preview without breaking rules."
+  },
+  {
+   "index": 6,
+   "pass": true,
+   "rule": null,
+   "reason": "Redesigns home_intro to configure companion habits within the allowed onboarding scope."
+  },
+  {
+   "index": 7,
+   "pass": true,
+   "rule": null,
+   "reason": "Redesigns sign_in options with express passkey authentication without losing functionality."
+  },
+  {
+   "index": 8,
+   "pass": true,
+   "rule": null,
+   "reason": "Adds a completion timer and audio chime toggle for the actual waiting period."
+  },
+  {
+   "index": 9,
+   "pass": true,
+   "rule": null,
+   "reason": "Adds a new prologue story screen to onboarding while retaining all mandatory steps in sequence."
+  }
+ ]
+}

@@ -1,0 +1,514 @@
+{
+ "round": 2,
+ "starts_week": 2,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.729,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Interactive companion selection gallery",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the companion selection screen into a stage layout with live animated pet previews and style cards.",
+   "why": "Adoption conversion drops to 60.9% and custom creation can fail; a clear stage preview helps users make a swift, reliable choice.",
+   "config": {
+    "pick_friend": {
+     "layout": "stage",
+     "headline": "Meet Your New Desktop Companion",
+     "replace": {
+      "pet_choices": [
+       {
+        "type": "preview",
+        "role": "pet_choices",
+        "asset": "asset:pet_stage_preview",
+        "style": "large"
+       },
+       {
+        "type": "choice_cards",
+        "role": "pet_choices",
+        "label": "Select Companion Breed",
+        "style": "playful"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'pick_friend.pet_choices' does not do the job: needs 1 of ['choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Pet generation progress tracker screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Insert a dedicated progress tracking screen before waiting finishes to show live visual updates and setup tips.",
+   "why": "Home waiting step mean time is extremely long (2336s), indicating users get lost or think the app hung during pet generation.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "hint": "Your pet engine is generating animations."
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_pet_status",
+     "waiting",
+     "home_intro"
+    ],
+    "new_pet_status": {
+     "headline": "Crafting Your Desktop Pet",
+     "body": "We are setting up your pet's desktop behaviors and custom animations.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "progress",
+       "label": "Generating desktop assets",
+       "style": "highlight"
+      },
+      {
+       "type": "tip_carousel",
+       "text": "Tip: Right-click your pet anytime to bring up quick controls.",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a progress tracking screen inside onboarding without removing required steps."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.08,
+   "score": 3.75,
+   "score_note": "Addresses 2336s average wait on home, but requires building a full new tracker screen.",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Interactive desktop control walkthrough",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Add a structured control checklist flow to the final screen so users test hiding, moving, and chatting with their pet.",
+   "why": "3 support tickets highlighted confusion on how to control, hide, or speak to the pet after setup.",
+   "config": {
+    "home_intro": {
+     "layout": "checklist",
+     "headline": "Quick Desktop Controls Practice",
+     "body": "Try out these simple controls to finish onboarding.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "1. Click pet to interact | 2. Right-click tray to hide | 3. Drag to reposition",
+       "style": "rounded"
+      },
+      {
+       "type": "button",
+       "label": "Complete Practice",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'home_intro.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Account sync and pet recovery sign-in layout",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in screen into a split view highlighting pet recovery for returning users.",
+   "why": "8 support emails complained about missing or reset pets after signing back in.",
+   "config": {
+    "sign_in": {
+     "layout": "split",
+     "headline": "Sign In & Restore Your Pets",
+     "body": "Sign in with your registered account to instantly restore saved pets and certificates.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "type": "badge",
+        "role": "sign_in_options",
+        "text": "Sync Saved Pets & Data",
+        "style": "highlight"
+       },
+       {
+        "type": "button",
+        "role": "sign_in_options",
+        "label": "Sign In & Restore",
+        "action": "choose",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Path selection decision helper tip",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Add a clear recommendation tip guiding hesitant users to choose the preset pet path quickly.",
+   "why": "Choose path median time is 8s but mean is 514s, showing severe long-tail decision paralysis.",
+   "config": {
+    "choose_path": {
+     "hint": "Not sure? Choose Preset Friend to jump right in with a ready-made pet design.",
+     "show_step_counter": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds path selection tip without removing options or breaking design rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.05,
+   "score": 6.25,
+   "score_note": "Helps high mean decision time (514s) on path selection via simple config/hint.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Background pet readiness notification status",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display background status updates and enable ready alerts on the waiting screen.",
+   "why": "Users abandon or leave the app idling for over 38 minutes on average during pet generation.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "body": "Feel free to minimize this window. We will alert you the second your pet is ready.",
+     "show_time_estimate": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates waiting screen options as allowed under onboarding changes."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.07,
+   "score": 5.0,
+   "score_note": "Reduces abandonment from 38min idle time in home pet generation."
+  },
+  {
+   "title": "Photo upload quality guidance tip",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Add explicit photo quality recommendations and clear photo guidelines on the photo upload screen.",
+   "why": "3 support tickets reported custom pet generation failures or unexpected visuals.",
+   "config": {
+    "upload_photos": {
+     "headline": "Upload Clear Pet Photos",
+     "body": "Use well-lit, front-facing photos with clear contrast for best 2D generation results.",
+     "hint": "Avoid dark or blurry photos to ensure generation succeeds."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds photo guidance tips on the photo upload screen without rule violations."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.12,
+   "score": 8.75,
+   "score_note": "Adoption has highest dropoff (39.1%) and direct support ticket evidence for photo quality issues.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "First pet adoption reward badge",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Show an starter accessory reward badge and welcoming pet visual on the final intro screen.",
+   "why": "Finish step drop is 64.8% and overall onboarding completion is only 17.8%.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Starter Pack Unlocked: Free Toy & Certificate",
+       "style": "playful"
+      },
+      {
+       "type": "mascot",
+       "asset": "asset:welcoming_pet",
+       "style": "large"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions 'Free Toy', violating rule 3 prohibitions on free extras and pricing copy."
+   }
+  },
+  {
+   "title": "Sign-in troubleshooting delay tip",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Display a timed hint providing connection advice if the user hesitates on sign in.",
+   "why": "Support noted sign-in screens occasionally stalling or failing to open.",
+   "config": {
+    "sign_in": {
+     "hint": "Screen taking long to load? Check your network connection or try an alternate sign-in option.",
+     "tip_delay_seconds": 10
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds troubleshooting tip on sign-in screen without rule violations."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.06,
+   "score": 6.67,
+   "score_note": "Sign-in drop (27.1%) and long tail supported by explicit support mail reports.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 102.7
+  },
+  {
+   "title": "Adoption certificate naming highlight",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch adoption certificate step to stage layout with a prominent pet naming field.",
+   "why": "Adoption conversion is low (60.9%) and users need a clear finishing milestone for pet creation.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "headline": "Official Adoption Certificate",
+     "components": [
+      {
+       "type": "name_input",
+       "label": "Give Your Pet a Name",
+       "style": "large"
+      },
+      {
+       "type": "button",
+       "label": "Sign Certificate & Finish",
+       "action": "next",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.components[0]': inputs may only ask for the pet's name"
+   }
+  }
+ ],
+ "picked": [
+  "Pet generation progress tracker screen",
+  "Photo upload quality guidance tip",
+  "Sign-in troubleshooting delay tip",
+  "Path selection decision helper tip"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 410.8,
+ "decisions": [
+  {
+   "test": "sim-5",
+   "title": "Pet generation progress tracker screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.8253,
+     "treatment": 0.7871,
+     "lift": -0.0463,
+     "lift_se": 0.0303,
+     "p": 0.133427
+    },
+    "finish": {
+     "control": 0.1727,
+     "treatment": 0.16,
+     "lift": -0.0734,
+     "lift_se": 0.0758,
+     "p": 0.351568
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.75,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": -0.0241,
+   "finishers_delta_hidden": -6.63
+  },
+  {
+   "test": "sim-6",
+   "title": "Photo upload quality guidance tip",
+   "target_step": "adoption",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.5866,
+     "treatment": 0.6063,
+     "lift": 0.0336,
+     "lift_se": 0.0416,
+     "p": 0.410636
+    },
+    "finish": {
+     "control": 0.1673,
+     "treatment": 0.1753,
+     "lift": 0.0478,
+     "lift_se": 0.0842,
+     "p": 0.56094
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.75,
+   "predicted_lift": 0.12,
+   "true_lift_hidden": 0.0039,
+   "finishers_delta_hidden": 1.07
+  },
+  {
+   "test": "sim-7",
+   "title": "Sign-in troubleshooting delay tip",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.7392,
+     "treatment": 0.7612,
+     "lift": 0.0298,
+     "lift_se": 0.0248,
+     "p": 0.223211
+    },
+    "finish": {
+     "control": 0.1887,
+     "treatment": 0.1873,
+     "lift": -0.0071,
+     "lift_se": 0.0754,
+     "p": 0.92554
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.67,
+   "predicted_lift": 0.06,
+   "true_lift_hidden": 0.0533,
+   "finishers_delta_hidden": 14.66
+  },
+  {
+   "test": "sim-8",
+   "title": "Path selection decision helper tip",
+   "target_step": "choose_path",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 102.7,
+   "result": {
+    "step": {
+     "control": 0.7513,
+     "treatment": 0.81,
+     "lift": 0.0781,
+     "lift_se": 0.0209,
+     "p": 0.000103
+    },
+    "finish": {
+     "control": 0.1773,
+     "treatment": 0.1967,
+     "lift": 0.109,
+     "lift_se": 0.0846,
+     "p": 0.174492
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "won, shipped",
+   "score": 6.25,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.0285,
+   "finishers_delta_hidden": 7.84
+  }
+ ],
+ "shipped": [
+  "Path selection decision helper tip"
+ ],
+ "ends_week": 2,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

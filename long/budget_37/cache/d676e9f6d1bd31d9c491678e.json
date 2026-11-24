@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, reorder] Late Sign-In Placement Before Home Intro: Moves the sign-in step to occur right before the home_intro screen after pet creation is complete.\n   config: {\"sign_in\": {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"sign_in\", \"home_intro\"]}}\n1: [finish, redesign] Home Intro Companion Quick Control Deck: Replaces the home welcome section with explicit control status badges and instructions on how to summon and hide the desktop pet.\n   config: {\"home_intro\": {\"layout\": \"card\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"badge\", \"text\": \"Desktop Pet Active\", \"style\": \"playful\"}, {\"role\": \"home_welcome\", \"type\": \"text\", \"text\": \"Use system tray or keyboard shortcuts to show, hide, or talk to your pet anytime.\", \"style\": \"emphasis\"}]}}}\n2: [sign_in, hint] Sign In Account Recovery Clarification Hint: Adds explicit hint copy explaining that logging into an existing account recovers saved pets.\n   config: {\"sign_in\": {\"hint\": \"Use your primary account sign-in to automatically restore existing desktop pets.\"}}\n3: [home, wait_info] Waiting Screen Progress Notification Setup: Enables notify-when-ready and live progress estimates during the pet generation waiting phase.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"show_time_estimate\": true, \"hint\": \"We are preparing your desktop pet. You will receive a desktop alert when ready!\"}}\n4: [choose_path, layout] Choose Path Spotlight Trait Selection Layout: Switches the choose_path screen layout to spotlight to focus user attention on path selection.\n   config: {\"choose_path\": {\"layout\": \"spotlight\", \"headline\": \"Select Your Companion Journey\", \"body\": \"Choose whether to pick an instant companion or create a customized pet.\"}}\n5: [finish, new_flow] Desktop Controls Quick Demonstration Flow: Appends a quick controls overview screen right after home_intro before finishing onboarding.\n   config: {\"home_intro\": {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_controls_overview\"]}, \"new_controls_overview\": {\"headline\": \"Desktop Pet Controls\", \"body\": \"Right-click your pet on desktop or use system tray icons to access settings and interactions.\", \"layout\": \"card\"}}\n6: [adoption, hint] Custom Photo Rendering Requirements Hint: Displays a clear hint on photo upload detailing lighting and photo framing best practices.\n   config: {\"upload_photos\": {\"hint\": \"For best results, upload clear front-facing photos with good lighting.\"}}\n7: [choose_path, redesign] Story Screen Mascot Narrative Redesign: Replaces the default story section with an animated mascot illustration and clear intro text.\n   config: {\"story\": {\"layout\": \"centered\", \"replace\": {\"intro_story\": [{\"role\": \"intro_story\", \"type\": \"mascot\", \"asset\": \"asset:mascot_welcome\", \"style\": \"playful\"}, {\"role\": \"intro_story\", \"type\": \"text\", \"text\": \"Welcome! Let's get your new virtual companion living on your desktop.\", \"style\": \"large\"}]}}}\n8: [sign_in, copy] Existing Account Pet Sync Notification Copy: Updates sign-in headline and body text to explain automatic pet synchronization across logins.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Sync & Save Pets\", \"body\": \"Signing in ensures your desktop companion is backed up safely and accessible across your devices.\"}}\n9: [finish, redesign] Home Intro Split View Overview Redesign: Redesigns home_intro into a split layout showcasing pet preview alongside desktop interaction steps.\n   config: {\"home_intro\": {\"layout\": \"split\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"preview\", \"asset\": \"asset:companion_preview\", \"style\": \"highlight\"}, {\"role\": \"home_welcome\", \"type\": \"text\", \"text\": \"Your companion is live on your screen! Explore options in the system taskbar.\", \"style\": \"emphasis\"}]}}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in within onboarding is allowed by Rule 4."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro layout and content is permitted within onboarding."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding informative hint copy to sign-in is allowed."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating waiting screen notification settings and time estimates is permitted."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Spotlight layout redesign retains both adoption and custom pet creation options."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new controls overview screen after home_intro is explicitly allowed by Rule 4."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding helpful photo upload guidance hints is allowed."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the story section retains its core job of introducing the pet."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating sign-in headline and body copy is permitted within onboarding."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro to a split view layout within onboarding is allowed."
+   }
+  ]
+ }
+}

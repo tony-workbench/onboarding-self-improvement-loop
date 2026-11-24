@@ -1,0 +1,482 @@
+{
+ "round": 15,
+ "starts_week": 15,
+ "funnel": {
+  "choose_path": 0.8093964,
+  "sign_in": 0.7575038999999999,
+  "adoption": 0.8192509530861598,
+  "home": 0.8946667707184348,
+  "finish": 0.8313247265328002
+ },
+ "weights_used": {
+  "impact": 2.69,
+  "evidence": 1.142,
+  "confidence": 0.084,
+  "cost": 0.084
+ },
+ "lessons_used": [
+  "Adding new screens (new_screen) was helpful, winning 5 tests (up to +15.4%), though 1 hurt performance (-7.7%) and 5 showed no clear effect.",
+  "Waiting screen info updates (wait_info) were helpful, winning 3 tests (up to +5.7%), though 1 hurt performance (-6.0%) and 7 showed no clear effect.",
+  "Layout changes (layout) were helpful, winning 2 tests (+7.0% and +8.7%), though 2 hurt performance (-3.7% and -3.8%) and 3 showed no clear effect.",
+  "Redesigns (redesign) were helpful, winning 1 test (+9.0%), though 1 hurt performance (-7.5%) and 5 showed no clear effect.",
+  "Step reordering (reorder) hurt performance in 1 test (-3.8%) and showed no clear effect in 2 tests, while copy changes, hints, notifications, and new flows showed no clear effect across all tests.",
+  "Predictions underestimated large wins (e.g., predicting -2.0% vs +8.7% measured, -1.5% vs +9.0% measured) and overestimated changes that hurt performance or had no clear effect."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Account Safeguard Sign-In Screen Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in step with a stage layout framing account sign-in around pet preservation to prevent account resets.",
+   "why": "8 support emails reported lost or reset pets after signing back in, which is the single largest user complaint.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Keep Your Desktop Companion Safe",
+     "layout": "stage",
+     "replace": {
+      "sign_in_options": [
+       {
+        "action": "choose",
+        "role": "sign_in_options",
+        "style": "emphasis",
+        "text": "Sign in with existing account to preserve pets, or create a new account safely",
+        "type": "choice_cards"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': nothing on the sign-in screen may lead past it without signing in"
+   }
+  },
+  {
+   "title": "Desktop Visibility Diagnostic Status on Waiting Screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display an active status checklist verifying system display resolution, overlay permissions, and render engine readiness while waiting.",
+   "why": "3 support emails mentioned pets not appearing on the desktop, and the home stage has a high mean time of 2336s.",
+   "config": {
+    "waiting": {
+     "components": [
+      {
+       "style": "calm",
+       "text": "Checking screen resolution, desktop overlay permissions, and graphics engine readiness...",
+       "type": "checklist"
+      }
+     ],
+     "tip_delay_seconds": 10
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 2,
+    "reason": "The waiting screen text focuses purely on technical system diagnostics and loses the required job of showing that the pet is being made."
+   }
+  },
+  {
+   "title": "Desktop Pet Interaction Mode Selection Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Add a new screen during adoption allowing users to set their pet's default desktop behavior (e.g. Quiet Observer, Active Companion, Playful Explorer).",
+   "why": "Adoption completion takes a long median of 89s and mean of 1017s, and users express confusion later about how the pet behaves on desktop.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "new_interaction_mode",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_interaction_mode": {
+     "components": [
+      {
+       "action": "choose",
+       "style": "highlight",
+       "text": "Choose between Quiet Observer, Active Companion, or Playful Explorer",
+       "type": "choice_cards"
+      },
+      {
+       "action": "next",
+       "label": "Save Behavior Mode",
+       "style": "rounded",
+       "type": "button"
+      }
+     ],
+     "headline": "Select Companion Desktop Behavior Mode",
+     "layout": "grid"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new custom behavior selection screen inside onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.03,
+   "score": 6.6,
+   "score_note": "Adding a new screen during adoption targets long step duration and has a strong historical track record (+2.5% avg, up to +15.4% wins), but requires building a new screen.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 181.9
+  },
+  {
+   "title": "Desktop Pet Controls Quick Start Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a dedicated quick start guide screen right after home intro detailing essential controls for dragging, hiding, and talking to the pet.",
+   "why": "3 support tickets specifically cite confusion on how to control, hide, or talk to the pet after completing onboarding.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_quick_controls_guide"
+    ],
+    "new_quick_controls_guide": {
+     "components": [
+      {
+       "style": "emphasis",
+       "text": "Right-click pet for Quick Menu | Double-click to talk | Drag to reposition",
+       "type": "checklist"
+      },
+      {
+       "action": "next",
+       "label": "Launch Pet on Desktop",
+       "style": "rounded",
+       "type": "button"
+      }
+     ],
+     "headline": "Essential Desktop Pet Controls & Shortcuts",
+     "layout": "checklist"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'new_quick_controls_guide.components[0].text' has characters outside the allowed set: ['|']"
+   }
+  },
+  {
+   "title": "Interactive Companion Pathway Carousel Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Rebuild the path selection screen with an interactive carousel layout highlighting premade vs custom pet options.",
+   "why": "The choose_path step has a huge discrepancy between median 8s and mean 514s, showing many users stall at path selection.",
+   "config": {
+    "choose_path": {
+     "headline": "Choose How You Want to Create Your Desktop Pet",
+     "layout": "carousel",
+     "replace": {
+      "path_options": [
+       {
+        "action": "choose",
+        "role": "path_options",
+        "style": "playful",
+        "text": "Pick a premade companion or generate a custom pet from photo",
+        "type": "choice_cards"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Background Engine Performance Tip on Waiting",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display background resource usage and auto-pause behavior information during generation waiting time.",
+   "why": "3 support emails reported application stalling or desktop rendering issues upon setup.",
+   "config": {
+    "waiting": {
+     "components": [
+      {
+       "style": "calm",
+       "text": "Your pet uses low background CPU and auto-pauses during full-screen games or video calls.",
+       "type": "tip_carousel"
+      }
+     ],
+     "tip_delay_seconds": 15
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an informative background resource usage tip to the waiting screen without altering core jobs or pricing."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.013,
+   "score": 4.36,
+   "score_note": "Supported by 3 support emails. Wait info updates on home have consistent mild positive results (+1.3% over 11 tests).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 181.9
+  },
+  {
+   "title": "Adoption Certificate Permanent Account Guarantee Copy",
+   "target_step": "adoption",
+   "type": "copy",
+   "change": "Update adoption certificate copy to explicitly state that the pet companion is permanently linked to the signed-in account.",
+   "why": "Reduces anxiety around account reset issues which generated 8 support emails last week.",
+   "config": {
+    "adoption_certificate": {
+     "body": "Once adoption is complete, your pet companion will automatically save to your account and sync across all your desktop devices.",
+     "headline": "Your Pet is Permanently Linked to Your Account",
+     "hint": "You can view your adopted companions anytime from the desktop tray menu."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates certificate copy to clarify account sync while preserving the adoption certificate step."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.002,
+   "score": 7.55,
+   "score_note": "Strong evidence from 8 support emails and cheap to implement, but copy changes historically show no clear effect or slight negative (-0.5%)."
+  },
+  {
+   "title": "Custom Pet Photo Guidance and Template Selector Flow",
+   "target_step": "choose_path",
+   "type": "new_flow",
+   "change": "Add an extra guidance step immediately following path selection to help users prepare high quality pet photos before custom generation.",
+   "why": "3 support tickets reported custom pet generation failing or producing bad visual results.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "new_photo_guidance_step",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "new_photo_guidance_step": {
+     "components": [
+      {
+       "style": "highlight",
+       "text": "Ensure good lighting and centered face for optimal 3D pet generation",
+       "type": "photo_picker"
+      },
+      {
+       "action": "next",
+       "label": "Proceed with Selected Photo",
+       "style": "rounded",
+       "type": "button"
+      }
+     ],
+     "headline": "Select Pet Photo Template for Best Results",
+     "layout": "grid"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'new_photo_guidance_step.components[0]': photo pickers belong only on upload_photos"
+   }
+  },
+  {
+   "title": "First Desktop Summon Tray Notification",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Enable desktop readiness notification and update hint text on home intro to guide users to system tray options.",
+   "why": "The finish step mean duration is 5815s and overall onboarding completion is low (37.4%), indicating users lose track of the app.",
+   "config": {
+    "home_intro": {
+     "hint": "Check your system tray icon to summon, hide, or adjust pet settings anytime.",
+     "notify_when_ready": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates home_intro tray notification settings and copy within onboarding bounds."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.005,
+   "score": 8.73,
+   "score_note": "High potential impact addressing huge finish step duration and low overall completion (37.4%), but notifications/hints historically show no clear positive lift.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 98.8
+  },
+  {
+   "title": "Sign-In Stalling Resolution Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add a fallback hint on the sign in screen with alternative authentication options if the screen stalls.",
+   "why": "2 support tickets reported that the sign-in screen does not appear or stalls before loading.",
+   "config": {
+    "sign_in": {
+     "hint": "Having trouble signing in? Click below to try standard browser authentication or guest mode."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' suggests skipping a step"
+   }
+  }
+ ],
+ "picked": [
+  "Desktop Pet Interaction Mode Selection Screen",
+  "First Desktop Summon Tray Notification",
+  "Background Engine Performance Tip on Waiting"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 462.6,
+ "decisions": [
+  {
+   "test": "sim-54",
+   "title": "Desktop Pet Interaction Mode Selection Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 181.9,
+   "result": {
+    "step": {
+     "control": 0.833,
+     "treatment": 0.8124,
+     "lift": -0.0247,
+     "lift_se": 0.0148,
+     "p": 0.099311
+    },
+    "finish": {
+     "control": 0.394,
+     "treatment": 0.384,
+     "lift": -0.0254,
+     "lift_se": 0.0315,
+     "p": 0.426951
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.6,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": -0.0086,
+   "finishers_delta_hidden": -10.05
+  },
+  {
+   "test": "sim-55",
+   "title": "First Desktop Summon Tray Notification",
+   "target_step": "finish",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 98.8,
+   "result": {
+    "step": {
+     "control": 0.8297,
+     "treatment": 0.8525,
+     "lift": 0.0275,
+     "lift_se": 0.0168,
+     "p": 0.096733
+    },
+    "finish": {
+     "control": 0.401,
+     "treatment": 0.393,
+     "lift": -0.02,
+     "lift_se": 0.0312,
+     "p": 0.526564
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.73,
+   "predicted_lift": 0.005,
+   "true_lift_hidden": 0.0142,
+   "finishers_delta_hidden": 16.6
+  },
+  {
+   "test": "sim-56",
+   "title": "Background Engine Performance Tip on Waiting",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 181.9,
+   "result": {
+    "step": {
+     "control": 0.9037,
+     "treatment": 0.9002,
+     "lift": -0.0039,
+     "lift_se": 0.0118,
+     "p": 0.741612
+    },
+    "finish": {
+     "control": 0.3873,
+     "treatment": 0.3857,
+     "lift": -0.0043,
+     "lift_se": 0.0324,
+     "p": 0.894541
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.36,
+   "predicted_lift": 0.013,
+   "true_lift_hidden": 0.0006,
+   "finishers_delta_hidden": 0.7
+  }
+ ],
+ "shipped": [],
+ "ends_week": 15,
+ "weights_next": {
+  "impact": 2.771,
+  "evidence": 1.062,
+  "confidence": 0.084,
+  "cost": 0.084
+ },
+ "lessons_next": [
+  "Adding new screens (new_screen) was helpful, winning 5 tests (up to +15.4%), though 1 hurt performance (-7.7%) and 6 showed no clear effect.",
+  "Waiting screen info updates (wait_info) were helpful, winning 3 tests (up to +5.7%), though 1 hurt performance (-6.0%) and 8 showed no clear effect.",
+  "Layout changes (layout) were helpful, winning 2 tests (+7.0% and +8.7%), though 2 hurt performance (-3.7% and -3.8%) and 3 showed no clear effect.",
+  "Redesigns (redesign) were helpful, winning 1 test (+9.0%), though 1 hurt performance (-7.5%) and 5 showed no clear effect.",
+  "Step reordering (reorder) hurt performance in 1 test (-3.8%) and showed no clear effect in 2 tests, while copy changes, hints, notifications, and new flows showed no clear effect across all tests.",
+  "Predictions underestimated large wins (e.g., predicting -2.0% vs +8.7% measured, -1.5% vs +9.0% measured) and overestimated changes that hurt performance or had no clear effect."
+ ]
+}

@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Split Photo Upload Quality Assistant: Redesign the photo upload screen into a two-column layout featuring live image validation checks alongside sample acceptable pet photos.\n   config: {\"upload_photos\": {\"layout\": \"two_column\", \"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"photo_picker\", \"label\": \"Upload Pet Photos\", \"style\": \"rounded\"}, {\"role\": \"photo_upload\", \"type\": \"checklist\", \"text\": \"Clear lighting, front-facing, high resolution\", \"style\": \"subtle\"}]}}}\n1: [finish, new_screen] Interactive Desktop Pet Controls Walkthrough: Add a dedicated controls walkthrough screen before the final welcome screen showing visual instructions for interacting with, hiding, and summoning the desktop pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"new_controls_walkthrough\", \"home_intro\"], \"new_controls_walkthrough\": {\"headline\": \"How to Interact with Your Pet\", \"body\": \"Click to talk, right-click for desktop options, or minimize to the system tray anytime.\", \"layout\": \"centered\", \"components\": [{\"type\": \"image\", \"asset\": \"asset:desktop_controls_diagram\", \"style\": \"large\"}, {\"type\": \"button\", \"label\": \"Got It!\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n2: [sign_in, hint] Multi-Device Account Sync Banner: Display an explicit account synchronization notice on the sign-in screen reassuring users that logging in preserves existing pet data.\n   config: {\"sign_in\": {\"hint\": \"Sign in to keep your pet data saved and synced across all your devices.\"}}\n3: [choose_path, new_flow] Visual Path Choice Spotlight Showcase: Redesign the path selection screen into a spotlight interactive layout comparing premade pets with custom photo generation.\n   config: {\"choose_path\": {\"layout\": \"spotlight\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"text\": \"Instant Pet vs Custom Photo Pet\", \"style\": \"playful\", \"action\": \"choose\"}]}}}\n4: [home, wait_info] Desktop Spawn Readiness Status Checklist: Display a detailed system initialization checklist on the waiting screen showing asset rendering and desktop spawn status.\n   config: {\"waiting\": {\"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"text\": \"Rendering 3D mesh... Initializing desktop physics... Spawning pet...\", \"style\": \"calm\"}]}}\n5: [finish, redesign] Desktop Mascot Welcome Greeting Stage: Redesign the finish screen into a stage layout showcasing an animated mascot welcoming the user to their desktop.\n   config: {\"home_intro\": {\"layout\": \"stage\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"mascot\", \"asset\": \"asset:welcome_mascot_anim\", \"style\": \"playful\"}, {\"role\": \"home_welcome\", \"type\": \"text\", \"text\": \"Your new companion is ready on your desktop!\", \"style\": \"large\"}]}}}\n6: [adoption, incentive] Adoption Certificate Name Badge Banner: Add an official adoption badge and name tag confirmation to the certificate screen before final sign-in.\n   config: {\"adoption_certificate\": {\"layout\": \"card\", \"components\": [{\"type\": \"badge\", \"text\": \"Official Pet Adoption Verified\", \"style\": \"highlight\"}]}}\n7: [sign_in, redesign] Persistent Account Session Split View: Redesign sign_in into a split view emphasizing account security and instant session validation.\n   config: {\"sign_in\": {\"layout\": \"split\", \"headline\": \"Secure Your Pet Companion\", \"replace\": {\"sign_in_options\": [{\"role\": \"sign_in_options\", \"type\": \"button\", \"label\": \"Continue with Google\", \"action\": \"next\", \"style\": \"rounded\"}, {\"role\": \"sign_in_options\", \"type\": \"text\", \"text\": \"Your pet profile will be safely linked to this account.\", \"style\": \"subtle\"}]}}}\n8: [choose_path, hint] Path Selection Time Expectation Banner: Add a hint banner on the path selection screen explaining the difference in setup duration between premade and custom pet paths.\n   config: {\"choose_path\": {\"hint\": \"Pick a ready-made friend for instant play, or create a custom pet from photos in under 2 minutes.\"}}\n9: [home, notification] System Tray Desktop Spawn Alert Prompt: Configure a notification tip on the waiting screen pointing out exactly where on the desktop taskbar/tray the pet will spawn.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"tip_delay_seconds\": 8, \"hint\": \"Look at the bottom right corner of your screen near the system tray when generation completes!\"}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "All rules respected."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "All rules respected."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "All rules respected."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "All rules respected."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "All rules respected."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "All rules respected."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "All rules respected."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "All rules respected."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "All rules respected."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "All rules respected."
+   }
+  ]
+ }
+}

@@ -1,0 +1,537 @@
+{
+ "round": 7,
+ "starts_week": 7,
+ "funnel": {
+  "choose_path": 0.7899653999999999,
+  "sign_in": 0.9091194990673501,
+  "adoption": 0.6300714,
+  "home": 0.8836166759400002,
+  "finish": 0.7014600000000001
+ },
+ "weights_used": {
+  "impact": 1.839,
+  "evidence": 0.508,
+  "confidence": 1.191,
+  "cost": 0.461
+ },
+ "lessons_used": [
+  "Moving sign-in post-adoption (+13.3%, underpredicted) or post-certificate (+5.8%, overpredicted) was helpful, while placing sign-in after the waiting room made results worse (-3.9%) and hand-off timing had no clear effect. Account sync banners were helpful (+2.7%, overpredicted), but pet sync verification hints showed no clear effect.",
+  "Path clarity headline updates were helpful (+5.9%, underpredicted), whereas path copy simplification, value proposition refreshes, clear outcome headlines, and time expectation banners showed no clear effect.",
+  "Interactive waiting rooms (+5.6%, overpredicted) and background hatching readiness status (+3.3%, underpredicted) were helpful, but 3D progress trackers and detailed progress details showed no clear effect.",
+  "Photo quality guides with companion preview were helpful (+7.6%, overpredicted), while compact grid layouts (-7.7%) and photo fallback flows (-11.8%) made results worse; split upload assistants showed no clear effect.",
+  "System tray location notification tips were helpful (+3.8%), but first interaction tips made results worse (-6.5%), and sound notifications, spawn alerts, mascot welcome stages, and interaction badges showed no clear effect."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Choose Path Choice Cards Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the path choice screen with interactive spotlight choice cards highlighting instant premade companion adoption versus custom photo pet creation.",
+   "why": "The choose_path step drops 21.0% of users with a high mean completion time of 514s, indicating confusion between the two adoption paths.",
+   "config": {
+    "choose_path": {
+     "layout": "stage",
+     "headline": "How would you like to adopt your desktop pet?",
+     "body": "Select a ready-to-play companion or create a personalized pet from your own photos.",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Choose Adoption Style",
+        "style": "emphasis",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Pet Companion Habit Selection Screen",
+   "target_step": "adoption",
+   "type": "new_screen",
+   "change": "Insert a new companion habit selector screen before certificate confirmation where users choose their pet's main desktop activity style.",
+   "why": "Adoption has the highest funnel drop-off at 37.0%. Adding personal customization increases emotional investment before signing.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "new_habit_selector",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ],
+    "adoption_certificate": {
+     "hint": "Your pet's desktop activity profile has been configured."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_habit_selector']"
+   }
+  },
+  {
+   "title": "Interactive Desktop Companion Control Showcase",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Add a companion control flow screen right before completing onboarding to demonstrate how to summon, hide, and interact with the desktop mascot.",
+   "why": "Three support tickets reported confusion on how to control, hide, or talk to the pet after completing setup, and finish drop-off is 29.9%.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "new_companion_controls",
+     "home_intro"
+    ],
+    "home_intro": {
+     "headline": "Your Desktop Companion is Ready!",
+     "body": "Use keyboard shortcuts or right-click the system tray icon anytime to manage your pet.",
+     "button_label": "Start Interacting"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_companion_controls']"
+   }
+  },
+  {
+   "title": "Move Sign-In Post Desktop Welcome Stage",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Reorder sign-in to take place at the very end of onboarding after the user sees their active pet in the home welcome stage.",
+   "why": "Placing sign-in after instant value proof lets users experience the active desktop companion before asking for account authentication.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "sign_in"
+    ],
+    "sign_in": {
+     "headline": "Save Your Companion Profile",
+     "body": "Sign in now to keep your companion synced across devices and protect your progress.",
+     "button_label": "Save & Complete"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "home_intro must come after every existing screen, sign_in included"
+   }
+  },
+  {
+   "title": "Existing Account Pet Restoration Callout",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add an explicit hint on the sign-in screen informing returning users to sign in with their original account to prevent pet resets.",
+   "why": "The single largest support theme (8 emails) involved users reporting missing or reset pets after signing in again under new credentials.",
+   "config": {
+    "sign_in": {
+     "hint": "Returning user? Sign in with your original account to instantly restore your existing pet and progress."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds account restoration hint on sign-in screen without violating rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 6.93,
+   "score_note": "Top support issue (8 emails), though sign_in step drop-off is low (9.1%); hint/sync banners historically effective.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 168.3
+  },
+  {
+   "title": "Desktop Hatching Animation Progress Status",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add an animated hatching mascot component with detailed readiness state text while background rendering completes.",
+   "why": "The waiting screen (home step) takes a median 201s / mean 2336s, and support emails noted app stalling or pets failing to appear.",
+   "config": {
+    "waiting": {
+     "headline": "Preparing Your Pet's Desktop Home...",
+     "body": "We are calibrating animations and desktop interactions. Your pet will spawn shortly.",
+     "components": [
+      {
+       "type": "animation",
+       "asset": "asset:hatching_mascot",
+       "style": "playful",
+       "action": "play"
+      },
+      {
+       "type": "progress",
+       "label": "Desktop Habitat Status",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates waiting screen status display without false countdowns."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.025,
+   "score": 5.98,
+   "score_note": "Addresses huge wait time and stalling reports; animation helps (+3.3%) but detailed text historical gains are mixed.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 168.3
+  },
+  {
+   "title": "Custom Photo Upload Quality Guidelines Banner",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Display a detailed photo formatting and lighting tip component on the photo upload screen to improve pet generation outcomes.",
+   "why": "Support received multiple complaints about custom pet creation failing or generating unexpected visual output.",
+   "config": {
+    "upload_photos": {
+     "headline": "Upload Clear Pet Photos",
+     "body": "For best accuracy, upload well-lit photos showing your pet's face clearly against a simple background.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Tip: Clear lighting yields best 3D pet accuracy",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful photo quality guidelines to photo upload screen."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.065,
+   "score": 9.42,
+   "score_note": "Adoption step has the biggest drop (37%) and support issues; photo quality guides previously delivered +7.6% lift.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 168.3
+  },
+  {
+   "title": "Interactive Adoption Certificate Stamp Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate screen with a interactive seal stamp and companion badge layout.",
+   "why": "Improving completion satisfaction at adoption (37.0% drop-off) strengthens commitment prior to account sign-in.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "headline": "Official Adoption Certificate",
+     "body": "Sign your name below to finalize your companion adoption bond.",
+     "replace": {
+      "official_stamp": [
+       {
+        "role": "official_stamp",
+        "type": "badge",
+        "text": "OFFICIALLY ADOPTED",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'adoption_certificate.official_stamp' does not do the job: needs 1 of ['animation', 'badge', 'image'] with an asset:stamp/ asset"
+   }
+  },
+  {
+   "title": "Desktop Pet Visibility & Tray Controls Tip",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Display a explicit tray control callout tip on the home intro screen detailing how to show, hide, or mute the companion.",
+   "why": "Multiple users contacted support asking how to control or hide the desktop companion post-onboarding.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Quick Controls: Right-click the system tray icon to hide, mute, or summon your pet at any time.",
+       "style": "highlight",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds tray controls tip carousel to home intro screen within onboarding."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.01,
+   "score": 3.53,
+   "score_note": "Addresses support queries, but finish notifications historically hurt step completion (-1.3%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 108.7
+  },
+  {
+   "title": "Story Screen Value Focus Refresh",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update the story screen copy to highlight zero CPU impact and unobtrusive companion presence.",
+   "why": "79.0% conversion at choose_path leaves 21.0% drop-off right after the introductory story screen.",
+   "config": {
+    "story": {
+     "headline": "Meet Your Lightweight Desktop Companion",
+     "body": "Enjoy a charming, low-resource pet that keeps you company while you work, study, or relax without interrupting your workflow.",
+     "button_label": "Choose Your Companion"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates story copy while preserving pet introduction job."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 6.13,
+   "score_note": "Target step loses 21% without support callouts; simple copy tweak aligns with +2.1% historical copy average.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 168.3
+  }
+ ],
+ "picked": [
+  "Custom Photo Upload Quality Guidelines Banner",
+  "Existing Account Pet Restoration Callout",
+  "Story Screen Value Focus Refresh",
+  "Desktop Hatching Animation Progress Status",
+  "Desktop Pet Visibility & Tray Controls Tip"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 781.9,
+ "decisions": [
+  {
+   "test": "sim-26",
+   "title": "Custom Photo Upload Quality Guidelines Banner",
+   "target_step": "adoption",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 168.3,
+   "result": {
+    "step": {
+     "control": 0.6401,
+     "treatment": 0.6082,
+     "lift": -0.0499,
+     "lift_se": 0.0224,
+     "p": 0.02947
+    },
+    "finish": {
+     "control": 0.2903,
+     "treatment": 0.2707,
+     "lift": -0.0677,
+     "lift_se": 0.0386,
+     "p": 0.089983
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 9.42,
+   "predicted_lift": 0.065,
+   "true_lift_hidden": -0.012,
+   "finishers_delta_hidden": -10.33
+  },
+  {
+   "test": "sim-27",
+   "title": "Existing Account Pet Restoration Callout",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 168.3,
+   "result": {
+    "step": {
+     "control": 0.9143,
+     "treatment": 0.9294,
+     "lift": 0.0166,
+     "lift_se": 0.0086,
+     "p": 0.051099
+    },
+    "finish": {
+     "control": 0.2847,
+     "treatment": 0.2973,
+     "lift": 0.0445,
+     "lift_se": 0.0421,
+     "p": 0.280126
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.93,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": 0.0257,
+   "finishers_delta_hidden": 22.12
+  },
+  {
+   "test": "sim-28",
+   "title": "Story Screen Value Focus Refresh",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 168.3,
+   "result": {
+    "step": {
+     "control": 0.8017,
+     "treatment": 0.7917,
+     "lift": -0.0125,
+     "lift_se": 0.0129,
+     "p": 0.335907
+    },
+    "finish": {
+     "control": 0.3,
+     "treatment": 0.294,
+     "lift": -0.02,
+     "lift_se": 0.0389,
+     "p": 0.611062
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.13,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": 0.0035,
+   "finishers_delta_hidden": 3.01
+  },
+  {
+   "test": "sim-29",
+   "title": "Desktop Hatching Animation Progress Status",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 168.3,
+   "result": {
+    "step": {
+     "control": 0.8961,
+     "treatment": 0.9172,
+     "lift": 0.0236,
+     "lift_se": 0.0126,
+     "p": 0.057914
+    },
+    "finish": {
+     "control": 0.288,
+     "treatment": 0.2893,
+     "lift": 0.0046,
+     "lift_se": 0.0407,
+     "p": 0.90927
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.98,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": 0.0262,
+   "finishers_delta_hidden": 22.55
+  },
+  {
+   "test": "sim-30",
+   "title": "Desktop Pet Visibility & Tray Controls Tip",
+   "target_step": "finish",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 108.7,
+   "result": {
+    "step": {
+     "control": 0.7097,
+     "treatment": 0.7013,
+     "lift": -0.0119,
+     "lift_se": 0.026,
+     "p": 0.649074
+    },
+    "finish": {
+     "control": 0.2877,
+     "treatment": 0.2793,
+     "lift": -0.029,
+     "lift_se": 0.0399,
+     "p": 0.473923
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.53,
+   "predicted_lift": -0.01,
+   "true_lift_hidden": -0.006,
+   "finishers_delta_hidden": -5.16
+  }
+ ],
+ "shipped": [],
+ "ends_week": 7,
+ "weights_next": {
+  "impact": 1.853,
+  "evidence": 0.483,
+  "confidence": 1.229,
+  "cost": 0.435
+ },
+ "lessons_next": [
+  "Moving sign-in post-adoption (+13.3%, underpredicted) or post-certificate (+5.8%, overpredicted) was helpful, while placing sign-in after the waiting room made results worse (-3.9%) and hand-off timing showed no clear effect.",
+  "Multi-device account sync banners were helpful (+2.7%, overpredicted), but pet sync verification hints and pet restoration callouts showed no clear effect.",
+  "Path clarity headline updates were helpful (+5.9%, underpredicted), whereas copy simplification, value refreshes, clear outcome headlines, value focus refreshes, and time expectation banners showed no clear effect.",
+  "Interactive waiting rooms (+5.6%, overpredicted) and background hatching readiness status (+3.3%, underpredicted) were helpful, but 3D progress trackers, progress details, animation progress status, sound notifications, and spawn alerts showed no clear effect.",
+  "Photo quality guides with companion preview were helpful (+7.6%, overpredicted), while compact grid layouts (-7.7%), photo fallback flows (-11.8%), and custom photo guidelines banners (-5.0%) made results worse; split upload assistants showed no clear effect.",
+  "System tray location notification tips were helpful (+3.8%, overpredicted), whereas first interaction tips made results worse (-6.5%), and sound notifications, spawn alerts, mascot welcome stages, interaction badges, and tray controls tips showed no clear effect."
+ ]
+}

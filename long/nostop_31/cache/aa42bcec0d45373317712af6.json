@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [home, wait_info] Interactive Generation Progress Milestone Tracker: Displays animated backend generation milestone stages directly on the waiting screen to give users transparency into pet asset rendering and personality synthesis.\n   config: {\"waiting\": {\"layout\": \"centered\", \"show_progress\": true, \"show_time_estimate\": true, \"components\": [{\"type\": \"progress\", \"text\": \"Initializing Pet Behaviors & Desktop Assets\", \"style\": \"highlight\"}]}}\n1: [finish, new_flow] Desktop Placement Guided Calibration Flow: Adds an interactive post-onboarding calibration step where users click and drag their newly adopted companion to set its home dock boundary on their desktop.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_placement_calibration\"], \"new_placement_calibration\": {\"headline\": \"Calibrate Pet Desktop Docking\", \"body\": \"Click and position your desktop companion to set its initial workspace dock zone.\", \"layout\": \"spotlight\", \"components\": [{\"type\": \"text\", \"text\": \"Position pet companion on screen\", \"style\": \"emphasis\"}, {\"type\": \"button\", \"label\": \"Confirm Screen Placement\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n2: [home, wait_info] Desktop Pet Mood Live Simulation Preview: Presents an interactive mood preview on the waiting screen where users can test cursor hover reactions while backend pet creation completes.\n   config: {\"waiting\": {\"layout\": \"split\", \"components\": [{\"type\": \"preview\", \"text\": \"Live Companion Reaction Preview\", \"style\": \"playful\"}, {\"type\": \"tip_carousel\", \"text\": \"Hover over pet preview to test initial mood cues\", \"style\": \"calm\"}]}}\n3: [finish, new_screen] Companion Command Shortcut Masterclass Screen: Introduces a new shortcut reference screen before finishing onboarding detailing hotkeys and system tray toggles for hiding and interacting with the pet.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_shortcut_masterclass\"], \"new_shortcut_masterclass\": {\"headline\": \"Pet Hotkeys & System Tray Quick Actions\", \"body\": \"Press Alt+P anytime to summon or hide your desktop pet, or right-click its system tray icon.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"text\": \"Use Alt+P shortcut to toggle pet visibility\", \"style\": \"emphasis\"}, {\"type\": \"button\", \"label\": \"Ready to Launch\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n4: [choose_path, redesign] Interactive Story Mode Preview Stage Redesign: Redesigns the path selection screen with stage-style interactive archetype cards highlighting companion behaviors before choosing.\n   config: {\"choose_path\": {\"layout\": \"stage\", \"headline\": \"Choose Your Pet Companion Journey\", \"body\": \"Select between story-driven companionship or lightweight desk buddy mode.\", \"replace\": {\"path_options\": [{\"type\": \"choice_cards\", \"text\": \"Select Companion Mode\", \"style\": \"large\", \"action\": \"choose\", \"role\": \"path_options\"}]}}}\n5: [finish, new_flow] Desktop Audio and Interaction Sensitivity Setup Flow: Adds a short audio volume and window collision sensitivity configuration screen to the end of onboarding.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_audio_sensitivity_flow\"], \"new_audio_sensitivity_flow\": {\"headline\": \"Set Companion Sound & Window Sensitivity\", \"body\": \"Adjust sound cue volume and set how your pet interacts with active application windows.\", \"layout\": \"card\", \"components\": [{\"type\": \"sound\", \"text\": \"Test Pet Chime Sound\", \"style\": \"plain\", \"action\": \"play\"}, {\"type\": \"button\", \"label\": \"Save & Complete Setup\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n6: [adoption, incentive] Adoption Certificate Custom Ribbon Selection: Offers users an interactive ribbon badge selector to stamp onto their digital adoption certificate before finalizing adoption.\n   config: {\"adoption_certificate\": {\"layout\": \"centered\", \"headline\": \"Personalize Your Official Adoption Certificate\", \"body\": \"Select a commemorative seal to finalize your companion registration.\", \"components\": [{\"type\": \"badge\", \"text\": \"Official Desk Companion Seal\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Stamp & Finalize\", \"action\": \"next\", \"style\": \"rounded\"}]}}\n7: [home, notification] Desktop Background Generation Audio Notification Switch: Adds an explicit toggle and audio option on the waiting screen so users are notified with a gentle chime when pet creation finishes in the background.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"layout\": \"card\", \"components\": [{\"type\": \"sound\", \"text\": \"Play notification chime when pet is ready\", \"style\": \"calm\", \"action\": \"play\"}]}}\n8: [sign_in, layout] Account Sync Dual Panel Layout: Re-architects the sign-in screen into a split layout explicitly explaining pet data synchronization and cross-device account recovery.\n   config: {\"sign_in\": {\"layout\": \"split\", \"headline\": \"Secure Your Pet & Enable Cloud Sync\", \"body\": \"Signing in ensures your desktop companion's personality and unlocks remain safe across app restarts.\", \"replace\": {\"sign_in_options\": [{\"type\": \"button\", \"label\": \"Sign In to Save Pet Data\", \"action\": \"next\", \"style\": \"emphasis\", \"role\": \"sign_in_options\"}]}}}\n9: [choose_path, hint] Workspace Desktop Fit Guidance Hint: Displays a clear compatibility notice on the story screen reassuring users that pets seamlessly function across single and multi-monitor setups.\n   config: {\"story\": {\"hint\": \"Desktop companions support multi-monitor setups and auto-adjust to screen resolution changes.\", \"components\": [{\"type\": \"text\", \"text\": \"Compatible with single & multi-monitor desktops\", \"style\": \"subtle\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds progress tracking to the waiting screen while retaining the job of showing pet creation."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new calibration step following home_intro with all required onboarding steps present."
+   },
+   {
+    "index": 2,
+    "pass": false,
+    "rule": 2,
+    "reason": "The waiting screen config removes the indication that the pet is being made, failing Rule 2."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid hotkey reference screen after home_intro while maintaining all required onboarding steps."
+   },
+   {
+    "index": 4,
+    "pass": false,
+    "rule": 2,
+    "reason": "The choose_path redesign replaces adopting vs making your own with companion modes, losing a required screen job."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid audio/collision setup flow after home_intro while preserving all required onboarding steps."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Customizes the adoption certificate while preserving the official stamp/seal job."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a audio notification option to the waiting screen without altering required screen jobs."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the sign-in screen layout while retaining the sign-in functionality."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a desktop setup hint to the story screen without removing any required functionality."
+   }
+  ]
+ }
+}

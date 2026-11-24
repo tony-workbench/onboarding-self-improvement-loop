@@ -1,0 +1,517 @@
+{
+ "round": 14,
+ "starts_week": 14,
+ "funnel": {
+  "choose_path": 0.8696246555883237,
+  "sign_in": 0.9299383355959924,
+  "adoption": 0.68923510446,
+  "home": 0.9146336270753486,
+  "finish": 0.7537889160000001
+ },
+ "weights_used": {
+  "impact": 0.995,
+  "evidence": 0.468,
+  "confidence": 1.973,
+  "cost": 0.565
+ },
+ "lessons_used": [
+  "Post-adoption/certificate sign-in reordering, account recovery copy, and multi-device sync banners worked; post-waiting sign-in hurt, while other sign-in reorders and sync hints showed no clear effect.",
+  "Path selection clarity headlines, spotlight layouts, and certain visual redesigns worked; checklist layouts and story scroll narrative redesigns hurt, while copy simplifications, value refreshes, and time banners showed no clear effect.",
+  "Interactive waiting rooms, readiness/visibility status checks, and spawn location hints worked; 3D trackers, completion timers, sound notifications, and background activity displays showed no clear effect.",
+  "Companion previews paired with quality guides or split upload layouts worked; compact grids, photo fallback flows, guidelines banners, and mascot stamp redesigns hurt, while pre-adoption review flows, ownership guarantees, and layout customization showed no clear effect.",
+  "Interactive spawn placement flows and system tray location tips worked; direct controls guides and first interaction tips hurt, while mascot greetings, docking hints, retrieval callouts, and welcome stage redesigns showed no clear effect.",
+  "Predictions underpredicted counter-intuitive wins (e.g., interactive spawn placement flow, visual redesigns) and overpredicted outcomes on severe failures (e.g., mascot stamp redesign, direct controls guide, story scroll redesign)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Photo Upload Stage Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the custom pet photo upload screen into a stage layout with live asset preview integration.",
+   "why": "Support received 3 tickets about custom pets failing or looking wrong, and adoption step has the lowest conversion rate at 68.9%.",
+   "config": {
+    "upload_photos": {
+     "layout": "stage",
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "label": "Select Pet Photo",
+        "style": "emphasis"
+       },
+       {
+        "role": "photo_upload",
+        "type": "preview",
+        "asset": "asset:pet_preview",
+        "style": "large"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[1]': a preview cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Placement Verification Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Add a dedicated verification screen right before onboarding completion to confirm pet desktop rendering and position.",
+   "why": "Support reported multiple complaints of pets missing from the desktop, and the finish step has a high mean duration of 5815s.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "new_desktop_verify",
+     "home_intro"
+    ],
+    "new_desktop_verify": {
+     "headline": "Verify Desktop Pet Placement",
+     "body": "Confirm your companion appears clearly on your desktop screen before continuing.",
+     "button_label": "Confirm Placement",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "mascot",
+       "asset": "asset:desktop_mascot",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new verification screen inside onboarding is allowed under Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.144,
+   "score": 2.44,
+   "score_note": "Adding a new screen at finish step adds severe friction, matching historical -14.4% failure.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 115.3
+  },
+  {
+   "title": "Path Selection Stage Showcase Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Redesign the choose path screen using a prominent stage layout that replaces standard path selection options with visual choice cards.",
+   "why": "Path selection has an 87.0% conversion rate with a long mean duration (514s), suggesting user uncertainty about choices.",
+   "config": {
+    "choose_path": {
+     "layout": "stage",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "label": "Select Companion Path",
+        "style": "emphasis",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Multi-Step Photo Quality Inspection Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Introduce a split-layout photo inspection flow with real-time feedback and photo tips during upload.",
+   "why": "3 support emails specifically reported custom pet creation issues or incorrect pet appearances.",
+   "config": {
+    "upload_photos": {
+     "layout": "split",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "progress",
+       "text": "Checking Photo Quality",
+       "style": "highlight"
+      },
+      {
+       "type": "tip_carousel",
+       "text": "Use clear lighting for best custom pet generation",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding photo quality inspection tips and progress inside the photo upload step is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.057,
+   "score": 3.27,
+   "score_note": "Targeting high drop-off adoption with multi-step flows historically hurts completion (-5.7%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 184.5
+  },
+  {
+   "title": "Desktop Pet Delivery Progress Stage Indicator",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add detailed progress tracking and time estimates on the waiting screen while desktop assets render.",
+   "why": "Home waiting median duration is 201s (mean 2336s); progress visibility reassures users while assets download.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "hint": "Preparing companion graphics for your desktop..."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress tracking and estimates on the waiting screen is permitted."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.019,
+   "score": 7.56,
+   "score_note": "Progress stage indicators and waiting room info reliably improve retention during long downloads.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 184.5
+  },
+  {
+   "title": "Account Sync & Pet Recovery Notification Banner",
+   "target_step": "sign_in",
+   "type": "notification",
+   "change": "Display a explicit account recovery hint explaining that signing in safeguards companion data across sessions.",
+   "why": "8 support emails (the single largest theme) reported lost or reset pets upon re-authenticating.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in secures your pet data so companions are never lost across device sign-ins.",
+     "notify_when_ready": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an account recovery hint to the sign-in screen is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.025,
+   "score": 5.88,
+   "score_note": "Addresses top support issue (8 mails) with sync banners that worked in earlier tests."
+  },
+  {
+   "title": "Home Welcome Split Screen Showcase",
+   "target_step": "finish",
+   "type": "layout",
+   "change": "Change the home intro screen layout to split view featuring pet welcome graphics and completion confirmation.",
+   "why": "Finish step drop-off is 24.6% with extremely high mean time (5815s); clean structure helps users complete setup.",
+   "config": {
+    "home_intro": {
+     "layout": "split",
+     "replace": {
+      "home_welcome": [
+       {
+        "role": "home_welcome",
+        "type": "mascot",
+        "asset": "asset:welcome_mascot",
+        "style": "large"
+       },
+       {
+        "role": "home_welcome",
+        "type": "text",
+        "text": "Your desktop companion is ready!",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro screen layout is permitted within onboarding."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.012,
+   "score": 5.22,
+   "score_note": "Finish step drop-off is high; split layout structural refresh provides moderate positive lift."
+  },
+  {
+   "title": "Starter Pet Companion Badge Prompt",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Add an incentive badge to the path selection screen highlighting instant companion unlocks.",
+   "why": "13.0% of users drop off at choose_path within a median of 8s; visible perks encourage progression.",
+   "config": {
+    "choose_path": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Unlocks Exclusive Starter Pets",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy must not mention gifts, discounts, or free extras like exclusive unlocks."
+   }
+  },
+  {
+   "title": "Adoption Certificate Companion Guarantee Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add a reassurance hint on the adoption certificate screen promising multi-device account preservation.",
+   "why": "Adoption has the biggest drop-off (31.1% abandon) and account pet loss was reported 8 times in support.",
+   "config": {
+    "adoption_certificate": {
+     "hint": "Your adoption certificate and pet traits are linked to your profile automatically."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a reassurance hint on the adoption certificate screen is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.05,
+   "score": 5.07,
+   "score_note": "Strong evidence and high impact step, but adoption hints and banners historically perform poorly (-5.0%)."
+  },
+  {
+   "title": "Seamless Account Restore Headline Refresh",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Update sign-in headline and body text to clearly state pet restoration and cross-device syncing.",
+   "why": "Clear sign-in messaging addresses user confusion around missing pets after re-authenticating.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Save & Restore Your Pets",
+     "body": "Keep your desktop pets safe and synchronized across all your devices seamlessly."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating text on the sign-in screen to explain sync functionality is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.042,
+   "score": 8.34,
+   "score_note": "Account recovery copy updates have strong historic win rate (+4.2%) addressing key support theme.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 184.5
+  }
+ ],
+ "picked": [
+  "Multi-Step Photo Quality Inspection Flow",
+  "Desktop Placement Verification Screen",
+  "Seamless Account Restore Headline Refresh",
+  "Desktop Pet Delivery Progress Stage Indicator"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 668.8,
+ "decisions": [
+  {
+   "test": "sim-61",
+   "title": "Multi-Step Photo Quality Inspection Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": 93,
+   "share": 1.0,
+   "planned_harm": 184.5,
+   "result": {
+    "step": {
+     "control": 0.7044,
+     "treatment": 0.6468,
+     "lift": -0.0818,
+     "lift_se": 0.0225,
+     "p": 0.000485
+    },
+    "finish": {
+     "control": 0.401,
+     "treatment": 0.3893,
+     "lift": -0.0293,
+     "lift_se": 0.0384,
+     "p": 0.452403
+    },
+    "users_per_group": 1960
+   },
+   "outcome": "stopped early: adoption worse",
+   "score": 3.27,
+   "predicted_lift": -0.057,
+   "true_lift_hidden": -0.0893,
+   "finishers_delta_hidden": -71.23
+  },
+  {
+   "test": "sim-62",
+   "title": "Desktop Placement Verification Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 115.3,
+   "result": {
+    "step": {
+     "control": 0.7629,
+     "treatment": 0.834,
+     "lift": 0.0931,
+     "lift_se": 0.0195,
+     "p": 1e-06
+    },
+    "finish": {
+     "control": 0.4087,
+     "treatment": 0.4437,
+     "lift": 0.0856,
+     "lift_se": 0.0326,
+     "p": 0.006123
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 2.44,
+   "predicted_lift": -0.144,
+   "true_lift_hidden": 0.0917,
+   "finishers_delta_hidden": 112.11
+  },
+  {
+   "test": "sim-63",
+   "title": "Seamless Account Restore Headline Refresh",
+   "target_step": "sign_in",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 184.5,
+   "result": {
+    "step": {
+     "control": 0.9344,
+     "treatment": 0.9387,
+     "lift": 0.0046,
+     "lift_se": 0.0072,
+     "p": 0.522855
+    },
+    "finish": {
+     "control": 0.4043,
+     "treatment": 0.415,
+     "lift": 0.0264,
+     "lift_se": 0.0318,
+     "p": 0.400875
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.34,
+   "predicted_lift": 0.042,
+   "true_lift_hidden": -0.0031,
+   "finishers_delta_hidden": -3.79
+  },
+  {
+   "test": "sim-64",
+   "title": "Desktop Pet Delivery Progress Stage Indicator",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 184.5,
+   "result": {
+    "step": {
+     "control": 0.9331,
+     "treatment": 0.9425,
+     "lift": 0.0101,
+     "lift_se": 0.0088,
+     "p": 0.252675
+    },
+    "finish": {
+     "control": 0.3983,
+     "treatment": 0.415,
+     "lift": 0.0418,
+     "lift_se": 0.0325,
+     "p": 0.188815
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.56,
+   "predicted_lift": 0.019,
+   "true_lift_hidden": 0.016,
+   "finishers_delta_hidden": 19.56
+  }
+ ],
+ "shipped": [
+  "Desktop Placement Verification Screen"
+ ],
+ "ends_week": 14,
+ "weights_next": {
+  "impact": 0.905,
+  "evidence": 0.468,
+  "confidence": 2.041,
+  "cost": 0.586
+ },
+ "lessons_next": [
+  "Post-adoption/certificate sign-in timing, account recovery copy, and multi-device sync banners won, while moving sign-in post-waiting hurt and sync hints/notices showed no clear effect.",
+  "Headline clarity updates, spotlight layouts, and story stage visual redesigns won; checklist layouts and story scroll redesigns hurt, while value refreshes and copy simplifications showed no clear effect.",
+  "Interactive waiting rooms, readiness/visibility status checks, and desktop spawn hints won; 3D trackers, completion timers, progress indicators, and sound notifications showed no clear effect.",
+  "Split upload companion previews paired with photo quality guides won; compact grids, multi-step quality inspection/fallback flows, guidelines banners, and stamp redesigns hurt, while pre-adoption reviews showed no clear effect.",
+  "Interactive spawn placement flows, desktop placement verification screens, and system tray location tips won; direct controls guides and first interaction tips hurt, while welcome stage redesigns and retrieval callouts had no clear effect.",
+  "Predictions underpredicted counter-intuitive wins (e.g., placement verification screens, interactive spawn flows) and overpredicted outcomes on severe failures (e.g., stamp redesigns, direct controls guides, multi-step quality inspection flows)."
+ ]
+}

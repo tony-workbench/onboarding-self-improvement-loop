@@ -1,0 +1,482 @@
+{
+ "round": 4,
+ "starts_week": 4,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7702614,
+  "adoption": 0.609,
+  "home": 0.8766579,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Quick Desktop Pet Interaction Guide Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a visual controls walkthrough screen before home intro that shows key shortcuts and how to hide, summon, or talk to the desktop pet.",
+   "why": "3 support emails reported post-onboarding confusion on how to control, hide, or talk to the pet once setup completes.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_controls_guide",
+     "home_intro"
+    ],
+    "home_intro": {
+     "headline": "Meet Your Desktop Companion",
+     "body": "Your pet is ready on your desktop! Use keyboard shortcuts or click to interact."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_controls_guide']"
+   }
+  },
+  {
+   "title": "Custom Photo Adoption Preview Split Screen",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the photo upload step into a split-screen layout featuring a real-time rendering preview alongside photo upload options.",
+   "why": "Adoption step drops to 60.9% and 3 support emails reported custom pet generation failures or unexpected visual results.",
+   "config": {
+    "upload_photos": {
+     "layout": "split",
+     "headline": "Create & Preview Your Custom Pet",
+     "body": "Upload a photo and see your companion take shape in real time.",
+     "replace": {
+      "photo_upload": [
+       {
+        "role": "photo_upload",
+        "type": "photo_picker",
+        "label": "Upload Pet Photo",
+        "style": "emphasis",
+        "action": "choose"
+       },
+       {
+        "role": "photo_upload",
+        "type": "preview",
+        "asset": "asset:pet_render_preview",
+        "style": "rounded"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[1]': a preview cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Companion Persona Selection Flow",
+   "target_step": "choose_path",
+   "type": "new_flow",
+   "change": "Rebuild path choice into a spotlight layout displaying distinct pet personality traits and interactive desktop behavior cards.",
+   "why": "Choose_path step has an 8s median / 514s mean time, showing users stall while evaluating path options.",
+   "config": {
+    "choose_path": {
+     "layout": "spotlight",
+     "headline": "Select Your Ideal Companion Trait",
+     "body": "Pick a companion personality style that fits your daily desktop workflow.",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "text": "Focus Assistant Pet",
+        "style": "playful",
+        "action": "choose"
+       },
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "text": "Playful Desktop Buddy",
+        "style": "playful",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Account Restore Safety Check Sign-In Layout",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Redesign the sign-in screen to emphasize existing account retrieval badges to prevent duplicate account creation.",
+   "why": "8 support emails (the largest volume) reported lost or reset pets due to signing in with a different account.",
+   "config": {
+    "sign_in": {
+     "layout": "centered",
+     "headline": "Sign In to Keep Your Pet Safe",
+     "body": "Sign in with your primary account to automatically sync and retain your saved pets.",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "badge",
+        "text": "Prevents Pet Data Loss",
+        "style": "highlight"
+       },
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Sign In with Existing Account",
+        "style": "emphasis",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Display Troubleshooter on Waiting Screen",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add a desktop visibility checklist and timer indicator on the waiting screen to assist users if pet rendering stalls.",
+   "why": "3 support emails reported pets failing to appear on the desktop or the app stalling on opening.",
+   "config": {
+    "waiting": {
+     "headline": "Preparing Your Pet for Desktop...",
+     "body": "If your pet does not appear on screen, check system tray permissions below.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Check System Tray / Taskbar Icon",
+       "style": "plain"
+      },
+      {
+       "type": "timer",
+       "text": "Estimated setup time: 30s",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'waiting.components[1]': timer text must read like 'About 4 min left' (at most 30 min)"
+   }
+  },
+  {
+   "title": "Path Selection Starter Perk Badge",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Display a starter item reward badge on the path choice screen to motivate quicker path selection.",
+   "why": "23.8% user drop-off occurs at choose_path with a high mean duration of 514s.",
+   "config": {
+    "choose_path": {
+     "hint": "Includes exclusive starter desktop toy for your pet!",
+     "components": [
+      {
+       "type": "badge",
+       "text": "+ Free Starter Accessory",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions free extras ('+ Free Starter Accessory'), violating pricing copy rules."
+   }
+  },
+  {
+   "title": "Adoption Certificate Name Recognition Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Add clear tip carousel components explaining how pet naming impacts in-app interaction.",
+   "why": "Adoption conversion drops to 60.9%, making it the largest single drop-off point in the onboarding funnel.",
+   "config": {
+    "adoption_certificate": {
+     "hint": "Choose a name your pet will recognize during desktop chat!",
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "Tip: You can rename your pet anytime in Settings.",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a tip carousel to the adoption certificate screen without removing any required elements."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 6.67,
+   "score_note": "Adoption step has the highest drop-off, but tip carousels can add visual clutter.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 107.6
+  },
+  {
+   "title": "Account Recovery & Reset Warning Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Update sign-in headline and body copy warning users to sign in with their existing account to prevent pet resets.",
+   "why": "8 support tickets cited missing or reset pets caused by logging in via alternate accounts.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In & Sync Your Pets",
+     "body": "Already adopted a pet? Sign in with the exact same account to prevent progress resets.",
+     "hint": "Using a new account will create a separate fresh pet profile."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updates sign-in copy to clarify account syncing without introducing dark patterns or losing screen functionality."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.05,
+   "score": 8.33,
+   "score_note": "Supported by 8 explicit support tickets and achievable via simple copy changes.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 107.6
+  },
+  {
+   "title": "Launch Completed Desktop Mascot Welcome",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Display an interactive mascot welcome widget on the final home intro screen guiding the user to their desktop.",
+   "why": "Finish step drop-off is 35.2% with a long median completion time of 395s.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Pet Has Arrived on Desktop!",
+     "components": [
+      {
+       "type": "mascot",
+       "text": "Hi there! Click me on your desktop to start interacting.",
+       "style": "playful",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a mascot welcome widget to the home intro screen within onboarding limits."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.04,
+   "score": 4.58,
+   "score_note": "Addresses large final drop-off, but creating an interactive widget requires release work.",
+   "slot": "best score",
+   "share": 0.5,
+   "planned_harm": 70.1
+  },
+  {
+   "title": "Compact Pet Choice Selection Screen",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch pet selection layout to a compact showcase separating pre-made and custom companions.",
+   "why": "Adoption step has a long mean completion time of 1017s and 39.1% overall churn.",
+   "config": {
+    "pick_friend": {
+     "layout": "compact",
+     "headline": "Pick Your Companion",
+     "body": "Choose a pre-made pet or upload a photo to create a custom companion.",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "text": "Classic Desktop Cat",
+        "style": "rounded",
+        "action": "choose"
+       },
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "text": "Friendly Desktop Dog",
+        "style": "rounded",
+        "action": "choose"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the pet selection layout to compact companion cards while preserving pet choosing functionality."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.08,
+   "score": 6.67,
+   "score_note": "Combats extreme mean completion time and 39.1% drop at adoption by streamlining selection."
+  }
+ ],
+ "picked": [
+  "Account Recovery & Reset Warning Copy",
+  "Adoption Certificate Name Recognition Hint",
+  "Launch Completed Desktop Mascot Welcome"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 285.3,
+ "decisions": [
+  {
+   "test": "sim-14",
+   "title": "Account Recovery & Reset Warning Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 107.6,
+   "result": {
+    "step": {
+     "control": 0.7686,
+     "treatment": 0.7991,
+     "lift": 0.0397,
+     "lift_se": 0.0226,
+     "p": 0.073906
+    },
+    "finish": {
+     "control": 0.2233,
+     "treatment": 0.2153,
+     "lift": -0.0358,
+     "lift_se": 0.0664,
+     "p": 0.596484
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.33,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": 0.047,
+   "finishers_delta_hidden": 14.75
+  },
+  {
+   "test": "sim-15",
+   "title": "Adoption Certificate Name Recognition Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 107.6,
+   "result": {
+    "step": {
+     "control": 0.6114,
+     "treatment": 0.5874,
+     "lift": -0.0393,
+     "lift_se": 0.0373,
+     "p": 0.300527
+    },
+    "finish": {
+     "control": 0.2093,
+     "treatment": 0.2113,
+     "lift": 0.0096,
+     "lift_se": 0.0714,
+     "p": 0.89309
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.67,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": -0.004,
+   "finishers_delta_hidden": -1.26
+  },
+  {
+   "test": "sim-16",
+   "title": "Launch Completed Desktop Mascot Welcome",
+   "target_step": "finish",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 70.1,
+   "result": {
+    "step": {
+     "control": 0.6659,
+     "treatment": 0.6841,
+     "lift": 0.0273,
+     "lift_se": 0.0461,
+     "p": 0.548067
+    },
+    "finish": {
+     "control": 0.206,
+     "treatment": 0.2267,
+     "lift": 0.1003,
+     "lift_se": 0.0766,
+     "p": 0.169258
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 4.58,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": -0.0236,
+   "finishers_delta_hidden": -7.41
+  }
+ ],
+ "shipped": [],
+ "ends_week": 4,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

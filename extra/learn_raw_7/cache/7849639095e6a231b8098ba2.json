@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [sign_in, reorder] Defer Sign-In to End of Onboarding: Move sign-in step to the very end of onboarding after home intro, allowing users to experience pet setup completely before committing to an account.\n   config: {\"sign_in\": {\"headline\": \"Create account to save your desktop pet\", \"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"sign_in\"]}}\n1: [home, new_screen] Desktop Display Check Screen Before Waiting Screen: Insert a new screen before pet generation waiting screen to verify desktop display compatibility and screen permissions.\n   config: {\"waiting\": {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_desktop_check\", \"waiting\", \"home_intro\"]}, \"new_desktop_check\": {\"headline\": \"Checking Desktop Display Compatibility\", \"body\": \"Verifying screen overlay permissions and display drivers before rendering your pet.\", \"layout\": \"centered\", \"button_label\": \"Continue\", \"components\": [{\"type\": \"progress\", \"label\": \"Checking display engine...\"}]}}\n2: [adoption, new_flow] Preset Pet Quick Selection Flow: Provide an instant preset pet selection flow that skips custom photo upload steps entirely for users wanting starter pets.\n   config: {\"pick_friend\": {\"layout\": \"grid\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Quick Starter Pets\", \"action\": \"choose\"}]}}\n3: [choose_path, redesign] Split Grid Layout Redesign for Path Choice: Redesign the path selection screen with a split card layout separating standard pet selection from custom pet creation.\n   config: {\"choose_path\": {\"layout\": \"split\", \"replace\": {\"path_options\": [{\"type\": \"choice_cards\", \"label\": \"Select Creation Path\", \"style\": \"emphasis\", \"action\": \"choose\", \"role\": \"path_options\"}]}}}\n4: [home, redesign] Calm Stage Redesign for Waiting Screen: Redesign the waiting screen using a non-interactive stage layout focused purely on generation status.\n   config: {\"waiting\": {\"layout\": \"stage\", \"show_progress\": true, \"replace\": {\"wait_status\": [{\"type\": \"progress\", \"label\": \"Generating desktop pet model...\", \"role\": \"wait_status\"}]}}}\n5: [finish, new_screen] Pet Control Cheat Sheet End Screen: Add a new cheat sheet screen right after home intro explaining hotkeys and desktop control shortcuts.\n   config: {\"home_intro\": {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_controls_sheet\"]}, \"new_controls_sheet\": {\"headline\": \"Desktop Pet Controls Quick Reference\", \"body\": \"Right-click your pet anytime on desktop to open options, hide pet, or toggle pet interaction.\", \"layout\": \"card\", \"button_label\": \"Start Desktop Pet\"}}\n6: [home, wait_info] Time Estimate Display on Waiting Screen: Enable estimated wait time display on the waiting screen so users know how long generation will take.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"show_progress\": true}}\n7: [sign_in, new_flow] Guest Continuation Flow on Sign-In Screen: Add a Guest Profile button on the sign-in screen allowing users to proceed without immediate account setup.\n   config: {\"sign_in\": {\"components\": [{\"type\": \"button\", \"label\": \"Continue as Guest\", \"style\": \"plain\", \"action\": \"next\"}]}}\n8: [choose_path, layout] Two Column Layout for Path Options Screen: Switch choose path layout to a two-column structure to clearly differentiate options side-by-side.\n   config: {\"choose_path\": {\"layout\": \"two_column\"}}\n9: [adoption, layout] Progress Bar and Step Counter on Upload Screen: Display a progress bar and step counter on the photo upload screen.\n   config: {\"upload_photos\": {\"show_step_counter\": true, \"show_progress\": true}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to the end of onboarding is explicitly allowed."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new compatibility check screen inside onboarding is allowed."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Preset pet selection layout retains the required pick a friend onboarding step."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning choose_path layout preserves its function of offering creation paths."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the waiting screen maintains the status display of pet generation."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new controls quick reference screen after home_intro is allowed."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Displaying estimated wait time for pet generation is allowed."
+   },
+   {
+    "index": 7,
+    "pass": false,
+    "rule": 1,
+    "reason": "Adding a guest option makes the required sign-in step skippable."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Changing the choose_path layout to two columns is allowed."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress indicators to the photo upload screen is allowed."
+   }
+  ]
+ }
+}

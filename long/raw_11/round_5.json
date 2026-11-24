@@ -1,0 +1,448 @@
+{
+ "round": 5,
+ "starts_week": 5,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7822169999999999,
+  "adoption": 0.6420687,
+  "home": 0.8385282000000001,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.431,
+  "evidence": 2.174,
+  "confidence": 0.303,
+  "cost": 0.091
+ },
+ "lessons_used": [
+  "Reordering sign-in after adoption (sign_in, reorder) yielded a win (+7.0%), though a second attempt showed no clear effect.",
+  "Introducing a new flow on home (home, new_flow) and quality guidance hints for adoption (adoption, hint) were helpful (+8.6% and +5.4%).",
+  "Streamlining path selection copy (choose_path, copy) hurt performance (-4.7%).",
+  "Layout updates, background notifications, tutorial screens, incentives, copy changes, and general hints showed no clear effect.",
+  "Predictions were generally too optimistic, overestimating gains for most tests.",
+  "Predictions were too low for the winning home new flow (+1.0% predicted vs +8.6% measured)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Account Persistence & Pet Restore Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Adds an explicit explanatory note on the sign-in screen reassuring users that signing in restores existing pets safely without loss.",
+   "why": "Support mail highlighted 8 issues regarding missing or reset pets after signing in again, leading to user hesitation during sign-in.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in connects your desktop pet to your cloud account so your pet state and accessories are always preserved."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds standard explanatory copy to the sign-in screen without violating any rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.035,
+   "score": 8.43,
+   "score_note": "Strong alignment between support complaints (8 mails) and sign-in drop-off; hints have shown moderate success.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 151.2
+  },
+  {
+   "title": "Adoption Certificate Name Entry Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the adoption certificate step into a card layout with clear visual companion confirmation and streamlined name entry.",
+   "why": "Adoption step drops significantly to 64.2% conversion with long completion times (median 89s / mean 1017s).",
+   "config": {
+    "adoption_certificate": {
+     "layout": "card",
+     "headline": "Official Pet Adoption Certificate",
+     "body": "Give your new desktop companion a name to make it officially yours.",
+     "replace": {
+      "certificate": [
+       {
+        "type": "name_input",
+        "label": "Companion Name",
+        "text": "Enter name",
+        "style": "large",
+        "action": "next",
+        "role": "certificate"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[0]': a name_input cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Presence Quick Diagnostic Flow",
+   "target_step": "home",
+   "type": "new_flow",
+   "change": "Adds a quick diagnostic check step on the waiting screen to verify desktop pet rendering and window visibility before completing setup.",
+   "why": "Support mail logged 3 reports of pets failing to show on desktop or app not opening, while home step completion takes up to 2336s on average.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_diagnostic",
+     "home_intro"
+    ],
+    "waiting": {
+     "components": [
+      {
+       "type": "button",
+       "label": "Run Desktop Display Check",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_desktop_diagnostic']"
+   }
+  },
+  {
+   "title": "Desktop Controls Quick Reference Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Inserts a dedicated quick-reference controls screen right after home intro explaining how to summon, move, and hide the desktop pet.",
+   "why": "3 support tickets cited confusion on controlling or interacting with the pet post-onboarding, and finish step conversion is low (64.8%).",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_controls_guide"
+    ],
+    "home_intro": {
+     "components": [
+      {
+       "type": "text",
+       "text": "Press Ctrl+Shift+P anytime to summon or hide your pet on your screen.",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_controls_guide']"
+   }
+  },
+  {
+   "title": "Choose Path Two Column Spotlight",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Changes path selection screen to a side-by-side two column layout contrasting instant ready-made pets versus custom photo creation.",
+   "why": "Choose path drop-off is 23.8% (76.2% conversion) with a very long mean duration of 514s, indicating confusion between available paths.",
+   "config": {
+    "choose_path": {
+     "layout": "two_column",
+     "headline": "Select How to Create Your Desktop Pet",
+     "body": "Choose a pre-designed companion for instant launch or upload photos for a custom creation."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning choose_path into two columns maintains both adoption and custom creation choices."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 4.2,
+   "score_note": "Targets high drop-off and long duration, but layout updates historically showed no clear effect and cost is high."
+  },
+  {
+   "title": "Photo Generation Validation Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Adds an inline photo clarity validator component on the photo upload screen to prevent failed image renders during pet generation.",
+   "why": "3 support emails reported custom pet creation failing or producing distorted results, contributing to long adoption times.",
+   "config": {
+    "upload_photos": {
+     "components": [
+      {
+       "type": "badge",
+       "label": "Clear Lighting & Frontal View Recommended",
+       "style": "playful"
+      },
+      {
+       "type": "progress",
+       "text": "Photo Quality Check: Ready",
+       "style": "calm"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.components[0].label' must be text up to 40 characters"
+   }
+  },
+  {
+   "title": "Instant Sign-In Fallback Guidance Copy",
+   "target_step": "sign_in",
+   "type": "copy",
+   "change": "Updates sign-in screen headline and body copy with direct connection troubleshooting instructions.",
+   "why": "Support received 2 bug reports about sign-in screen failing to appear or stalling.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Save Your Pet Progress",
+     "body": "Connect your account to save your companion. If browser window does not open, check your system tray or firewall settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating sign-in copy with troubleshooting guidance does not break any rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": -0.005,
+   "score": 3.23,
+   "score_note": "Only 2 bug reports provided as evidence, and past copy changes have yielded neutral to negative results."
+  },
+  {
+   "title": "Progressive Desktop Loading Indicator",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Displays an active step-by-step progress indicator showing desktop initialization phases on the waiting screen.",
+   "why": "The waiting phase on home takes median 201s and mean 2336s, leaving users unsure if pet creation is progressing.",
+   "config": {
+    "waiting": {
+     "show_progress": true,
+     "show_time_estimate": true,
+     "headline": "Initializing Desktop Pet Companion",
+     "body": "Preparing animations, desktop overlay permissions, and companion assets."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Progress and time estimates for real initialization on the waiting screen are allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.005,
+   "score": 3.12,
+   "score_note": "Home drop-off is relatively low; previous test of home wait_info showed a -0.5% drop.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 151.2
+  },
+  {
+   "title": "First Interaction Companion Welcome Gift",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Adds a welcome bonus badge on the home intro screen offering a starter pet accessory upon completing the final onboarding step.",
+   "why": "Overall onboarding completion is only 20.8%, and finish step drops 35.2% of remaining users.",
+   "config": {
+    "home_intro": {
+     "components": [
+      {
+       "type": "badge",
+       "label": "Unlocked: Special Edition Desktop Pet Collar",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'home_intro.components[0].label' must be text up to 40 characters"
+   }
+  },
+  {
+   "title": "Instant Path Decision Helper Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "change": "Adds a friendly decision hint on the story screen helping users choose the fastest path to spawn their first pet.",
+   "why": "Users take a mean of 514s on path selection before moving forward, indicating early confusion.",
+   "config": {
+    "story": {
+     "hint": "Want to start immediately? Choose Pick a Friend on the next screen for instant desktop pet launch!"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a helpful decision hint on the story screen preserves all onboarding steps and rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.005,
+   "score": 4.8,
+   "score_note": "Easy config hint addressing long choose_path duration; past test of choose_path hint showed +0.5%.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 151.2
+  }
+ ],
+ "picked": [
+  "Account Persistence & Pet Restore Hint",
+  "Instant Path Decision Helper Hint",
+  "Progressive Desktop Loading Indicator"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 453.6,
+ "decisions": [
+  {
+   "test": "sim-17",
+   "title": "Account Persistence & Pet Restore Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": 134,
+   "share": 1.0,
+   "planned_harm": 151.2,
+   "result": {
+    "step": {
+     "control": 0.7974,
+     "treatment": 0.751,
+     "lift": -0.0582,
+     "lift_se": 0.0161,
+     "p": 0.000442
+    },
+    "finish": {
+     "control": 0.2213,
+     "treatment": 0.196,
+     "lift": -0.1144,
+     "lift_se": 0.0479,
+     "p": 0.024492
+    },
+    "users_per_group": 2607
+   },
+   "outcome": "stopped early: sign_in worse",
+   "score": 8.43,
+   "predicted_lift": 0.035,
+   "true_lift_hidden": -0.014,
+   "finishers_delta_hidden": -7.71
+  },
+  {
+   "test": "sim-18",
+   "title": "Instant Path Decision Helper Hint",
+   "target_step": "choose_path",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 151.2,
+   "result": {
+    "step": {
+     "control": 0.7553,
+     "treatment": 0.7787,
+     "lift": 0.0309,
+     "lift_se": 0.0147,
+     "p": 0.032541
+    },
+    "finish": {
+     "control": 0.201,
+     "treatment": 0.209,
+     "lift": 0.0398,
+     "lift_se": 0.0529,
+     "p": 0.442788
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 4.8,
+   "predicted_lift": 0.005,
+   "true_lift_hidden": -0.0008,
+   "finishers_delta_hidden": -0.51
+  },
+  {
+   "test": "sim-19",
+   "title": "Progressive Desktop Loading Indicator",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 151.2,
+   "result": {
+    "step": {
+     "control": 0.8425,
+     "treatment": 0.8558,
+     "lift": 0.0158,
+     "lift_se": 0.0177,
+     "p": 0.368659
+    },
+    "finish": {
+     "control": 0.2137,
+     "treatment": 0.2197,
+     "lift": 0.0281,
+     "lift_se": 0.0505,
+     "p": 0.572711
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.12,
+   "predicted_lift": -0.005,
+   "true_lift_hidden": 0.0136,
+   "finishers_delta_hidden": 8.61
+  }
+ ],
+ "shipped": [
+  "Instant Path Decision Helper Hint"
+ ],
+ "ends_week": 5,
+ "weights_next": {
+  "impact": 1.491,
+  "evidence": 2.199,
+  "confidence": 0.214,
+  "cost": 0.096
+ },
+ "lessons_next": [
+  "Reordering sign-in after adoption was helpful in one test (+7.0%), though a second attempt showed no clear effect.",
+  "Introducing a new flow on home (+8.6%) and specific hints for adoption (+5.4%) and path decisions (+3.1%) were helpful.",
+  "Streamlining path selection copy hurt performance (-4.7%), and sign-in restore hints also hurt performance (-5.8%).",
+  "Layout updates, background notifications, wait info, tutorial screens, incentives, and other copy changes showed no clear effect.",
+  "Predictions were generally too optimistic, overestimating expected gains for most tests.",
+  "Predictions were too low for the winning home new flow (+1.0% predicted vs +8.6% measured) and path decision hint (+0.5% predicted vs +3.1% measured)."
+ ]
+}

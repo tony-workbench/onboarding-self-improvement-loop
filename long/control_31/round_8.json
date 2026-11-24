@@ -1,0 +1,448 @@
+{
+ "round": 8,
+ "starts_week": 8,
+ "funnel": {
+  "choose_path": 0.8618090964626881,
+  "sign_in": 0.8174649081600001,
+  "adoption": 0.69405195342,
+  "home": 0.8419428,
+  "finish": 0.689148
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Cloud Save Account Verification Redesign",
+   "target_step": "sign_in",
+   "type": "redesign",
+   "change": "Rebuild the sign-in screen layout to prominently highlight automatic account data restoration and cloud sync badges before login.",
+   "why": "Support tickets show 8 complaints about missing or reset pets after re-authenticating, and sign_in has a high mean completion time of 567s.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Sync & Protect Your Desktop Companion",
+     "body": "Use your primary account to automatically save your pet's memory, custom traits, and progression across installs.",
+     "layout": "centered",
+     "replace": {
+      "sign_in_options": [
+       {
+        "role": "sign_in_options",
+        "type": "badge",
+        "text": "Cloud Restore Protection Enabled",
+        "style": "highlight"
+       },
+       {
+        "role": "sign_in_options",
+        "type": "button",
+        "label": "Continue with Google",
+        "action": "next",
+        "style": "emphasis"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'sign_in.replace.sign_in_options[0]': a badge cannot do the sign_in_options job (use ['button', 'choice_cards', 'image', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Companion System Tray Readiness Check",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Insert a dedicated system tray readiness check screen right before waiting to ensure companion rendering overlay initializes properly.",
+   "why": "Support mailbox received 3 bug reports about pets failing to show up on the desktop, and home step takes a high mean duration of 2336s.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_tray_check",
+     "waiting",
+     "home_intro"
+    ],
+    "waiting": {
+     "headline": "Finalizing Desktop Companion Launch",
+     "hint": "Check your system tray if companion does not appear immediately.",
+     "layout": "checklist"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_tray_check']"
+   }
+  },
+  {
+   "title": "Interactive Desktop Pet Control Quickstart Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Add an interactive shortcut guide on the final welcome screen demonstrating right-click controls, dragging, and tray hiding.",
+   "why": "3 support tickets report user confusion regarding how to control, hide, or interact with the pet after onboarding completes.",
+   "config": {
+    "home_intro": {
+     "headline": "Meet Your Desktop Companion!",
+     "body": "Your pet is active on your desktop. Right-click for options, drag to move around, or use hotkeys to interact.",
+     "layout": "spotlight",
+     "components": [
+      {
+       "type": "choice_cards",
+       "text": "Quick Desktop Controls Overview",
+       "style": "playful",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a quickstart guide component inside home_intro is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.08,
+   "score": 6.25,
+   "score_note": "Addresses major drop-off at finish step supported by support tickets; requires new screens.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 110.6
+  },
+  {
+   "title": "Adoption Certificate First Milestone Flow",
+   "target_step": "adoption",
+   "type": "reorder",
+   "change": "Reorder adoption step screens so naming the companion on adoption_certificate occurs right after selection, before photo upload customization.",
+   "why": "Adoption completion rate drops to 69.4% with a mean duration of 1017s; naming first builds early ownership commitment.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "adoption_certificate",
+     "upload_photos",
+     "waiting",
+     "home_intro"
+    ],
+    "adoption_certificate": {
+     "headline": "Name & Adopt Your New Companion",
+     "body": "Officially register your pet's name first before customizing their visual look.",
+     "layout": "card"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "existing screens must keep their order; only sign_in may move"
+   }
+  },
+  {
+   "title": "Instant Adoption Vs Custom Companion Benefit Microcopy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Explicitly state setup duration estimates (30 sec Instant vs 2 min Custom) directly within the choose_path path descriptions.",
+   "why": "Choose_path step mean time is 514s despite 86.2% conversion, indicating user hesitation when comparing onboarding paths.",
+   "config": {
+    "choose_path": {
+     "headline": "Choose Your Onboarding Speed",
+     "body": "Select Instant Adopt (30-sec setup with ready presets) or Custom Creator (2-min personalized traits).",
+     "hint": "You can create extra pets or modify traits at any time later in app settings."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding duration estimates preserves both path options and does not violate rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.04,
+   "score": 5.42,
+   "score_note": "Low cost copy tweak to address high mean time on choose_path.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 170.2
+  },
+  {
+   "title": "Existing User Account Persistence Security Callout",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Display an explicit persistent hint on sign_in confirming that logging into existing accounts automatically restores existing pets.",
+   "why": "8 support emails complained about pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Returning user? Sign in with your original email account to instantly retrieve your previously adopted pets.",
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Starter Pet Accessory Unlock Badge",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Add an accessory unlock reward badge on pick_friend screen motivating users to finish pet creation.",
+   "why": "Adoption stage has the steepest funnel drop-off (69.4% conversion) and long completion times.",
+   "config": {
+    "pick_friend": {
+     "headline": "Select Companion & Unlock Starter Accessory",
+     "body": "Adopt your desktop pet now to claim your bonus starter accessory.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Bonus: Exclusive Starter Accessory Unlocked",
+       "style": "playful",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions bonus starter accessories, violating the prohibition on mentioning gifts or extras."
+   }
+  },
+  {
+   "title": "Live Desktop Environment Preparation Checklist",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Replace waiting screen text with a real-time system preparation checklist monitoring graphics rendering and taskbar placement.",
+   "why": "Home waiting stage has median time of 201s (mean 2336s) and causes user drop-off due to launch uncertainty.",
+   "config": {
+    "waiting": {
+     "headline": "Preparing Desktop Pet Workspace",
+     "body": "Initializing desktop overlay rendering, audio engine, and system tray quick controls...",
+     "show_time_estimate": true,
+     "notify_when_ready": true,
+     "layout": "checklist"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating waiting-screen information is permitted under Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.06,
+   "score": 3.75,
+   "score_note": "Replaces static wait state with active monitoring to reduce drop-off during long home stage wait.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 170.2
+  },
+  {
+   "title": "Companion Wake-Up Taskbar Notification Banner",
+   "target_step": "finish",
+   "type": "notification",
+   "change": "Show a high-visibility taskbar status notification on home_intro indicating exactly where the pet is active on the screen.",
+   "why": "Finish conversion drops to 68.9% with mean duration of 5815s; users get stuck locating active pets.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Companion Has Arrived!",
+     "body": "Look at your desktop! Your pet is active and waiting near your taskbar.",
+     "hint": "Click the taskbar icon anytime to pin or hide your companion.",
+     "button_label": "Start Playing"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding notification copy to home_intro is allowed during onboarding."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.07,
+   "score": 6.67,
+   "score_note": "Targets largest funnel drop-off at finish by making the pet location visible."
+  },
+  {
+   "title": "Split Stage Companion Preview Path Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Switch choose_path screen to a split stage layout displaying live companion motion previews alongside path options.",
+   "why": "Mean time spent on choose_path is 514s; visual side-by-side previews help users select quicker.",
+   "config": {
+    "choose_path": {
+     "headline": "Explore Desktop Companion Options",
+     "layout": "split",
+     "components": [
+      {
+       "type": "preview",
+       "text": "Live Companion Motion Preview",
+       "style": "rounded",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating the layout of choose_path inside onboarding is permitted."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.05,
+   "score": 2.92,
+   "score_note": "Adds live motion previews to reduce selection hesitation, but requires new layout work."
+  }
+ ],
+ "picked": [
+  "Interactive Desktop Pet Control Quickstart Flow",
+  "Instant Adoption Vs Custom Companion Benefit Microcopy",
+  "Live Desktop Environment Preparation Checklist"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 451.0,
+ "decisions": [
+  {
+   "test": "sim-30",
+   "title": "Interactive Desktop Pet Control Quickstart Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 110.6,
+   "result": {
+    "step": {
+     "control": 0.6257,
+     "treatment": 0.6282,
+     "lift": 0.0039,
+     "lift_se": 0.0348,
+     "p": 0.910478
+    },
+    "finish": {
+     "control": 0.209,
+     "treatment": 0.205,
+     "lift": -0.0191,
+     "lift_se": 0.0496,
+     "p": 0.702187
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.25,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": -0.0172,
+   "finishers_delta_hidden": -11.29
+  },
+  {
+   "test": "sim-31",
+   "title": "Instant Adoption Vs Custom Companion Benefit Microcopy",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 170.2,
+   "result": {
+    "step": {
+     "control": 0.8263,
+     "treatment": 0.8083,
+     "lift": -0.0218,
+     "lift_se": 0.0119,
+     "p": 0.071197
+    },
+    "finish": {
+     "control": 0.2257,
+     "treatment": 0.2153,
+     "lift": -0.0458,
+     "lift_se": 0.0463,
+     "p": 0.334382
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.42,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": -0.0108,
+   "finishers_delta_hidden": -7.09
+  },
+  {
+   "test": "sim-32",
+   "title": "Live Desktop Environment Preparation Checklist",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 170.2,
+   "result": {
+    "step": {
+     "control": 0.8032,
+     "treatment": 0.8425,
+     "lift": 0.0489,
+     "lift_se": 0.0195,
+     "p": 0.010086
+    },
+    "finish": {
+     "control": 0.214,
+     "treatment": 0.2347,
+     "lift": 0.0966,
+     "lift_se": 0.0527,
+     "p": 0.055009
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 3.75,
+   "predicted_lift": 0.06,
+   "true_lift_hidden": 0.0423,
+   "finishers_delta_hidden": 27.77
+  }
+ ],
+ "shipped": [
+  "Live Desktop Environment Preparation Checklist"
+ ],
+ "ends_week": 8,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

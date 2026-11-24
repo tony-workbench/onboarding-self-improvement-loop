@@ -1,0 +1,509 @@
+{
+ "round": 10,
+ "starts_week": 10,
+ "funnel": {
+  "choose_path": 0.8040624,
+  "sign_in": 0.8736851260728359,
+  "adoption": 0.6791651250299999,
+  "home": 0.8961325101300001,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "(none yet)"
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop Readiness Diagnostic Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Insert a dedicated screen right after waiting to verify display permissions and desktop positioning before spawning the pet.",
+   "why": "Support received multiple tickets about pets not appearing on the desktop or the app failing to open upon initial launch.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_diagnostic",
+     "home_intro"
+    ],
+    "waiting": {
+     "hint": "Preparing desktop workspace environment check..."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_desktop_diagnostic']"
+   }
+  },
+  {
+   "title": "Adoption Naming and Certificate Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the adoption certificate into a full-bleed celebratory identity view with animated confirmation badge and interactive name tag builder.",
+   "why": "The adoption step suffers a major drop-off (67.9% conversion), requiring a more engaging emotional milestone experience before spawning.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "full_bleed",
+     "headline": "Official Pet Adoption Identity Certificate",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "animation",
+        "style": "playful",
+        "asset": "asset:cert_badge"
+       },
+       {
+        "role": "certificate",
+        "type": "name_input",
+        "style": "large",
+        "label": "Pet Name"
+       },
+       {
+        "role": "certificate",
+        "type": "badge",
+        "style": "highlight",
+        "text": "Official Companion Registered"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[1]': a name_input cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Guided Desktop Interaction Tutorial Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Add an interactive control practice screen before home_intro where users practice dragging, tray hiding, and chat commands.",
+   "why": "Support reported multiple tickets about post-onboarding confusion regarding how to control, hide, or talk to the desktop pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_controls_practice",
+     "home_intro"
+    ],
+    "home_intro": {
+     "layout": "split",
+     "headline": "Master Desktop Pet Controls",
+     "components": [
+      {
+       "type": "text",
+       "style": "plain",
+       "text": "Try dragging your pet or clicking the system tray icon to toggle visibility."
+      },
+      {
+       "type": "button",
+       "style": "emphasis",
+       "label": "Practice Pet Commands",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_controls_practice']"
+   }
+  },
+  {
+   "title": "Path Selection Stage Redesign",
+   "target_step": "choose_path",
+   "type": "redesign",
+   "change": "Transform path selection into a stage layout with distinct visual choice cards for pre-made pet versus custom photo creation journeys.",
+   "why": "Path selection step has a long mean duration (514s), indicating user hesitation when deciding how to start.",
+   "config": {
+    "choose_path": {
+     "layout": "stage",
+     "headline": "Choose Your Pet Creation Path",
+     "replace": {
+      "path_options": [
+       {
+        "role": "path_options",
+        "type": "choice_cards",
+        "style": "large",
+        "label": "Select Starter Pet or Custom Creation"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "replacement for 'choose_path.path_options' does not do the job (two distinct choices: adopting a friend and making your own): needs 2 of ['button', 'choice_cards'] with real words"
+   }
+  },
+  {
+   "title": "Account Session Recovery Warning Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add a security warning banner on the sign-in screen explaining how signing into a different account overwrites local pet profiles.",
+   "why": "Support received 8 emails regarding pets missing or reset after signing in again with a different account.",
+   "config": {
+    "sign_in": {
+     "hint": "Important: Sign into your primary account to retain your existing pet profiles and data.",
+     "layout": "centered"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a security warning hint to the sign-in screen is a allowed change within onboarding."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.02,
+   "score": 6.25,
+   "score_note": "Addresses account overwrite issue noted in support emails, though sign-in already has high completion.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 166.2
+  },
+  {
+   "title": "Live Pet Spawning Status Feed",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display live status feed updates for pet asset rendering, audio setup, and desktop placement during the waiting screen.",
+   "why": "Home waiting screen has a high mean time (2336s) and drop-off, leaving users uncertain if creation is frozen.",
+   "config": {
+    "waiting": {
+     "headline": "Creating Your Desktop Pet",
+     "body": "Rendering pet graphics, configuring desktop placement, and preparing animations...",
+     "show_progress": true,
+     "components": [
+      {
+       "type": "progress",
+       "style": "rounded",
+       "label": "Pet Generation Status"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a live status feed to the waiting screen preserves its job of showing that the pet is being created."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.05,
+   "score": 5.0,
+   "score_note": "High mean wait time on home indicates users think app frozen; status feed reduces drop-off.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 166.2
+  },
+  {
+   "title": "Desktop Control Overview Summary Copy",
+   "target_step": "finish",
+   "type": "copy",
+   "change": "Update the home_intro summary copy to explicitly outline desktop dragging, system tray minimizing, and chat commands.",
+   "why": "Users submitted multiple support tickets post-onboarding expressing confusion on how to minimize or talk to their desktop pet.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Pet is Ready on Your Desktop!",
+     "body": "Click and drag to move your pet around. Right-click or check the system tray icon anytime to hide or open settings.",
+     "button_label": "Start Playing"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating the home intro copy within onboarding is permitted."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.04,
+   "score": 8.75,
+   "score_note": "Finish step loses 35.2% of users and support tickets confirm post-onboarding desktop control confusion.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 115.6
+  },
+  {
+   "title": "Pet Friend Selection Grid Layout",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Reconfigure the pick_friend screen into a visual grid layout displaying pet choices with animated preview cards.",
+   "why": "The adoption stage drops 32.1% of users, pointing to friction when browsing starter companions.",
+   "config": {
+    "pick_friend": {
+     "layout": "grid",
+     "headline": "Select Your Desktop Pet Friend",
+     "components": [
+      {
+       "type": "preview",
+       "style": "rounded",
+       "asset": "asset:pet_grid_preview"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reconfiguring the pick_friend layout to a grid still allows the user to pick a friend."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.08,
+   "score": 4.58,
+   "score_note": "Adoption has a 32.1% drop-off; visual grid layout makes companion selection significantly smoother.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 166.2
+  },
+  {
+   "title": "Instant Starter Pet Adoption Incentive",
+   "target_step": "choose_path",
+   "type": "incentive",
+   "change": "Highlight a fast 30-second quick-adopt route on the story welcome screen to encourage immediate progression.",
+   "why": "Choose path stage has a high mean time of 514s, showing users take significant time before starting.",
+   "config": {
+    "story": {
+     "headline": "Meet Your New Desktop Companion in 30 Seconds",
+     "body": "Choose a ready-to-play pet or design your own unique companion.",
+     "button_label": "Adopt Now",
+     "components": [
+      {
+       "type": "badge",
+       "style": "playful",
+       "text": "Instant 30-Sec Setup Available"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "fairness",
+    "reason": "Creates urgency with time limits"
+   }
+  },
+  {
+   "title": "Background Completion Desktop System Sound Notification",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable desktop audio chime notification when pet creation completes on the waiting screen to notify users who switched windows.",
+   "why": "The median wait time is 201s and mean is 2336s, indicating users switch to other applications while waiting.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "style": "emphasis",
+       "label": "Play Sound On Completion",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an audio completion notification to the waiting screen is permitted under onboarding updates."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 5.0,
+   "score_note": "Large gap between median and mean home time indicates users tab away; chime alerts them when done."
+  }
+ ],
+ "picked": [
+  "Desktop Control Overview Summary Copy",
+  "Account Session Recovery Warning Hint",
+  "Live Pet Spawning Status Feed",
+  "Pet Friend Selection Grid Layout"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 614.2,
+ "decisions": [
+  {
+   "test": "sim-40",
+   "title": "Desktop Control Overview Summary Copy",
+   "target_step": "finish",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 115.6,
+   "result": {
+    "step": {
+     "control": 0.6478,
+     "treatment": 0.659,
+     "lift": 0.0173,
+     "lift_se": 0.029,
+     "p": 0.547642
+    },
+    "finish": {
+     "control": 0.282,
+     "treatment": 0.286,
+     "lift": 0.0142,
+     "lift_se": 0.0416,
+     "p": 0.731185
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.75,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": 0.0168,
+   "finishers_delta_hidden": 14.22
+  },
+  {
+   "test": "sim-41",
+   "title": "Account Session Recovery Warning Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 166.2,
+   "result": {
+    "step": {
+     "control": 0.8906,
+     "treatment": 0.888,
+     "lift": -0.0029,
+     "lift_se": 0.0101,
+     "p": 0.77236
+    },
+    "finish": {
+     "control": 0.3007,
+     "treatment": 0.292,
+     "lift": -0.0288,
+     "lift_se": 0.0386,
+     "p": 0.462302
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.25,
+   "predicted_lift": 0.02,
+   "true_lift_hidden": 0.0096,
+   "finishers_delta_hidden": 8.13
+  },
+  {
+   "test": "sim-42",
+   "title": "Live Pet Spawning Status Feed",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 166.2,
+   "result": {
+    "step": {
+     "control": 0.9132,
+     "treatment": 0.8867,
+     "lift": -0.029,
+     "lift_se": 0.012,
+     "p": 0.017756
+    },
+    "finish": {
+     "control": 0.2753,
+     "treatment": 0.2827,
+     "lift": 0.0266,
+     "lift_se": 0.0426,
+     "p": 0.526568
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 5.0,
+   "predicted_lift": 0.05,
+   "true_lift_hidden": -0.0003,
+   "finishers_delta_hidden": -0.25
+  },
+  {
+   "test": "sim-43",
+   "title": "Pet Friend Selection Grid Layout",
+   "target_step": "adoption",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 166.2,
+   "result": {
+    "step": {
+     "control": 0.6878,
+     "treatment": 0.7393,
+     "lift": 0.0749,
+     "lift_se": 0.0211,
+     "p": 0.000224
+    },
+    "finish": {
+     "control": 0.2853,
+     "treatment": 0.301,
+     "lift": 0.0549,
+     "lift_se": 0.0423,
+     "p": 0.182556
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 4.58,
+   "predicted_lift": 0.08,
+   "true_lift_hidden": 0.0761,
+   "finishers_delta_hidden": 64.43
+  }
+ ],
+ "shipped": [
+  "Pet Friend Selection Grid Layout"
+ ],
+ "ends_week": 10,
+ "weights_next": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_next": [
+  "(none yet)"
+ ]
+}

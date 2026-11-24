@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_screen] Pet Control and Hide Desktop Guide Screen: Add a new dedicated screen during onboarding completion introducing desktop hotkeys, tray controls, and pet visibility toggles.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_pet_controls\"], \"new_pet_controls\": {\"headline\": \"Desktop Pet Quick Controls\", \"body\": \"Learn how to summon, minimize, or chat with your pet anytime directly from your desktop.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"text\": \"Right-click pet for instant action menu\", \"style\": \"plain\"}, {\"type\": \"checklist\", \"text\": \"Use system tray icon to hide or unhide pet\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Got It\", \"style\": \"rounded\", \"action\": \"next\"}]}}\n1: [adoption, new_flow] Custom Pet Generation Fallback Creation Flow: Add an explicit fallback guidance sub-flow on photo upload providing instant preset pet styles if custom generation encounters issues.\n   config: {\"upload_photos\": {\"hint\": \"If photo processing encounters issues, instant starter styles will be offered automatically.\", \"components\": [{\"type\": \"badge\", \"text\": \"Automatic Fallback Protection Enabled\", \"style\": \"subtle\"}]}}\n2: [home, wait_info] Desktop Pet Engine Warmup Status Indicator: Display real-time desktop graphics engine warmup and pet sprite initialization status on the waiting screen.\n   config: {\"waiting\": {\"headline\": \"Initializing Desktop Pet Companion\", \"body\": \"Warming up desktop rendering engine and preparing pet companion assets...\", \"show_progress\": true, \"components\": [{\"type\": \"progress\", \"text\": \"Loading desktop graphics pipeline...\", \"style\": \"plain\"}]}}\n3: [finish, new_flow] Desktop Companion First Interaction Orientation Flow: Introduce an interactive guidance sub-flow on the final screen prompting users to click and interact with their desktop pet right away.\n   config: {\"home_intro\": {\"headline\": \"Welcome Your Companion to the Desktop!\", \"body\": \"Try clicking on your pet right now or right-click to open its desktop action menu.\", \"components\": [{\"type\": \"button\", \"label\": \"Try Desktop Interaction\", \"style\": \"playful\", \"action\": \"next\"}]}}\n4: [finish, notification] Desktop Pet Tray Launch Notification Banner: Add an explicit system notification callout on the home intro screen detailing where the system tray icon lives.\n   config: {\"home_intro\": {\"headline\": \"Your Pet is Ready on Your Desktop!\", \"body\": \"Look for your pet on your screen. You can also right-click the pet icon in your system tray anytime.\", \"components\": [{\"type\": \"badge\", \"text\": \"Active in System Tray\", \"style\": \"highlight\"}]}}\n5: [finish, new_screen] Pet Command & Control Interactive Onboarding Screen: Introduce a dedicated screen right before completion showing visual desktop pet keyboard shortcuts and tray access controls.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_pet_commands\"], \"new_pet_commands\": {\"headline\": \"Mastering Your Pet Controls\", \"body\": \"Quickly summon, talk, or manage your companion using keyboard shortcuts and tray controls.\", \"layout\": \"default\", \"components\": [{\"type\": \"text\", \"text\": \"Press Alt+P to summon or hide your desktop pet anytime.\", \"style\": \"emphasis\"}, {\"type\": \"button\", \"label\": \"Start Playing\", \"style\": \"large\", \"action\": \"next\"}]}}\n6: [sign_in, hint] Account Pet Recovery and Re-login Persistence Hint: Display an explicit hint on the sign-in screen reassuring users that logging into an existing account restores saved pets.\n   config: {\"sign_in\": {\"hint\": \"Signing in with your registered account automatically restores your saved pets and progress.\", \"components\": [{\"type\": \"text\", \"text\": \"Existing user? Sign in to restore your saved pets.\", \"style\": \"subtle\"}]}}\n7: [choose_path, hint] Path Creation Time & Quick Adoption Recommendation Hint: Add a path time estimation hint clarifying setup duration and highlighting instant pet adoption options.\n   config: {\"choose_path\": {\"hint\": \"Preset adoption takes under 1 minute. Custom pet creation takes 2-3 minutes.\", \"components\": [{\"type\": \"badge\", \"text\": \"Fastest Option: Preset Pet\", \"style\": \"playful\"}]}}\n8: [adoption, wait_info] Adoption Certificate Generation Progress Status: Display real-time processing status steps while finalizing the adoption certificate.\n   config: {\"adoption_certificate\": {\"show_progress\": true, \"hint\": \"Generating official adoption records and initializing pet companion attributes...\", \"components\": [{\"type\": \"progress\", \"text\": \"Finalizing pet personality matrix...\", \"style\": \"plain\"}]}}\n9: [home, wait_info] Desktop Display Permission & System Tray Readiness Counter: Add display overlay permission and system tray integration readiness status updates on the waiting screen.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"hint\": \"Verifying desktop display overlay permissions and system tray notification hooks...\", \"components\": [{\"type\": \"badge\", \"text\": \"Desktop System Check OK\", \"style\": \"emphasis\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid new pet controls screen after home_intro while keeping all required onboarding steps and jobs intact."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds starter style fallback guidance to photo upload without removing any required step or screen functionality."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Enhances the waiting screen with graphics engine warmup status while maintaining the core job of showing pet creation progress."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds interactive orientation guidance to home_intro, which is part of onboarding."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds system tray guidance banner to home_intro without altering non-onboarding components or breaking rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new interactive shortcut and controls screen following home_intro while maintaining all standard steps."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds account pet recovery persistence hint to the sign-in screen within rule limits."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds path time estimation hints without removing path choices, mentioning prices, or violating fair design rules."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds real-time status updates to the adoption certificate screen while keeping its core job intact."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds permission and tray readiness status updates to the waiting screen within allowed onboarding parameters."
+   }
+  ]
+ }
+}

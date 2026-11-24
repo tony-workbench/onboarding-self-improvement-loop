@@ -1,0 +1,536 @@
+{
+ "round": 17,
+ "starts_week": 17,
+ "funnel": {
+  "choose_path": 0.7939208277,
+  "sign_in": 0.799877894241375,
+  "adoption": 0.8188520613647717,
+  "home": 0.9209009426057998,
+  "finish": 0.8101396773807302
+ },
+ "weights_used": {
+  "impact": 3.221,
+  "evidence": 0.425,
+  "confidence": 0.263,
+  "cost": 0.091
+ },
+ "lessons_used": [
+  "Predictions generally overestimate noise-corrected outcomes, though winning tests frequently exceed expected gains.",
+  "Finish hints were helpful, winning in two out of three tests.",
+  "Choose path hints showed no clear positive effect or degraded performance across four tests.",
+  "Adoption layout changes showed no clear positive effect or degraded performance across two tests.",
+  "Home notifications showed no clear positive effect across two tests.",
+  "Evidence remains thin for change kinds tested only once."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Custom Pet Photo Validation Flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Adds an interactive validation flow to photo upload with live quality status badges before pet creation.",
+   "why": "Support received 3 emails about custom pet creation failing or looking wrong, causing user drop-off in adoption.",
+   "config": {
+    "upload_photos": {
+     "replace": {
+      "photo_upload": [
+       {
+        "type": "photo_picker",
+        "label": "Select Pet Image",
+        "action": "choose",
+        "role": "photo_upload"
+       },
+       {
+        "type": "preview",
+        "asset": "asset:pet_preview_stage",
+        "style": "rounded",
+        "role": "photo_upload"
+       },
+       {
+        "type": "badge",
+        "text": "Quality Check Passed",
+        "style": "highlight",
+        "role": "photo_upload"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'upload_photos.replace.photo_upload[1]': a preview cannot do the photo_upload job (use ['button', 'checklist', 'image', 'photo_picker', 'text'])"
+   }
+  },
+  {
+   "title": "Post-Onboarding Control Summary Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Adds a dedicated summary screen detailing pet controls, hiding shortcuts, and interaction commands right before finishing.",
+   "why": "Support logged 3 complaints from users unclear on how to control, hide, or talk to their pet after setup.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_control_summary"
+    ],
+    "home_intro": {
+     "button_label": "Next: Pet Controls"
+    },
+    "new_control_summary": {
+     "headline": "Desktop Pet Controls",
+     "body": "Use quick shortcuts to summon, hide, or interact with your companion on your desktop at any time.",
+     "layout": "card",
+     "button_label": "Finish Setup"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a control summary screen after home_intro is explicitly allowed under Rule 4, and no required steps are removed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": -0.01,
+   "score": 6.08,
+   "score_note": "Adding a new screen on the finish step historically reduced conversion (-2.0%) and requires full UI release.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Move Sign-In After Friend Selection",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Moves the sign-in step to occur immediately after choosing a pet, building attachment before asking for authentication.",
+   "why": "Sign-in right after path choice creates early drop-off before users feel invested in a specific pet.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "sign_in",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in to occur after friend selection is explicitly permitted by Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.002,
+   "score": 6.05,
+   "score_note": "Reordering sign-in targets a high-drop step (20%) with mild historical success (+0.2%), but requires flow refactoring."
+  },
+  {
+   "title": "Waiting Screen Progress Checklist Redesign",
+   "target_step": "home",
+   "type": "redesign",
+   "change": "Redesigns the waiting screen layout into a checklist displaying setup milestones as pet assets download.",
+   "why": "The waiting step has a median time of 201s and mean of 2336s; a checklist layout keeps users informed during long loads.",
+   "config": {
+    "waiting": {
+     "layout": "checklist",
+     "headline": "Preparing Your Pet's Desktop Home",
+     "show_progress": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the waiting screen layout into a checklist retains its job of showing the pet is being prepared."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.025,
+   "score": 3.37,
+   "score_note": "Redesigning home screen previously yielded +2.7% (1 test), but home step already has high completion (92.1%)."
+  },
+  {
+   "title": "Story Value Narrative Headline Clarification",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Updates the story screen headline and body text to clearly explain the desktop pet concept up front.",
+   "why": "Path selection drops ~20.6% of users due to unclear early expectations of what the app provides.",
+   "config": {
+    "story": {
+     "headline": "Your New Desktop Companion Awaits",
+     "body": "Choose how your pet joins your daily workflow—as a quick ready-made buddy or a personalized companion."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating story screen copy clarifies the pet concept without violating copy/pricing restrictions."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.008,
+   "score": 6.28,
+   "score_note": "Low cost text change addressing high initial drop-off (20.6%), matching earlier +0.8% copy trial.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Finish Screen Quick Control Callout Hint",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Adds a hint on the finish screen displaying key shortcuts for toggling pet visibility on desktop.",
+   "why": "Finish hints previously won 2 out of 3 tests, and support reports users struggling to hide or control their pet.",
+   "config": {
+    "home_intro": {
+     "hint": "Press Alt+P anytime on your desktop to instantly show or hide your pet."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a shortcut callout hint to the home intro overlay stays within onboarding and introduces no dark patterns."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 7.2,
+   "score_note": "Strong alignment: support complaints and funnel drop point here, and finish hints consistently win (+4.0%)."
+  },
+  {
+   "title": "Sign-In Account Safety Reassurance Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Adds explanatory hint copy to the sign-in screen assuring users that signing in prevents pet loss.",
+   "why": "8 support tickets reported missing or reset pets after re-signing in; explicit reassurance addresses user anxiety.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in securely backs up your pet's personality and progress across all your devices."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding explanatory reassurance hint copy to sign-in is allowed and does not request new personal data."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 6.99,
+   "score_note": "8 support tickets and 20% sign-in drop provide strong evidence for a simple, low-cost copy reassurance hint.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Adoption Certificate Official Seal Incentive",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Adds a decorative official companion seal badge component to the adoption certificate.",
+   "why": "The adoption stage takes median 89s with ~18% drop-off; an official badge adds a rewarding milestone moment.",
+   "config": {
+    "adoption_certificate": {
+     "components": [
+      {
+       "type": "badge",
+       "text": "Official Desktop Companion",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a companion seal badge component to the adoption certificate maintains the certificate function."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.005,
+   "score": 5.84,
+   "score_note": "Untested change category (incentive) on adoption step; evidence remains thin."
+  },
+  {
+   "title": "Waiting Screen Asset Time Estimate",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Enables the estimated remaining time indicator component on the waiting screen during asset loading.",
+   "why": "Waiting step takes median 201s; displaying time estimates sets clear patience expectations for long downloads.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Enabling a time estimate indicator for asset loading reflects a real wait, which is allowed under Rule 5."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.008,
+   "score": 3.92,
+   "score_note": "High confidence config change (+0.8% across 11 tests) targeting long load times (median 201s).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": null
+  },
+  {
+   "title": "Split Layout Friend Selection Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the friend selection screen into a split layout with pet options on the left and live details on the right.",
+   "why": "Adoption conversion is 81.9%; a split layout gives equal visibility to pet options and character details.",
+   "config": {
+    "pick_friend": {
+     "layout": "split"
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the pick friend screen to a split layout preserves the core job of choosing a pet."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.005,
+   "score": 6.05,
+   "score_note": "Redesign shows modest gains (+1.2%), but adoption layout changes specifically degraded conversion in past tests (-2.3%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": null
+  }
+ ],
+ "picked": [
+  "Post-Onboarding Control Summary Screen",
+  "Split Layout Friend Selection Redesign",
+  "Sign-In Account Safety Reassurance Hint",
+  "Story Value Narrative Headline Clarification",
+  "Waiting Screen Asset Time Estimate"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 0,
+ "decisions": [
+  {
+   "test": "sim-70",
+   "title": "Post-Onboarding Control Summary Screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7766,
+     "treatment": 0.7474,
+     "lift": -0.0377,
+     "lift_se": 0.0224,
+     "p": 0.0977
+    },
+    "finish": {
+     "control": 0.306,
+     "treatment": 0.283,
+     "lift": -0.0752,
+     "lift_se": 0.037,
+     "p": 0.05067
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.08,
+   "predicted_lift": -0.01,
+   "true_lift_hidden": -0.0249,
+   "finishers_delta_hidden": -22.35
+  },
+  {
+   "test": "sim-71",
+   "title": "Split Layout Friend Selection Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.764,
+     "treatment": 0.7768,
+     "lift": 0.0167,
+     "lift_se": 0.0189,
+     "p": 0.372685
+    },
+    "finish": {
+     "control": 0.3017,
+     "treatment": 0.291,
+     "lift": -0.0354,
+     "lift_se": 0.0384,
+     "p": 0.365629
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.05,
+   "predicted_lift": 0.005,
+   "true_lift_hidden": 0.0177,
+   "finishers_delta_hidden": 15.89
+  },
+  {
+   "test": "sim-72",
+   "title": "Sign-In Account Safety Reassurance Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.7566,
+     "treatment": 0.742,
+     "lift": -0.0193,
+     "lift_se": 0.0169,
+     "p": 0.256979
+    },
+    "finish": {
+     "control": 0.3037,
+     "treatment": 0.2867,
+     "lift": -0.056,
+     "lift_se": 0.0377,
+     "p": 0.148879
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.99,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": -0.009,
+   "finishers_delta_hidden": -8.08
+  },
+  {
+   "test": "sim-73",
+   "title": "Story Value Narrative Headline Clarification",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.745,
+     "treatment": 0.742,
+     "lift": -0.004,
+     "lift_se": 0.0151,
+     "p": 0.790192
+    },
+    "finish": {
+     "control": 0.3033,
+     "treatment": 0.2843,
+     "lift": -0.0626,
+     "lift_se": 0.0375,
+     "p": 0.106212
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.28,
+   "predicted_lift": 0.008,
+   "true_lift_hidden": -0.0207,
+   "finishers_delta_hidden": -18.58
+  },
+  {
+   "test": "sim-74",
+   "title": "Waiting Screen Asset Time Estimate",
+   "target_step": "home",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": null,
+   "result": {
+    "step": {
+     "control": 0.8773,
+     "treatment": 0.8584,
+     "lift": -0.0215,
+     "lift_se": 0.0148,
+     "p": 0.149218
+    },
+    "finish": {
+     "control": 0.3113,
+     "treatment": 0.2853,
+     "lift": -0.0835,
+     "lift_se": 0.0363,
+     "p": 0.027742
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.92,
+   "predicted_lift": 0.008,
+   "true_lift_hidden": -0.0003,
+   "finishers_delta_hidden": -0.27
+  }
+ ],
+ "shipped": [],
+ "ends_week": 17,
+ "weights_next": {
+  "impact": 3.278,
+  "evidence": 0.388,
+  "confidence": 0.243,
+  "cost": 0.091
+ },
+ "lessons_next": [
+  "Predictions generally overestimate noise-corrected outcomes, though winning tests frequently exceed expected gains.",
+  "Finish hints were helpful, winning in two out of three tests.",
+  "Choose path hints showed no positive effect or degraded performance across four tests.",
+  "Adoption layout changes showed no positive effect or degraded performance across two tests.",
+  "Home notifications showed no effect across two tests.",
+  "Evidence remains thin for change kinds tested only once."
+ ]
+}

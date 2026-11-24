@@ -1,0 +1,427 @@
+{
+ "round": 4,
+ "starts_week": 4,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7620236999999999,
+  "adoption": 0.609,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.0,
+  "evidence": 1.0,
+  "confidence": 1.0,
+  "cost": 1.0
+ },
+ "lessons_used": [
+  "Predictions were consistently too high compared to noise-corrected measurements in all three rounds.",
+  "Evidence is still thin for adoption redesigns, as only one test has been completed and no clear effect was seen.",
+  "Evidence is still thin for sign-in reordering, as only one test has been completed, though that test was helpful (won).",
+  "Evidence is still thin for sign-in copy changes, as only one test has been completed and no clear effect was seen."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Pet Personality Carousel Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign the friend selection screen into an interactive carousel stage layout featuring animated mascot previews and personality badges.",
+   "why": "Adoption has the lowest conversion rate in the funnel at 60.9% and takes a mean of 1017 seconds, indicating high user hesitation when selecting a pet.",
+   "config": {
+    "pick_friend": {
+     "layout": "stage",
+     "headline": "Meet Your New Desktop Companion",
+     "body": "Choose a pet companion that fits your daily routine and workflow style.",
+     "replace": {
+      "pet_choices": [
+       {
+        "role": "pet_choices",
+        "type": "choice_cards",
+        "label": "Select Companion",
+        "style": "playful",
+        "action": "choose"
+       },
+       {
+        "role": "pet_choices",
+        "type": "mascot",
+        "asset": "asset:mascot_preview",
+        "style": "large"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'pick_friend.replace.pet_choices[1]': a mascot cannot do the pet_choices job (use ['animation', 'button', 'choice_cards', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Interactive Pet Nursery Waiting Screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Insert a new interactive nursery screen during waiting where users can play sound effects and view pet assembly progress before desktop launch.",
+   "why": "The waiting step has an extreme mean time of 2336 seconds (median 201s), causing users to abandon or assume the pet failed to spawn.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_nursery_wait",
+     "home_intro"
+    ],
+    "waiting": {
+     "headline": "Creating Your Desktop Pet",
+     "show_time_estimate": true,
+     "components": [
+      {
+       "type": "progress",
+       "label": "Preparing 3D desktop model",
+       "style": "highlight"
+      },
+      {
+       "type": "button",
+       "text": "Visit Nursery Preview",
+       "style": "playful",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_nursery_wait']"
+   }
+  },
+  {
+   "title": "Post-Adoption Sign-In Shift",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Move the sign-in step to occur right after adoption certificate generation so users form an emotional bond before creating an account.",
+   "why": "Sign-in right after path selection causes early dropoff (76.2% step conversion). Moving sign-in after adoption certificate leverages high user investment.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ],
+    "sign_in": {
+     "headline": "Save Your New Pet to Account",
+     "body": "Sign in now to sync your adoption certificate and preserve your pet progress.",
+     "hint": "Using your main login ensures custom pet files link to your saved profile."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Moving sign-in step after adoption certificate is explicitly permitted by Rule 4."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.035,
+   "score": 5.83,
+   "score_note": "Target step drops 23.8% of users. Past test for sign-in reordering showed positive lift (+3.7%).",
+   "slot": "big move",
+   "share": 0.5,
+   "planned_harm": 104.2
+  },
+  {
+   "title": "Desktop Companion Launch Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Add a dedicated desktop arrival flow with a spotlight view screen showing how the pet lands on your taskbar.",
+   "why": "3 support emails reported pets not appearing on the desktop, and finish step conversion is low at 64.8% with 5815s mean time.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_desktop_arrival",
+     "home_intro"
+    ],
+    "home_intro": {
+     "layout": "spotlight",
+     "headline": "Your Pet Has Arrived on Desktop!",
+     "body": "Look at the bottom corner of your screen to see your pet active and walking.",
+     "button_label": "Say Hello!"
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order names screens that are neither onboarding screens nor defined here: ['new_desktop_arrival']"
+   }
+  },
+  {
+   "title": "Real-Time Pet Render Status Counter",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Add precise dynamic status updates and estimated time remaining indicators on the waiting screen.",
+   "why": "Waiting step dropoff and support reports of desktop pets failing to open stem from lack of feedback during long setup renders.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "hint": "Generating high-resolution desktop animations. This usually takes 2-3 minutes.",
+     "components": [
+      {
+       "type": "timer",
+       "label": "Estimated finish time",
+       "style": "calm"
+      },
+      {
+       "type": "tip_carousel",
+       "text": "Did you know? Your pet stays active while you work in other apps.",
+       "style": "subtle"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding real wait progress indicators and status updates on waiting screen is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.025,
+   "score": 6.67,
+   "score_note": "Both support emails and long mean duration (2336s) point to render waiting friction.",
+   "slot": "best score"
+  },
+  {
+   "title": "Clear Path Selection Guidance",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Update the choose path headline and hint to clearly explain pre-made vs custom pet creation paths.",
+   "why": "Choose path takes a mean time of 514s despite being the first step, showing user confusion over which route to take.",
+   "config": {
+    "choose_path": {
+     "headline": "How Would You Like to Create Your Pet?",
+     "body": "Pick an instant companion template or craft a unique custom pet from your photos.",
+     "hint": "You can always adopt additional pets of any type later."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updated copy maintains jobs of choosing pre-made or custom pet without violating pricing copy rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.015,
+   "score": 5.42,
+   "score_note": "High mean duration (514s vs 8s median) suggests confusion; copy fix is low cost.",
+   "slot": "best score"
+  },
+  {
+   "title": "Photo Upload Guided Split Screen",
+   "target_step": "adoption",
+   "type": "layout",
+   "change": "Switch photo upload layout to a split view showing live image requirements alongside the upload dropzone.",
+   "why": "3 support emails reported custom pet creation failures or poor rendering results, and adoption mean duration is 1017s.",
+   "config": {
+    "upload_photos": {
+     "layout": "split",
+     "headline": "Upload Clear Pet Photos",
+     "hint": "Best results: Well-lit front face photos with visible ears.",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Front view photo, Good lighting, Neutral background",
+       "style": "rounded"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Split screen layout redesign for photo upload retains screen job and complies with rules."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.02,
+   "score": 5.0,
+   "score_note": "Adoption has highest dropoff (60.9% conv) and support emails, but past adoption redesigns had low lift (+0.2%).",
+   "slot": "best score"
+  },
+  {
+   "title": "Adoption Welcome Gift Badge",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Display a dynamic starter bonus badge on the home intro screen giving new users initial pet treats upon finishing.",
+   "why": "Finish conversion drops to 64.8%. Giving an immediate welcome bonus increases motivation to finalize onboarding.",
+   "config": {
+    "home_intro": {
+     "headline": "Welcome Home! Here is Your Starter Gift",
+     "body": "Your pet brought 50 starter treats to help you get acquainted.",
+     "components": [
+      {
+       "type": "badge",
+       "label": "+50 Starter Treats Unlocked",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions gifts ('Starter Gift', '+50 Starter Treats'), which violates Rule 3."
+   }
+  },
+  {
+   "title": "Pet Ready System Desktop Notification",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Enable background desktop notification option on the waiting screen to alert users when rendering finishes.",
+   "why": "High mean wait times (2336s) cause users to minimize or forget the desktop pet app during background pet generation.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "headline": "We are Preparing Your Desktop Companion",
+     "body": "Feel free to minimize this window. We will send a notification when your pet is ready."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding background notification toggle on waiting screen during onboarding is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.02,
+   "score": 3.75,
+   "score_note": "Addresses high wait duration on home screen (2336s mean), but requires system notification code."
+  },
+  {
+   "title": "Sign-In Existing Pet Account Sync Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add prominent sign-in hint clarifying account synchronization to prevent duplicate account creation.",
+   "why": "8 support emails complained about pets missing or reset after signing in again, indicating users sign into wrong or duplicate accounts.",
+   "config": {
+    "sign_in": {
+     "headline": "Sign In to Keep Your Pet Safe",
+     "hint": "Sign in with your previous login method to automatically restore your adopted pets.",
+     "components": [
+      {
+       "type": "text",
+       "text": "Already adopted a pet before? Use your original account to restore it.",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding helpful account sync guidance hint to sign-in screen complies with rules."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.005,
+   "score": 5.0,
+   "score_note": "Strong support mail evidence (8 emails), but previous sign-in copy change yielded negative lift (-0.6%)."
+  }
+ ],
+ "picked": [
+  "Post-Adoption Sign-In Shift"
+ ],
+ "held_by_harm_budget": [
+  "Real-Time Pet Render Status Counter",
+  "Clear Path Selection Guidance",
+  "Photo Upload Guided Split Screen"
+ ],
+ "harm_budget": 111.8,
+ "planned_harm": 104.2,
+ "decisions": [
+  {
+   "test": "sim-4",
+   "title": "Post-Adoption Sign-In Shift",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "weeks": 1,
+   "hours": null,
+   "share": 0.5,
+   "planned_harm": 104.2,
+   "result": {
+    "step": {
+     "control": 0.7551,
+     "treatment": 0.7752,
+     "lift": 0.0266,
+     "lift_se": 0.0236,
+     "p": 0.253553
+    },
+    "finish": {
+     "control": 0.1773,
+     "treatment": 0.19,
+     "lift": 0.0714,
+     "lift_se": 0.0825,
+     "p": 0.370323
+    },
+    "users_per_group": 1500
+   },
+   "outcome": "lost: no clear effect",
+   "score": 5.83,
+   "predicted_lift": 0.035,
+   "true_lift_hidden": -0.0079,
+   "finishers_delta_hidden": -2.3
+  }
+ ],
+ "shipped": [],
+ "ends_week": 4,
+ "weights_next": {
+  "impact": 1.76,
+  "evidence": 0.33,
+  "confidence": 0.842,
+  "cost": 1.068
+ },
+ "lessons_next": [
+  "Predictions were consistently too high compared to noise-corrected measurements across all four rounds.",
+  "Evidence is still thin for adoption redesigns, as only one test has been completed and no clear effect was seen.",
+  "Evidence is still thin for sign-in copy changes, as only one test has been completed and no clear effect was seen.",
+  "Sign-in reordering changes average +2.6% after noise correction across two positive tests, with one test proving helpful (won) and one showing no clear effect."
+ ]
+}

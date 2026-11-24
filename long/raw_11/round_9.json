@@ -1,0 +1,469 @@
+{
+ "round": 9,
+ "starts_week": 9,
+ "funnel": {
+  "choose_path": 0.778521684,
+  "sign_in": 0.82359918914724,
+  "adoption": 0.6420687,
+  "home": 0.8385282000000001,
+  "finish": 0.7847031816000001
+ },
+ "weights_used": {
+  "impact": 1.502,
+  "evidence": 2.294,
+  "confidence": 0.109,
+  "cost": 0.095
+ },
+ "lessons_used": [
+  "Helpful changes (won): Reordering sign-in after adoption, specific desktop flows (summon, visibility & control), targeted hints (photo upload, path decision, sign-in security), single-click and card carousel layouts, and desktop control redesigns consistently won.",
+  "Harmful changes (worse): Streamlined path copy, companion name certification copy, the account persistence hint, and the spotlight path selector layout significantly hurt performance.",
+  "No clear effect: Background notifications, tutorial/showcase screens, wait time/loading indicators, incentives, and various copy and layout variations showed no clear effect.",
+  "Predictions too high: Large predicted gains (e.g., +14.0% and +15.0%) were routinely overestimated, often leading to smaller actual gains or no clear effect.",
+  "Predictions too low: Major wins were significantly underestimated, most notably the desktop visibility onboarding flow (+4.5% predicted vs +16.6% measured), desktop summon flow (+1.0% vs +8.6%), and sign-in security hint (-4.0% vs +3.1%)."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Two Column Path Decision Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "change": "Reconfigures the choose path screen into a side-by-side two-column layout comparing preset pets versus custom pet creation.",
+   "why": "Path selection has a high mean duration of 514s; presenting both options side by side makes the distinction clearer immediately.",
+   "config": {
+    "choose_path": {
+     "layout": "two_column",
+     "hint": "Choose standard companion presets or create a custom pet from your photos."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the choose path layout into two columns while preserving options for adoption and custom pet creation."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 3.42,
+   "score_note": "Path selection has long mean duration but layout variations show minor impact historically (+0.2%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 167.2
+  },
+  {
+   "title": "Pre-Adoption Account Verification Screen",
+   "target_step": "sign_in",
+   "type": "new_screen",
+   "change": "Inserts a screen prior to sign-in asking users whether they are restoring an existing pet or creating a new account.",
+   "why": "8 support emails complained about pets missing or reset after signing in with an alternate account method.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "new_account_mode_select",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ],
+    "new_account_mode_select": {
+     "headline": "Existing Owner or New Companion?",
+     "body": "If you already created a pet before, select restore so your pet is not overwritten.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "button",
+       "label": "Restore Existing Pet",
+       "style": "emphasis",
+       "action": "next"
+      },
+      {
+       "type": "button",
+       "label": "Create New Pet Account",
+       "style": "plain",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "screen 'new_account_mode_select' is not part of onboarding (new screens are named new_..., and may not look like payment, account, sign-up or settings screens)"
+   }
+  },
+  {
+   "title": "Compact Certificate Adoption Redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesigns the adoption certificate screen using a streamlined compact layout to make naming and confirmation faster.",
+   "why": "Adoption is the largest bottleneck in the funnel at 64.2% conversion with a median time of 89s.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "compact",
+     "headline": "Name Your Desktop Companion",
+     "body": "Confirm your pet's name to complete the adoption process.",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "name_input",
+        "text": "Pet Name",
+        "style": "rounded"
+       },
+       {
+        "role": "certificate",
+        "type": "text",
+        "text": "Official Pet Adoption Certificate",
+        "style": "subtle"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[0]': a name_input cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  },
+  {
+   "title": "Desktop Docking Setup Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "change": "Adds an interactive screen anchoring step before home intro to define where the pet docks on screen.",
+   "why": "3 support tickets reported that pets do not show on the desktop or the app fails to open after onboarding.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "new_docking_step",
+     "home_intro"
+    ],
+    "new_docking_step": {
+     "headline": "Select Desktop Home Position",
+     "body": "Pick which corner of your screen your pet should stay near when idle.",
+     "layout": "centered",
+     "components": [
+      {
+       "type": "choice_cards",
+       "label": "Screen Corner",
+       "style": "rounded",
+       "action": "choose"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a new onboarding screen before home_intro, which is permitted by onboarding rules."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.1,
+   "score": 6.6,
+   "score_note": "Desktop setup/visibility flows strongly perform (+16.6% historically) and address specific support complaints.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 90.3
+  },
+  {
+   "title": "Account Sign-In Recovery Email Hint",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Displays an explicit hint on the sign-in screen reminding users to sign in with their original purchase or pre-order email.",
+   "why": "8 support emails involved account resets and missing pets due to logging in with wrong accounts.",
+   "config": {
+    "sign_in": {
+     "hint": "Use the exact email address from your purchase to preserve existing pet saves."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'sign_in.hint' asks for or mentions personal data"
+   }
+  },
+  {
+   "title": "Generation Status Timer Overview",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Adds explicit step checklist components and progress timer info to the waiting screen during pet creation.",
+   "why": "Home wait step has a long mean time of 2336s and 3 users reported generation stalls or bugs.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "components": [
+      {
+       "type": "timer",
+       "text": "Estimated wait: ~60s",
+       "style": "small"
+      },
+      {
+       "type": "checklist",
+       "text": "1. Building 3D model\\n2. Animating behaviors\\n3. Spawning on desktop",
+       "style": "plain"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "text in 'waiting.components[0].text' has characters outside the allowed set: ['~']"
+   }
+  },
+  {
+   "title": "Custom Photo Multi-Angle Hint",
+   "target_step": "adoption",
+   "type": "hint",
+   "change": "Adds quality guidance copy on photo upload requesting clear front-facing photos with balanced lighting.",
+   "why": "3 support tickets mentioned custom pets failing or looking distorted after photo creation.",
+   "config": {
+    "upload_photos": {
+     "hint": "For best results, upload clear front-facing photos with good lighting and no heavy filters."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adds valid quality guidance copy to the photo upload screen."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 2
+   },
+   "predicted_lift": 0.03,
+   "score": 10.0,
+   "score_note": "Targets highest drop-off step (adoption at 64.2%) with photo hints proven to be effective and easy to configure."
+  },
+  {
+   "title": "Pick Friend Before Story Sequence Reorder",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Reorders the journey to place path choice before the intro story so users choose their flow immediately.",
+   "why": "The initial choose_path stage has a high mean time of 514s; putting action before intro reduces bounce rate.",
+   "config": {
+    "_order": [
+     "choose_path",
+     "story",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "sign_in",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "existing screens must keep their order; only sign_in may move"
+   }
+  },
+  {
+   "title": "Onboarding Desktop Interaction Callout",
+   "target_step": "finish",
+   "type": "incentive",
+   "change": "Adds a mascot guide component on the final home screen highlighting right-click desktop controls.",
+   "why": "3 support emails indicated post-onboarding confusion on how to control, hide, or interact with the pet.",
+   "config": {
+    "home_intro": {
+     "headline": "Your Companion is Ready!",
+     "body": "Right-click your pet anywhere on your desktop to hide, chat, or access controls.",
+     "components": [
+      {
+       "type": "mascot",
+       "asset": "asset:mascot_guide",
+       "style": "playful"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Modifies home_intro overlay, which is part of onboarding and allowed to change."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.01,
+   "score": 5.33,
+   "score_note": "Incentives/showcases have weak historical performance despite support emails."
+  },
+  {
+   "title": "Split Personality Pick Friend Layout",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Replaces the pick friend list with a split layout comparing pet personality archetypes side-by-side.",
+   "why": "Adoption has the lowest conversion rate (64.2%); side-by-side comparison reduces selection indecision.",
+   "config": {
+    "pick_friend": {
+     "layout": "split",
+     "headline": "Select Companion Personality",
+     "body": "Compare companion traits side-by-side to find the right fit for your desktop."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the pick friend screen layout while retaining its core function of letting the user choose a pet."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.035,
+   "score": 7.71,
+   "score_note": "High potential impact at lowest funnel step (adoption); layout redesigns showed +2.7% gain previously.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 167.2
+  }
+ ],
+ "picked": [
+  "Split Personality Pick Friend Layout",
+  "Desktop Docking Setup Flow",
+  "Two Column Path Decision Layout"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 424.7,
+ "decisions": [
+  {
+   "test": "sim-32",
+   "title": "Split Personality Pick Friend Layout",
+   "target_step": "adoption",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": 44,
+   "share": 1.0,
+   "planned_harm": 167.2,
+   "result": {
+    "step": {
+     "control": 0.6577,
+     "treatment": 0.5714,
+     "lift": -0.1312,
+     "lift_se": 0.0394,
+     "p": 0.001769
+    },
+    "finish": {
+     "control": 0.3628,
+     "treatment": 0.2799,
+     "lift": -0.2287,
+     "lift_se": 0.0534,
+     "p": 0.000159
+    },
+    "users_per_group": 904
+   },
+   "outcome": "stopped early: finish_overall worse",
+   "score": 7.71,
+   "predicted_lift": 0.035,
+   "true_lift_hidden": -0.1367,
+   "finishers_delta_hidden": -41.35
+  },
+  {
+   "test": "sim-33",
+   "title": "Desktop Docking Setup Flow",
+   "target_step": "finish",
+   "type": "new_flow",
+   "weeks": 1,
+   "hours": 55,
+   "share": 1.0,
+   "planned_harm": 90.3,
+   "result": {
+    "step": {
+     "control": 0.8243,
+     "treatment": 0.7404,
+     "lift": -0.1018,
+     "lift_se": 0.0309,
+     "p": 0.001929
+    },
+    "finish": {
+     "control": 0.3194,
+     "treatment": 0.3211,
+     "lift": 0.0055,
+     "lift_se": 0.0612,
+     "p": 0.928655
+    },
+    "users_per_group": 1146
+   },
+   "outcome": "stopped early: finish worse",
+   "score": 6.6,
+   "predicted_lift": 0.1,
+   "true_lift_hidden": -0.0728,
+   "finishers_delta_hidden": -27.56
+  },
+  {
+   "test": "sim-34",
+   "title": "Two Column Path Decision Layout",
+   "target_step": "choose_path",
+   "type": "layout",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 167.2,
+   "result": {
+    "step": {
+     "control": 0.7983,
+     "treatment": 0.811,
+     "lift": 0.0159,
+     "lift_se": 0.0129,
+     "p": 0.215937
+    },
+    "finish": {
+     "control": 0.2973,
+     "treatment": 0.309,
+     "lift": 0.0392,
+     "lift_se": 0.0407,
+     "p": 0.32557
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.42,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": 0.0049,
+   "finishers_delta_hidden": 4.32
+  }
+ ],
+ "shipped": [],
+ "ends_week": 9,
+ "weights_next": {
+  "impact": 1.406,
+  "evidence": 2.4,
+  "confidence": 0.097,
+  "cost": 0.097
+ },
+ "lessons_next": [
+  "Helpful changes: Reordering sign-in after adoption, specific desktop flows (summon, visibility & control), targeted hints (photo upload, path helper, sign-in security), card carousel/single-click layouts, and control redesigns consistently won.",
+  "Harmful changes: Desktop docking setup flow, spotlight path selector layout, split personality redesign, account persistence hint, and specific copy changes (streamlined path copy, companion name certification copy) significantly hurt performance.",
+  "No clear effect: Loading/wait/progress indicators, notifications, tutorial/showcase screens, incentives, and several copy and layout variations showed no clear effect.",
+  "Predictions too high: Large predicted gains (+8.5% to +15.0%) consistently overestimated actual impact, frequently resulting in minor gains, no clear effect, or early test cutoffs.",
+  "Predictions too low: Major winning tests—especially key desktop flows (visibility & control, summon flow), card carousel layout, and sign-in security hint—were significantly underestimated."
+ ]
+}

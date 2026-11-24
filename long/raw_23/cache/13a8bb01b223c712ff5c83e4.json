@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_flow] Interactive Desktop Pet Routine Sandbox Flow: Adds an interactive routine sandbox to the final onboarding step where users can test feeding, sleeping, and moving the pet before launching to desktop.\n   config: {\"home_intro\": {\"headline\": \"Practice Caring for Your Desktop Pet\", \"body\": \"Try feeding, calling, and guiding your pet in this interactive sandbox before sending it to your desktop.\", \"button_label\": \"Launch Pet to Desktop\", \"components\": [{\"type\": \"mascot\", \"label\": \"Interactive Pet\", \"asset\": \"asset:pet_interactive\", \"style\": \"playful\", \"action\": \"play\"}, {\"type\": \"button\", \"label\": \"Feed Treat\", \"style\": \"rounded\", \"action\": \"play\"}, {\"type\": \"button\", \"label\": \"Call Pet\", \"style\": \"rounded\", \"action\": \"play\"}]}}\n1: [sign_in, copy] Account Restoration Sign-In Explanation Copy: Updates sign-in headline and body copy to explicitly assure returning users that signing in restores existing pets and prevents account duplication.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Keep & Restore Your Pets\", \"body\": \"Signing in connects your pet safely to your account so you never lose progress, even when logging in on new devices.\", \"hint\": \"Already have an account? Sign in with the same email to restore your existing pets instantly.\", \"button_label\": \"Continue with Account\"}}\n2: [home, new_flow] Interactive Pet Emotion Sound Board Flow: Integrates an interactive pet emotion sound board into the waiting screen, allowing users to test pet sound cues and reactions while setup finishes.\n   config: {\"waiting\": {\"headline\": \"Your Pet is Getting Ready!\", \"body\": \"Tap the sound buttons below to hear your pet's vocalizations while we initialize its animations.\", \"components\": [{\"type\": \"sound\", \"label\": \"Happy Purr\", \"asset\": \"asset:sound_purr\", \"style\": \"playful\", \"action\": \"play\"}, {\"type\": \"sound\", \"label\": \"Playful Bark\", \"asset\": \"asset:sound_bark\", \"style\": \"playful\", \"action\": \"play\"}, {\"type\": \"sound\", \"label\": \"Sleepy Chirp\", \"asset\": \"asset:sound_chirp\", \"style\": \"playful\", \"action\": \"play\"}]}}\n3: [adoption, new_screen] Interactive Pet Personality Quiz Screen: Inserts a short, interactive personality quiz screen right before adoption certificate to let users pick active, calm, or curious pet dispositions.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"new_personality_quiz\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_personality_quiz\": {\"headline\": \"What is Your Pet's Personality?\", \"body\": \"Select disposition traits that determine how your desktop companion reacts and plays throughout the day.\", \"button_label\": \"Confirm Trait Profile\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Energetic & Playful\", \"style\": \"highlight\", \"action\": \"choose\"}, {\"type\": \"choice_cards\", \"label\": \"Calm & Studio Cozy\", \"style\": \"calm\", \"action\": \"choose\"}, {\"type\": \"choice_cards\", \"label\": \"Curious Explorer\", \"style\": \"rounded\", \"action\": \"choose\"}]}}\n4: [choose_path, reorder] Reorder Story Sequence After Path Choice: Moves the introductory story screen to follow path choice, letting users choose their initial journey path immediately upon opening the app.\n   config: {\"_order\": [\"choose_path\", \"story\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n5: [finish, copy] Desktop Pet Taskbar Control Guidance Copy: Adds explicit instructions and hint copy to the home intro screen detailing how to summon, minimize, and access pet controls via system tray.\n   config: {\"home_intro\": {\"headline\": \"Your Desktop Companion is Ready!\", \"body\": \"Look for your pet on screen! Right-click its system tray icon in the taskbar anytime to change settings, play, or hide it.\", \"hint\": \"Shortcut: Press Ctrl+Shift+P anytime to instantly bring your pet to the front of your desktop.\", \"button_label\": \"Got It, Start Playing!\"}}\n6: [adoption, wait_info] Photo Processing Safety and Retry Indicator: Provides real-time feedback and photo processing status on the photo upload screen to prevent silent failures during custom pet generation.\n   config: {\"upload_photos\": {\"headline\": \"Uploading & Analyzing Photo\", \"body\": \"Checking lighting and pet boundaries to ensure accurate pet generation.\", \"hint\": \"For best results, upload clear photos with distinct contrast against the background.\", \"show_progress\": true, \"show_time_estimate\": true, \"components\": [{\"type\": \"progress\", \"label\": \"Photo Analysis Progress\", \"style\": \"plain\"}]}}\n7: [home, new_flow] Interactive Desktop Workspace Decorator Flow: Adds an interactive desktop preview decorator flow on the waiting screen where users place virtual pet beds and toys while files load.\n   config: {\"waiting\": {\"headline\": \"Decorate Your Pet's Desktop Corner\", \"body\": \"Arrange items on this mini desktop canvas while your pet finishes rendering.\", \"components\": [{\"type\": \"preview\", \"label\": \"Desktop Corner Canvas\", \"asset\": \"asset:desktop_canvas\", \"style\": \"large\"}, {\"type\": \"button\", \"label\": \"Place Cushion\", \"style\": \"rounded\", \"action\": \"play\"}, {\"type\": \"button\", \"label\": \"Add Toy Box\", \"style\": \"rounded\", \"action\": \"play\"}]}}\n8: [choose_path, incentive] Path Selection Starter Item Incentive: Displays an exclusive starter badge and toy item on each path option to incentivize users to make a choice quickly.\n   config: {\"choose_path\": {\"headline\": \"Choose Your Journey & Claim a Starter Accessory\", \"body\": \"Each path unlocks a unique starter accessory for your desktop companion.\", \"components\": [{\"type\": \"badge\", \"label\": \"Includes Golden Collar Perk\", \"style\": \"highlight\"}, {\"type\": \"badge\", \"label\": \"Includes Cozy Cushion Perk\", \"style\": \"highlight\"}]}}\n9: [finish, new_screen] Interactive Desktop Diagnostic & Calibration Screen: Adds a final system calibration step screen (`new_diagnostic_screen`) to test screen resolution and verify desktop pet overlay rendering before exiting.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"sign_in\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_diagnostic_screen\"], \"new_diagnostic_screen\": {\"headline\": \"Desktop Visibility & Overlay Check\", \"body\": \"We are verifying your display overlay settings so your pet wanders smoothly across all monitors.\", \"button_label\": \"Complete Onboarding\", \"components\": [{\"type\": \"checklist\", \"label\": \"Display Boundary Test\", \"style\": \"plain\"}, {\"type\": \"checklist\", \"label\": \"System Tray Link Test\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Test Pet Visibility Call\", \"style\": \"emphasis\", \"action\": \"play\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid interactive sandbox flow added to home intro within onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update explaining account restoration on the sign-in screen."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid waiting screen enhancement that continues to inform the user the pet is being prepared."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid insertion of a new personality quiz screen into the onboarding sequence."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid reordering of story and path choice steps within onboarding."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update providing guidance on the home intro overlay."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid progress feedback added to the photo upload screen."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid mini desktop canvas added to the waiting screen while keeping the pet setup context."
+   },
+   {
+    "index": 8,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions perks and starter accessory gifts, violating Rule 3."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid new diagnostic screen placed after home intro as permitted by Rule 4."
+   }
+  ]
+ }
+}

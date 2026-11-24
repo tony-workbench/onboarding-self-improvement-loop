@@ -1,0 +1,504 @@
+{
+ "round": 2,
+ "starts_week": 2,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7607115000000001,
+  "adoption": 0.6931029000000001,
+  "home": 0.813,
+  "finish": 0.648
+ },
+ "weights_used": {
+  "impact": 1.37,
+  "evidence": 1.023,
+  "confidence": 0.844,
+  "cost": 0.763
+ },
+ "lessons_used": [
+  "Bypassing onboarding steps directly (new_flow) significantly improves user conversion.",
+  "Reordering friction by moving sign-in after pet selection (reorder) significantly improves conversion.",
+  "Copy improvements, permission checks during setup, and layout changes showed no clear effect.",
+  "Predictions consistently overestimated actual measured gains across all tests."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Move sign-in to final onboarding step",
+   "target_step": "sign_in",
+   "type": "reorder",
+   "change": "Shift the sign-in screen to the very end of onboarding after desktop setup, so users interact with their pet before logging in.",
+   "why": "Support shows pets missing/reset after sign in (8 emails) and sign-in drops off users early. Moving sign-in after home intro reduces initial friction.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "sign_in"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "home_intro must come after every existing screen, sign_in included"
+   }
+  },
+  {
+   "title": "Direct one-click adopt flow",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Skip photo uploading and customization screens by providing a single-click instant pet choice flow during adoption.",
+   "why": "Adoption conversion is 69.3% with high mean time (1017s). Bypassing photo upload reduces drop-off and generation failure bugs.",
+   "config": {
+    "pick_friend": {
+     "headline": "Choose Your Companion",
+     "button_label": "Adopt Instantly"
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "_order leaves out existing screens ['upload_photos']: no step may be removed"
+   }
+  },
+  {
+   "title": "Desktop pet launchpad redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "change": "Redesign the home intro step into a spotlight layout with an instant pet spawn preview and quick desktop control keys.",
+   "why": "Finish conversion is 64.8% and median time is long (395s); users also complain about desktop features misbehaving or unclear controls.",
+   "config": {
+    "home_intro": {
+     "layout": "spotlight",
+     "headline": "Meet Your Desktop Companion",
+     "body": "Your pet is ready! Use Alt+P to summon or hide your pet anytime.",
+     "components": [
+      {
+       "type": "mascot",
+       "style": "playful",
+       "action": "next"
+      },
+      {
+       "type": "button",
+       "label": "Launch Pet",
+       "style": "emphasis",
+       "action": "next"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the home intro screen layout while keeping its core job is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.03,
+   "score": 4.84,
+   "score_note": "Target step loses ~35% of users with clear support and time evidence, but layout redesigns have shown no clear effect in past tests.",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 101.0
+  },
+  {
+   "title": "Pet care orientation screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Insert a new orientation screen before completing onboarding that demonstrates desktop controls and pet interaction.",
+   "why": "Support receives multiple tickets regarding unclear pet controls and desktop feature misbehavior (7 emails total).",
+   "config": {
+    "home_intro": {
+     "headline": "Orientation Complete",
+     "body": "Your desktop companion is active and ready."
+    },
+    "new_orientation": {
+     "headline": "Pet Control Basics",
+     "body": "Drag your pet to move it around your desktop. Right click for interactions.",
+     "layout": "centered"
+    },
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_orientation",
+     "home_intro"
+    ]
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new orientation screen inside onboarding is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 0
+   },
+   "predicted_lift": 0.01,
+   "score": 3.99,
+   "score_note": "Addresses 7 support tickets, but adding a new screen increases friction, contradicting lessons on simplifying flows."
+  },
+  {
+   "title": "Generation status notification on wait screen",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Add system notification prompt on the waiting screen to alert users when pet creation finishes if the app is minimized.",
+   "why": "Waiting stage mean time is 2336s and users drop off or experience app stalls.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "headline": "Creating Your Pet...",
+     "body": "We will notify you as soon as your pet is ready on your desktop."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding system notifications to the waiting screen is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 2,
+    "confidence": 1,
+    "cost": 1
+   },
+   "predicted_lift": 0.04,
+   "score": 6.0,
+   "score_note": "Addresses extreme mean wait duration (2336s) by re-engaging minimized users via push notifications.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 152.4
+  },
+  {
+   "title": "Real-time generation wait progress tips",
+   "target_step": "home",
+   "type": "wait_info",
+   "change": "Display animated pet tips and time estimates on the waiting screen while pet files compile in the background.",
+   "why": "The waiting step home has a mean duration of 2336s; keeping users engaged with tips reduces abandonment.",
+   "config": {
+    "waiting": {
+     "show_time_estimate": true,
+     "show_progress": true,
+     "tip_delay_seconds": 5,
+     "components": [
+      {
+       "type": "tip_carousel",
+       "style": "calm",
+       "text": "Did you know? Desktop pets love resting on active windows."
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding wait progress indicators and tips during a real wait is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": 0.005,
+   "score": 2.95,
+   "score_note": "Directly tested previously as home wait_info with only a +0.5% relative gain."
+  },
+  {
+   "title": "Certificate completion reward badge",
+   "target_step": "adoption",
+   "type": "incentive",
+   "change": "Display an official adoption badge and reward unlock on the adoption certificate screen upon completing registration.",
+   "why": "Adoption has a 69.3% conversion rate; adding visible achievement feedback encourages completing the certificate step.",
+   "config": {
+    "adoption_certificate": {
+     "headline": "Adoption Official!",
+     "body": "Your pet certificate is registered. Unlock special starter items upon setup completion.",
+     "components": [
+      {
+       "type": "badge",
+       "label": "Official Adoption Verified",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions unlocking special starter items (gifts/extras)."
+   }
+  },
+  {
+   "title": "Account recovery safety hint on sign-in",
+   "target_step": "sign_in",
+   "type": "hint",
+   "change": "Add a visible account persistence hint on the sign-in screen informing users how pets sync across re-logins.",
+   "why": "8 support emails reported lost or reset pets after signing back into their accounts.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in ensures your desktop pet data and customizations are saved safely to the cloud."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding sign-in persistence guidance text is allowed."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 2,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 4.75,
+   "score_note": "Low cost update backed by 8 support emails, though copy changes historically yield negligible measured lift.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 152.4
+  },
+  {
+   "title": "Simplified path selection guidance",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Simplify path selection text with clear, direct headlines emphasizing fast setup versus custom creation.",
+   "why": "Path selection takes a mean of 514s; clear copy speeds up choice decision.",
+   "config": {
+    "choose_path": {
+     "headline": "Select Your Setup Mode",
+     "body": "Pick Quick Starter for instant play, or Custom Pet to upload your own design.",
+     "hint": "You can change your pet anytime after setup."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Path selection copy preserves options for both adopting and making a custom pet."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 2
+   },
+   "predicted_lift": 0.0,
+   "score": 3.9,
+   "score_note": "Easy config change addressing 514s duration, but copy improvements have shown no clear impact.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 152.4
+  },
+  {
+   "title": "Adoption certificate stage redesign",
+   "target_step": "adoption",
+   "type": "redesign",
+   "change": "Redesign adoption certificate screen into a stage layout replacing the static certificate with interactive naming and stamp component.",
+   "why": "Adoption stage has 69.3% conversion rate; an interactive stage visual increases completion speed and commitment.",
+   "config": {
+    "adoption_certificate": {
+     "layout": "stage",
+     "headline": "Name Your Pet",
+     "replace": {
+      "certificate": [
+       {
+        "role": "certificate",
+        "type": "name_input",
+        "label": "Pet Name",
+        "style": "rounded"
+       },
+       {
+        "role": "certificate",
+        "type": "button",
+        "label": "Confirm Adoption",
+        "style": "emphasis",
+        "action": "next"
+       }
+      ]
+     }
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "'adoption_certificate.replace.certificate[0]': a name_input cannot do the certificate job (use ['animation', 'badge', 'image', 'preview', 'text'])"
+   }
+  }
+ ],
+ "picked": [
+  "Desktop pet launchpad redesign",
+  "Generation status notification on wait screen",
+  "Account recovery safety hint on sign-in",
+  "Simplified path selection guidance"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 558.2,
+ "decisions": [
+  {
+   "test": "sim-6",
+   "title": "Desktop pet launchpad redesign",
+   "target_step": "finish",
+   "type": "redesign",
+   "weeks": 1,
+   "hours": 80,
+   "share": 1.0,
+   "planned_harm": 101.0,
+   "result": {
+    "step": {
+     "control": 0.6977,
+     "treatment": 0.6136,
+     "lift": -0.1206,
+     "lift_se": 0.0371,
+     "p": 0.002132
+    },
+    "finish": {
+     "control": 0.2519,
+     "treatment": 0.2136,
+     "lift": -0.1522,
+     "lift_se": 0.0531,
+     "p": 0.008246
+    },
+    "users_per_group": 1695
+   },
+   "outcome": "stopped early: finish worse",
+   "score": 4.84,
+   "predicted_lift": 0.03,
+   "true_lift_hidden": -0.0386,
+   "finishers_delta_hidden": -15.53
+  },
+  {
+   "test": "sim-7",
+   "title": "Generation status notification on wait screen",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 152.4,
+   "result": {
+    "step": {
+     "control": 0.8199,
+     "treatment": 0.8152,
+     "lift": -0.0057,
+     "lift_se": 0.0189,
+     "p": 0.762734
+    },
+    "finish": {
+     "control": 0.2343,
+     "treatment": 0.216,
+     "lift": -0.0782,
+     "lift_se": 0.0442,
+     "p": 0.089144
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 6.0,
+   "predicted_lift": 0.04,
+   "true_lift_hidden": -0.0058,
+   "finishers_delta_hidden": -3.77
+  },
+  {
+   "test": "sim-8",
+   "title": "Account recovery safety hint on sign-in",
+   "target_step": "sign_in",
+   "type": "hint",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 152.4,
+   "result": {
+    "step": {
+     "control": 0.7812,
+     "treatment": 0.7535,
+     "lift": -0.0354,
+     "lift_se": 0.0156,
+     "p": 0.025915
+    },
+    "finish": {
+     "control": 0.2337,
+     "treatment": 0.2213,
+     "lift": -0.0528,
+     "lift_se": 0.0451,
+     "p": 0.254525
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: worse",
+   "score": 4.75,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": -0.0149,
+   "finishers_delta_hidden": -9.68
+  },
+  {
+   "test": "sim-9",
+   "title": "Simplified path selection guidance",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 152.4,
+   "result": {
+    "step": {
+     "control": 0.7547,
+     "treatment": 0.76,
+     "lift": 0.0071,
+     "lift_se": 0.0147,
+     "p": 0.629925
+    },
+    "finish": {
+     "control": 0.1923,
+     "treatment": 0.215,
+     "lift": 0.1179,
+     "lift_se": 0.0572,
+     "p": 0.029269
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 3.9,
+   "predicted_lift": 0.0,
+   "true_lift_hidden": 0.0035,
+   "finishers_delta_hidden": 2.27
+  }
+ ],
+ "shipped": [],
+ "ends_week": 2,
+ "weights_next": {
+  "impact": 1.632,
+  "evidence": 0.542,
+  "confidence": 1.159,
+  "cost": 0.667
+ },
+ "lessons_next": [
+  "Bypassing onboarding steps directly (new_flow) significantly improves conversion.",
+  "Reordering friction by moving sign-in after pet selection (reorder) significantly improves conversion.",
+  "Major redesigns (redesign) and sign-in hints (hint) significantly hurt performance.",
+  "Copy updates, permission checks, layout changes, and notifications showed no clear effect.",
+  "Predictions consistently overestimated actual measured gains across tests."
+ ]
+}

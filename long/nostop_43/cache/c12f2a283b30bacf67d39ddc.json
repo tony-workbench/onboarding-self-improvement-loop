@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_flow] Desktop Pet Interaction Simulator Sub-Flow: Adds an interactive practice sub-flow to the finish screen where users can test dragging, hiding, and talking to their pet before completing setup.\n   config: {\"home_intro\": {\"headline\": \"Try out your desktop pet controls now!\", \"components\": [{\"type\": \"button\", \"label\": \"Start Quick Practice\", \"action\": \"next\", \"style\": \"playful\"}]}, \"new_desktop_sim\": {\"headline\": \"Practice Controlling Your Pet\", \"body\": \"Click and drag your pet across the screen or right-click to access controls and settings.\", \"layout\": \"stage\", \"components\": [{\"type\": \"mascot\", \"asset\": \"asset:pet_preview\", \"style\": \"playful\"}, {\"type\": \"button\", \"label\": \"Finish Onboarding\", \"action\": \"next\", \"style\": \"emphasis\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_desktop_sim\"]}\n1: [home, new_screen] Desktop Hatching Companion Activity Feed Screen: Inserts a dedicated activity feed screen during pet rendering that shows real-time companion asset creation status updates.\n   config: {\"new_hatching_feed\": {\"headline\": \"Your Companion is Being Created\", \"body\": \"We are generating your custom pet traits and desktop animations.\", \"layout\": \"list\", \"show_progress\": true, \"show_time_estimate\": true, \"components\": [{\"type\": \"progress\", \"style\": \"rounded\"}, {\"type\": \"text\", \"text\": \"Rendering desktop behavior routines...\", \"style\": \"subtle\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_hatching_feed\", \"home_intro\"]}\n2: [sign_in, hint] Sign-In Multi-Device Pet Restoration Hint: Displays explicit reassurance text under sign-in choices explaining that logging in restores any existing pet progress across devices.\n   config: {\"sign_in\": {\"hint\": \"Signing in restores all your previously adopted desktop pets automatically across all your devices.\"}}\n3: [finish, redesign] Finish Companion Interaction Shortcut Layout Redesign: Redesigns the finish screen into a full-bleed visual layout displaying key mouse gestures and desktop pet shortcuts.\n   config: {\"home_intro\": {\"layout\": \"full_bleed\", \"headline\": \"Your Desktop Pet is Ready!\", \"body\": \"Double-click to chat, drag to reposition, or right-click to open pet settings anytime.\", \"components\": [{\"type\": \"badge\", \"text\": \"Shortcut: Alt + P to Hide\", \"style\": \"highlight\"}, {\"type\": \"button\", \"label\": \"Launch Desktop Companion\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n4: [home, wait_info] Desktop Rendering Stage Progress Checklist Display: Adds a stage-by-stage checklist component on the waiting screen to give real-time updates on pet model generation.\n   config: {\"waiting\": {\"show_progress\": true, \"components\": [{\"type\": \"checklist\", \"style\": \"rounded\", \"text\": \"Building 3D Mesh -> Generating Textures -> Syncing Desktop AI\"}]}}\n5: [home, notification] Desktop Rendering Completion Sound & Alert Switch: Adds a sound notification switch and system alert checkbox on the waiting screen so users know when rendering finishes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"sound\", \"label\": \"Play sound when pet hatches\", \"style\": \"plain\"}]}}\n6: [sign_in, hint] Sign-In Existing Pet Asset Recovery Guarantee Hint: Adds reassuring hint text below authentication buttons confirming that account login safeguards custom pets from being reset.\n   config: {\"sign_in\": {\"hint\": \"Your pet customization and progress are safely tied to your account and will never be reset.\"}}\n7: [adoption, new_flow] Custom Pet Photo Preview Verification Sub-Flow: Introduces a pet photo visual preview step immediately following photo upload to confirm output quality before adoption.\n   config: {\"upload_photos\": {\"button_label\": \"Preview Pet Render\"}, \"new_photo_preview\": {\"headline\": \"Preview Your Custom Pet\", \"body\": \"Here is how your custom pet will look on your desktop. You can adjust your photo or proceed to adopt.\", \"layout\": \"centered\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:custom_pet_preview\", \"style\": \"large\"}, {\"type\": \"button\", \"label\": \"Looks Great, Adopt!\", \"action\": \"next\", \"style\": \"emphasis\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_photo_preview\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n8: [choose_path, hint] Choose Path Account Data Transfer Hint: Adds a clear hint on the path selection screen confirming that choosing a path preserves all desktop settings and saved data.\n   config: {\"choose_path\": {\"hint\": \"Your selection here can be changed anytime in settings without losing your saved pets or data.\"}}\n9: [home, wait_info] Desktop Companion Asset Construction Live Timer Display: Displays an active countdown timer alongside time estimates on the waiting screen while pet assets are being built.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"components\": [{\"type\": \"timer\", \"style\": \"emphasis\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a valid interactive practice sub-flow after the home intro while retaining all required onboarding steps."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a valid activity feed screen during the pet waiting phase without removing any mandatory steps."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful sign-in reassurance copy without violating data, pricing, or fair design rules."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns the home intro layout while retaining its core function and staying within onboarding limits."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a stage-by-stage rendering progress checklist to the waiting screen, complying with all rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds an optional sound notification toggle on the waiting screen without modifying out-of-onboarding settings."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds helpful hint text reassuring account progress preservation on the sign-in screen."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserts a new photo preview verification screen into the photo upload flow while keeping all required steps intact."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds informative hint text on the path selection screen regarding settings and data preservation."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds a timer display during an actual wait on the waiting screen, which is permitted under Rule 5."
+   }
+  ]
+ }
+}

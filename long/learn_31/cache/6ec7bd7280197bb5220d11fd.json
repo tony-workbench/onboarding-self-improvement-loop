@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, new_flow] Interactive Desktop Pet Visibility and Controls Guided Sandbox Flow: Adds an interactive practice sequence on the final home intro screen where users practice toggling, hiding, and summoning their desktop pet.\n   config: {\"home_intro\": {\"headline\": \"Master Your Desktop Pet Controls\", \"body\": \"Try hiding and summoning your pet on your desktop right now before finishing setup.\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"checklist\", \"style\": \"playful\", \"text\": \"1. Press Hotkey to Hide Pet  2. Click Tray Icon to Summon Pet  3. Drag Pet to Preferred Corner\"}, {\"role\": \"home_welcome\", \"type\": \"button\", \"label\": \"Test Summon Gesture\", \"style\": \"emphasis\", \"action\": \"next\"}]}}}\n1: [finish, new_flow] Guided Desktop Companion Hotkey and Summon Practice Flow: Guides users through pressing quick hotkeys to control pet behavior directly within the home intro screen.\n   config: {\"home_intro\": {\"headline\": \"Practice Quick Commands Now\", \"body\": \"Learn how to instantly call or mute your pet with quick keyboard shortcuts.\", \"components\": [{\"type\": \"choice_cards\", \"style\": \"rounded\", \"text\": \"Press Option+P to toggle visibility | Press Option+M to mute voice\"}, {\"type\": \"button\", \"label\": \"Complete Practice\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n2: [finish, new_screen] Desktop Pet Sound and Voice Command Test Stage: Inserts a dedicated interactive voice and audio test stage right before completing onboarding.\n   config: {\"home_intro\": {\"headline\": \"Final Setup & Audio Test\", \"button_label\": \"Proceed to Audio Test\"}, \"new_voice_test\": {\"headline\": \"Test Pet Speech & Microphones\", \"body\": \"Say hello to your desktop pet to verify sound response and mic input.\", \"show_step_counter\": true, \"components\": [{\"type\": \"sound\", \"style\": \"playful\", \"action\": \"play\", \"text\": \"Test Pet Voice Output\"}, {\"type\": \"button\", \"label\": \"Finish Onboarding\", \"style\": \"emphasis\", \"action\": \"next\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_voice_test\"]}\n3: [choose_path, redesign] Story Scroll Companion Journey Path Selection Redesign: Redesigns the initial onboarding story screen into a story scroll layout that previews pet companion paths visually.\n   config: {\"story\": {\"layout\": \"story_scroll\", \"headline\": \"Choose Your Companion Journey\", \"body\": \"Scroll through pet companion styles to discover your perfect desktop friend.\", \"replace\": {\"intro_story\": [{\"role\": \"intro_story\", \"type\": \"choice_cards\", \"style\": \"large\", \"action\": \"choose\", \"text\": \"Standard Companion vs Custom Photo Pet\"}]}}}\n4: [sign_in, copy] Persistent Account Pet Security Sign-In Value Headline: Replaces sign-in headline and body to highlight that signing in ensures pets are permanently saved and never lost.\n   config: {\"sign_in\": {\"headline\": \"Secure & Preserve Your Pet Account\", \"body\": \"Signing in locks your pet's identity, customization, and progress safely to your cloud profile so you never lose them.\", \"hint\": \"Your pet is instantly saved upon sign in.\"}}\n5: [home, wait_info] Desktop Rendering Visual Readiness & Status Monitor: Adds visual rendering status indicators and desktop readiness tips on the waiting screen during pet generation.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"tip_delay_seconds\": 10, \"components\": [{\"type\": \"progress\", \"style\": \"emphasis\", \"text\": \"Building 3D Assets & Desktop Shaders...\"}, {\"type\": \"tip_carousel\", \"style\": \"calm\", \"text\": \"Tip: Your pet will appear in the top-right corner of your desktop screen when ready.\"}]}}\n6: [adoption, hint] Adoption Certificate Official Stamp Verification Hint: Displays an official certificate verification status hint clarifying photo quality processing on the adoption certificate screen.\n   config: {\"adoption_certificate\": {\"hint\": \"Official Adoption Seal: Photo features and pet traits verified for desktop rendering.\", \"components\": [{\"type\": \"badge\", \"style\": \"highlight\", \"text\": \"Verified Desktop Ready Seal\"}]}}\n7: [finish, new_flow] Interactive Desktop Pet Docking & Tray Controls Simulation Flow: Replaces home intro elements with an interactive simulation card to let users practice tray docking and desktop positioning.\n   config: {\"home_intro\": {\"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"choice_cards\", \"style\": \"rounded\", \"text\": \"Practice Docking: 1. Click Tray Icon  2. Select 'Pin to Top'  3. Drag to Side\"}, {\"role\": \"home_welcome\", \"type\": \"button\", \"label\": \"Complete Setup\", \"style\": \"emphasis\", \"action\": \"next\"}]}}}\n8: [sign_in, layout] Split Layout Account Sign-In and Cloud Backup Screen: Changes the sign-in screen to a split layout emphasizing data backup benefits alongside authentication options.\n   config: {\"sign_in\": {\"layout\": \"split\", \"headline\": \"Sign In to Protect Your Desktop Companion\", \"components\": [{\"type\": \"badge\", \"style\": \"subtle\", \"text\": \"Cloud Pet Storage Enabled\"}]}}\n9: [home, notification] Desktop Launch Ready Sound Signal & Notification Toggle: Enables sound alert and desktop notification toggles on the waiting screen while background generation finishes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"text\", \"style\": \"subtle\", \"text\": \"We will play a pleasant chime and send a desktop alert when your pet is ready!\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds interactive control sandbox inside home_intro without violating any base rules."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds hotkey command practice to home_intro without violating any base rules."
+   },
+   {
+    "index": 2,
+    "pass": false,
+    "rule": 5,
+    "reason": "Requesting microphone input and voice response constitutes a new request for personal data."
+   },
+   {
+    "index": 3,
+    "pass": false,
+    "rule": 2,
+    "reason": "Replacing intro_story on the story screen removes the pet introduction job of the story screen."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Updates sign-in value proposition copy without violating any base rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds rendering progress and tips to waiting screen allowed under rule 4."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds certificate seal hint while preserving the official stamp on the adoption certificate."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Replaces home_intro elements with interactive docking simulation inside onboarding."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigns sign-in screen to a split layout without altering core authentication functionality."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adds notification toggle and sound chime info to waiting screen."
+   }
+  ]
+ }
+}

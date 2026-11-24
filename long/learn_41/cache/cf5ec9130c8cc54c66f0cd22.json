@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, redesign] Pick Friend Compact Grid Selection Redesign: Redesign the pet selection step with a compact grid layout featuring choice card components for quicker character selection.\n   config: {\"pick_friend\": {\"layout\": \"compact\", \"headline\": \"Choose Your Desktop Companion\", \"body\": \"Select a pet archetype to bring to life on your desktop.\", \"replace\": {\"pet_choices\": [{\"role\": \"pet_choices\", \"type\": \"choice_cards\", \"label\": \"Companion Choices\", \"style\": \"playful\", \"action\": \"choose\"}]}}}\n1: [adoption, new_flow] Preset Pet Fast Adoption Flow: Add an instant pet avatar selection flow within photo upload to allow users to skip photo rendering issues.\n   config: {\"upload_photos\": {\"layout\": \"split\", \"headline\": \"Create or Pick Your Pet Avatar\", \"body\": \"Upload a custom pet photo or select one of our curated pet templates.\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Preset Templates\", \"style\": \"rounded\", \"action\": \"choose\"}, {\"type\": \"photo_picker\", \"label\": \"Upload Custom Photo\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n2: [choose_path, reorder] Story Screen Initial Path Order Adjustment: Reorder the onboarding sequence so users choose their companion path immediately before reading the welcome story.\n   config: {\"story\": {\"headline\": \"Welcome to Your Desktop Companion Journey\", \"body\": \"Discover how your pet lives, plays, and assists right on your screen.\"}, \"_order\": [\"choose_path\", \"story\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n3: [finish, new_screen] Desktop Shortcut & Docking Setup Screen: Add a new setup screen before completion explaining desktop placement, pet hiding, and screen docking shortcuts.\n   config: {\"new_desktop_setup\": {\"headline\": \"Desktop Pet Quick Controls\", \"body\": \"Learn how to move, hide, or talk to your companion from your desktop bar.\", \"layout\": \"checklist\", \"components\": [{\"type\": \"checklist\", \"text\": \"Press Alt+P to show/hide pet\", \"style\": \"plain\"}, {\"type\": \"checklist\", \"text\": \"Right-click pet for interaction menu\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Got It!\", \"style\": \"emphasis\", \"action\": \"next\"}]}, \"home_intro\": {\"headline\": \"Your Desktop Companion is Ready!\"}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_setup\", \"home_intro\"]}\n4: [sign_in, copy] Account Recovery Security Headline Copy Update: Update the sign-in screen headline and hint text to emphasize automatic pet data protection and cloud saving.\n   config: {\"sign_in\": {\"headline\": \"Sign In to Protect Your Pet & Sync Data\", \"body\": \"Linking your account ensures your pet's traits, items, and memory are backed up safely.\", \"hint\": \"Signing in secures your pet across app updates and device changes.\"}}\n5: [adoption, hint] Adoption Certificate Name Entry Hint Safeguard: Display a helpful hint and companion mascot badge explaining that pet names can be changed anytime later.\n   config: {\"adoption_certificate\": {\"hint\": \"Don't worry! You can update your pet's name and details anytime in app settings.\", \"components\": [{\"type\": \"mascot\", \"asset\": \"asset:companion_helper\", \"style\": \"playful\"}]}}\n6: [home, notification] Desktop Pet Spawn Ready Sound & Alert: Add an optional readiness chime and notification badge on the waiting screen when desktop pet rendering completes.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"hint\": \"We will play a sound and alert you when your pet is ready on your desktop.\", \"components\": [{\"type\": \"sound\", \"asset\": \"asset:chime_ready\", \"action\": \"play\"}, {\"type\": \"badge\", \"text\": \"Desktop Alert Active\", \"style\": \"highlight\"}]}}\n7: [home, wait_info] Waiting Screen Pet Animation Companion Display: Add an animated mascot preview and step counter to the waiting screen while desktop pet assets generate.\n   config: {\"waiting\": {\"show_step_counter\": true, \"show_progress\": true, \"components\": [{\"type\": \"animation\", \"asset\": \"asset:pet_hatching_anim\", \"style\": \"playful\"}, {\"type\": \"progress\", \"label\": \"Preparing Desktop Environment\", \"style\": \"emphasis\"}]}}\n8: [choose_path, layout] Split Screen Story Welcome Layout: Change the welcome story screen to a split layout with pet illustration side-by-side with welcome text.\n   config: {\"story\": {\"layout\": \"split\", \"headline\": \"Meet Your New Screen Companion\", \"body\": \"Your pet lives right on your computer desktop, reacting to your day and keeping you company.\", \"button_label\": \"Start Journey\"}}\n9: [finish, incentive] First Day Desktop Pet Reward Checklist: Add a starter reward checklist component on the home intro screen incentivizing initial pet interactions.\n   config: {\"home_intro\": {\"layout\": \"spotlight\", \"headline\": \"Welcome Home! 3 Quick Things to Try\", \"body\": \"Complete your first interactions to claim your companion starter badge.\", \"components\": [{\"type\": \"checklist\", \"text\": \"1. Drag pet to your favorite screen corner\", \"style\": \"plain\"}, {\"type\": \"checklist\", \"text\": \"2. Double click pet to give a treat\", \"style\": \"plain\"}, {\"type\": \"badge\", \"text\": \"Starter Companion Unlocked!\", \"style\": \"highlight\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the pet selection screen with compact choice cards retains the ability to choose a pet and stays within onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding preset pet template choices alongside photo upload within the photo upload screen does not skip or remove any required onboarding step."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering onboarding screens is explicitly permitted by Rule 4, and all required steps and screen jobs remain intact."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a new setup screen explaining desktop controls before home intro is allowed under Rule 4 as a new onboarding screen."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating sign-in copy to highlight account sync and backup keeps the sign-in step intact and violates no rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a helpful hint and mascot component to the adoption certificate screen preserves the step and its functionality."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding audio chimes and readiness alerts to the waiting screen is permitted under Rule 4."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding progress indicators and animated previews to the waiting screen maintains its core job of showing the pet being created."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the story screen to a split layout with pet illustrations properly introduces the pet and keeps the step."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an introductory interaction checklist on the home intro screen stays within onboarding and adheres to fair design."
+   }
+  ]
+ }
+}

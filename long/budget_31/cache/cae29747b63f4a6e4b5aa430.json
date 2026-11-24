@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, redesign] Interactive Desktop Placement Preview: Redesigns the final intro screen with a simulated desktop view stage so users can test dragging, placing, and summoning their pet before completing onboarding.\n   config: {\"home_intro\": {\"layout\": \"stage\", \"headline\": \"Meet Your Desktop Companion\", \"body\": \"Your pet is active on your screen. Practice positioning and interacting with them now.\", \"button_label\": \"Finish Setup & Launch\", \"components\": [{\"type\": \"preview\", \"label\": \"Desktop Overlay Preview\", \"style\": \"highlight\", \"action\": \"play\"}, {\"type\": \"mascot\", \"asset\": \"asset:desktop_pet_default\", \"style\": \"playful\", \"action\": \"choose\"}], \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"text\", \"text\": \"Your pet is ready to live on your desktop!\", \"style\": \"emphasis\"}]}}}\n1: [adoption, redesign] Preset Pet Selection Speed Run: Redesigns the friend selection screen into a split view with fast preset pet archetypes and instant preview cards.\n   config: {\"pick_friend\": {\"layout\": \"split\", \"headline\": \"Choose Your Ready-to-Adopt Pet\", \"body\": \"Select one of our popular ready-made companions or start fresh.\", \"button_label\": \"Adopt Selected Pet\", \"replace\": {\"pet_choices\": [{\"role\": \"pet_choices\", \"type\": \"choice_cards\", \"label\": \"Starter Pet Archetypes\", \"style\": \"rounded\", \"action\": \"choose\"}]}}}\n2: [finish, new_screen] Essential Pet Controls Quick Screen: Adds a short dedicated screen right after home intro demonstrating basic keyboard shortcuts and taskbar pet management.\n   config: {\"home_intro\": {\"button_label\": \"Next: Quick Controls\"}, \"new_controls_guide\": {\"layout\": \"checklist\", \"headline\": \"Quick Desktop Controls\", \"body\": \"Learn how to interact with your pet anytime from your taskbar or keyboard.\", \"button_label\": \"Start Playing\", \"components\": [{\"type\": \"checklist\", \"text\": \"Click pet to chat | Right-click for menu | Drag to move\", \"style\": \"plain\"}, {\"type\": \"button\", \"label\": \"Test Summon Key\", \"style\": \"calm\", \"action\": \"next\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\", \"new_controls_guide\"]}\n3: [adoption, new_flow] Express Naming and Personality Sub-Flow: Inserts a dedicated name input and mood selection screen between choosing a friend and certificate generation.\n   config: {\"pick_friend\": {\"button_label\": \"Continue to Name Pet\"}, \"new_pet_naming\": {\"layout\": \"centered\", \"headline\": \"Give Your Pet a Name & Trait\", \"body\": \"Personalize your pet's personality before we issue their official certificate.\", \"button_label\": \"Create Certificate\", \"components\": [{\"type\": \"name_input\", \"label\": \"Pet Name\", \"style\": \"large\"}, {\"type\": \"choice_cards\", \"label\": \"Personality Trait\", \"style\": \"playful\", \"action\": \"choose\"}]}, \"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"new_pet_naming\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"]}\n4: [home, wait_info] Waiting Screen Background Entertainment: Adds an interactive tip carousel, progress bar, and estimated time remaining during the pet generation wait screen.\n   config: {\"waiting\": {\"show_time_estimate\": true, \"notify_when_ready\": true, \"tip_delay_seconds\": 5, \"headline\": \"Preparing Your Pet...\", \"body\": \"We are generating high-res desktop animations. Explore tips while you wait!\", \"components\": [{\"type\": \"progress\", \"label\": \"Generation Progress\", \"style\": \"highlight\"}, {\"type\": \"tip_carousel\", \"text\": \"Did you know? You can customize desktop sounds later in settings.\", \"style\": \"calm\", \"action\": \"open_tip\"}]}}\n5: [sign_in, hint] Sign-In Stalling Diagnostic Assistant: Adds explicit connection tips and an immediate retry button if authentication takes more than a few seconds.\n   config: {\"sign_in\": {\"hint\": \"If authentication window does not open, check browser pop-up blockers or click Retry.\", \"components\": [{\"type\": \"button\", \"label\": \"Troubleshoot Sign-In\", \"style\": \"subtle\", \"action\": \"open_tip\"}]}}\n6: [sign_in, incentive] Clear Cloud Account Benefit Badge: Displays a prominent cloud sync guarantee badge above sign-in options explaining how accounts protect pets across reinstalls.\n   config: {\"sign_in\": {\"layout\": \"centered\", \"headline\": \"Sign In to Protect Your Pet\", \"body\": \"Linking an account saves your pet's identity and items safely in the cloud.\", \"components\": [{\"type\": \"badge\", \"label\": \"Automatic Cloud Backup Enabled\", \"style\": \"emphasis\"}]}}\n7: [choose_path, layout] Two-Column Path Choice Redesign: Reorganizes the choose path options into a high-contrast two-column layout comparing quick start vs detailed creation.\n   config: {\"choose_path\": {\"layout\": \"two_column\", \"headline\": \"How Would You Like to Start?\", \"body\": \"Pick quick setup for instant fun or custom setup for a tailored pet.\", \"replace\": {\"path_options\": [{\"role\": \"path_options\", \"type\": \"choice_cards\", \"label\": \"Onboarding Paths\", \"style\": \"rounded\", \"action\": \"choose\"}]}}}\n8: [choose_path, notification] Onboarding Duration and Step Indicator Bar: Adds explicit step counter and total time estimate indicators to the top of early onboarding screens.\n   config: {\"choose_path\": {\"show_step_counter\": true, \"show_time_estimate\": true, \"hint\": \"Takes less than 2 minutes to complete setup.\"}, \"story\": {\"show_step_counter\": true, \"show_time_estimate\": true}}\n9: [home, wait_info] Generation Sound and Status Cue: Adds visual progress status cues and ready sound notifications to the waiting stage before moving to home.\n   config: {\"waiting\": {\"notify_when_ready\": true, \"components\": [{\"type\": \"sound\", \"label\": \"Play Ready Chime\", \"style\": \"playful\", \"action\": \"play\"}, {\"type\": \"text\", \"text\": \"Your pet will notify you with a sound when ready!\", \"style\": \"subtle\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of home_intro screen within onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of pick_friend screen."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a controls guide screen following home_intro."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of pet naming sub-flow within onboarding."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of progress bar and tip carousel during waiting screen."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid sign-in troubleshooting hint and button addition."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of cloud backup badge to sign-in screen."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid two-column layout redesign of choose_path screen."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of step counter and time estimate indicators."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of sound cue and status updates to waiting screen."
+   }
+  ]
+ }
+}

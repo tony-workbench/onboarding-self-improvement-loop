@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [adoption, new_flow] Interactive Pet Trait Customizer Flow: Adds an interactive trait selector screen right before certificate generation where users pick pet temperament traits (Playful, Calm, Energetic).\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"new_trait_customizer\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_trait_customizer\": {\"headline\": \"Customize Your Pet's Personality\", \"body\": \"Select how your companion acts on your desktop throughout the day.\", \"layout\": \"stage\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Select Temperament\", \"style\": \"playful\", \"action\": \"choose\"}, {\"type\": \"button\", \"label\": \"Confirm Companion Traits\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n1: [sign_in, reorder] Reorder Sign-In After Pet Pick Stage: Moves sign-in screen immediately after selecting a companion in pick_friend, ensuring account creation locks in pet selection early.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"sign_in\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"sign_in\": {\"headline\": \"Save Your New Pet to Account\", \"body\": \"Sign in now to lock your companion choices securely into your cloud profile.\", \"button_label\": \"Save & Continue\"}}\n2: [home, new_screen] Interactive Desktop Toy Box Screen: Inserts an interactive toy box activity screen into the waiting stage where users test desktop toys while generation finishes.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"new_toy_box_activity\", \"waiting\", \"home_intro\"], \"new_toy_box_activity\": {\"headline\": \"Unpack Desktop Toys\", \"body\": \"Try out toys while your pet gets ready for your screen.\", \"layout\": \"centered\", \"components\": [{\"type\": \"animation\", \"asset\": \"asset:toy_ball\", \"style\": \"playful\", \"action\": \"play\"}, {\"type\": \"button\", \"label\": \"Done Playing\", \"style\": \"plain\", \"action\": \"next\"}]}}\n3: [finish, redesign] Interactive Desktop Pet Interaction Redesign: Redesigns home_intro into an interactive quick-command screen where users practice desktop summon, hide, and talk actions before launching.\n   config: {\"home_intro\": {\"headline\": \"Master Desktop Companion Commands\", \"body\": \"Try out summon, hide, and speak actions to ensure your pet behaves perfectly on your desktop.\", \"layout\": \"spotlight\", \"replace\": {\"home_welcome\": [{\"role\": \"home_welcome\", \"type\": \"button\", \"label\": \"Test Summon & Hide Controls\", \"style\": \"emphasis\", \"action\": \"next\"}]}}}\n4: [sign_in, copy] Account Loss Prevention Sign-In Notice: Updates headline and body copy on sign_in screen to stress cloud pet backup and prevent account overwrite confusion.\n   config: {\"sign_in\": {\"headline\": \"Secure Your Pet to Cloud Sync\", \"body\": \"Signing in ensures your desktop companion is backed up safely and won't reset on reboot or updates.\"}}\n5: [finish, copy] Desktop Pet Launch Button Clarity Update: Changes primary action button on home_intro to explicitly instruct launching and placing pet on active screen.\n   config: {\"home_intro\": {\"button_label\": \"Summon Pet to Desktop Screen\"}}\n6: [home, wait_info] Interactive Pet Hatching Progress Screen: Adds an interactive hatch countdown status bar and animated progress companion on the waiting screen.\n   config: {\"waiting\": {\"headline\": \"Pet Hatching in Progress...\", \"body\": \"Your companion is preparing its desktop behaviors. Tap the egg to speed up hatching!\", \"show_progress\": true, \"components\": [{\"type\": \"progress\", \"label\": \"Hatching Status\", \"style\": \"highlight\"}]}}\n7: [adoption, incentive] Adoption Certificate Badge Reward: Adds a founder adoption badge asset to the adoption certificate screen celebrating official pet ownership.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Pet Adoption Certificate\", \"body\": \"Congratulations! You have officially adopted your desktop companion.\", \"components\": [{\"type\": \"badge\", \"label\": \"Official Founder Parent\", \"style\": \"emphasis\"}]}}\n8: [choose_path, new_flow] Interactive Pet Starter Care Quiz Flow: Inserts a 2-question interactive quiz right after path selection to tailor desktop pet energy and schedule preferences.\n   config: {\"_order\": [\"story\", \"choose_path\", \"new_starter_quiz\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"home_intro\"], \"new_starter_quiz\": {\"headline\": \"Pet Schedule & Energy Quiz\", \"body\": \"Tell us how active you want your pet to be while you work.\", \"layout\": \"card\", \"components\": [{\"type\": \"choice_cards\", \"label\": \"Activity Level\", \"style\": \"rounded\", \"action\": \"choose\"}, {\"type\": \"button\", \"label\": \"Save Preferences\", \"style\": \"emphasis\", \"action\": \"next\"}]}}\n9: [sign_in, notification] Existing Account Pet Sync Notification: Adds a sync notice badge on sign_in screen confirming existing accounts restore existing pets automatically.\n   config: {\"sign_in\": {\"hint\": \"Signing into an existing account automatically recovers your saved pets.\", \"components\": [{\"type\": \"badge\", \"label\": \"Auto-Sync Enabled\", \"style\": \"subtle\"}]}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a personality trait customizer screen within onboarding is allowed and preserves all required steps."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Reordering sign-in after pick_friend inside onboarding is explicitly permitted by Rule 4."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interactive activity screen inside onboarding before the waiting step is allowed."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning home_intro components is allowed as home_intro is part of onboarding."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Updating sign-in copy to clarify cloud sync does not violate any base rules."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Clarifying the home_intro primary action button text is allowed within onboarding."
+   },
+   {
+    "index": 6,
+    "pass": false,
+    "rule": 5,
+    "reason": "Prompting users to tap the egg to speed up hatching introduces a false interaction/urgency pattern."
+   },
+   {
+    "index": 7,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an official parent badge component to the adoption certificate preserves the certificate's purpose."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Inserting a new schedule and energy preference quiz step after path selection is allowed."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an account recovery/sync notification hint to sign-in is allowed."
+   }
+  ]
+ }
+}

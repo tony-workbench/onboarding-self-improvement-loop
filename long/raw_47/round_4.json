@@ -1,0 +1,588 @@
+{
+ "round": 4,
+ "starts_week": 4,
+ "funnel": {
+  "choose_path": 0.762,
+  "sign_in": 0.7607115000000001,
+  "adoption": 0.6931029000000001,
+  "home": 0.8408859,
+  "finish": 0.7161696
+ },
+ "weights_used": {
+  "impact": 1.617,
+  "evidence": 0.397,
+  "confidence": 1.265,
+  "cost": 0.721
+ },
+ "lessons_used": [
+  "Reordering friction (moving sign-in after pet selection), adding a pet control tutorial screen, and estimated countdown wait info won.",
+  "Bypassing onboarding steps (new_flow) yielded mixed results, winning in one test but significantly hurting in another.",
+  "Major redesigns and sign-in safety hints significantly hurt performance.",
+  "Copy updates, permission checks, layout changes, and notifications showed no clear effect.",
+  "Predictions generally overestimated actual gains, but underestimated performance for the tutorial screen and countdown info."
+ ],
+ "carried_retests": [],
+ "candidates": [
+  {
+   "title": "Desktop pet interaction playground on wait screen",
+   "target_step": "home",
+   "type": "new_screen",
+   "change": "Adds an interactive mini-game screen during generation wait time where users can practice petting and feeding a test companion on their desktop.",
+   "why": "The waiting step has a long median duration of 201s (mean 2336s) causing significant drop-off before finishing onboarding.",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "new_pet_playground",
+     "home_intro"
+    ],
+    "waiting": {
+     "notify_when_ready": true
+    },
+    "new_pet_playground": {
+     "headline": "Practice with your companion while you wait",
+     "body": "Try feeding and petting your companion preview while generation finishes in the background.",
+     "layout": "spotlight",
+     "components": [
+      {
+       "type": "mascot",
+       "asset": "asset:pet_interactive",
+       "style": "playful",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding an interactive preview screen during the waiting step inside onboarding is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.02,
+   "score": 4.61,
+   "score_note": "Addresses high wait time at home, but building a mini-game screen has high implementation cost and unproven mechanics."
+  },
+  {
+   "title": "Desktop pet shortcut and wake controls guide screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "change": "Adds a dedicated onboarding tutorial screen explaining mouse actions, tray icon controls, and summon shortcuts before completing setup.",
+   "why": "3 support tickets reported users confused about how to control, hide, or talk to their pet after finishing setup, hurting finish completion (71.6%).",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro",
+     "new_controls_guide"
+    ],
+    "home_intro": {
+     "button_label": "Continue to Controls Guide"
+    },
+    "new_controls_guide": {
+     "headline": "Desktop Pet Quick Controls",
+     "body": "Left-click to interact, drag to reposition on screen, or right-click the tray icon to hide or open settings.",
+     "layout": "checklist",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Left-click: Interact, Drag: Move pet, Right-click tray: Hide/Settings",
+       "style": "emphasis"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a controls guide screen after home_intro is allowed as new screens may follow home_intro."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 2,
+    "cost": 0
+   },
+   "predicted_lift": 0.071,
+   "score": 8.2,
+   "score_note": "High drop-off and support tickets align; pet control tutorial screens previously delivered strong wins (+7.1%).",
+   "slot": "big move",
+   "share": 1.0,
+   "planned_harm": 97.0
+  },
+  {
+   "title": "Guided photo tips sub-flow for pet generation",
+   "target_step": "adoption",
+   "type": "new_flow",
+   "change": "Inserts a photo guidance screen before photo upload detailing optimal lighting and framing for custom pet generation.",
+   "why": "3 support emails reported custom pet generation failures or distorted results, contributing to drop-off in the adoption step (69.3%).",
+   "config": {
+    "_order": [
+     "story",
+     "choose_path",
+     "sign_in",
+     "pick_friend",
+     "new_photo_guide",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "upload_photos": {
+     "hint": "Follow the lighting and pose tips to ensure best rendering quality."
+    },
+    "new_photo_guide": {
+     "headline": "Tips for the best pet render",
+     "body": "Use clear, well-lit photos showing your pet's face front-on without obstructions.",
+     "layout": "compact",
+     "components": [
+      {
+       "type": "checklist",
+       "text": "Bright lighting, Clear face focus, Only one pet in picture",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a photo guidance screen before photo upload creates a valid sub-flow without losing required steps."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 0
+   },
+   "predicted_lift": 0.012,
+   "score": 6.62,
+   "score_note": "Targets highest drop step (30.7%) backed by support emails, but sub-flows yield mixed performance (+1.2% avg)."
+  },
+  {
+   "title": "Story introduction after path selection",
+   "target_step": "choose_path",
+   "type": "reorder",
+   "change": "Swaps the initial sequence so users pick their pet path immediately upon opening the app before viewing the backstory.",
+   "why": "The choose_path step takes a mean of 514s; presenting decision paths upfront reduces initial decision latency.",
+   "config": {
+    "_order": [
+     "choose_path",
+     "story",
+     "sign_in",
+     "pick_friend",
+     "upload_photos",
+     "adoption_certificate",
+     "waiting",
+     "home_intro"
+    ],
+    "choose_path": {
+     "hint": "Select how you would like to create your desktop companion."
+    }
+   },
+   "guard": {
+    "pass": false,
+    "rule": "code",
+    "reason": "existing screens must keep their order; only sign_in may move"
+   }
+  },
+  {
+   "title": "Split view layout for sign-in screen",
+   "target_step": "sign_in",
+   "type": "layout",
+   "change": "Redesigns sign_in into a split-column layout featuring pet save safety perks next to login options.",
+   "why": "8 support emails noted pets missing or reset after signing in again, indicating confusion over account data syncing.",
+   "config": {
+    "sign_in": {
+     "layout": "split",
+     "body": "Sign in to back up your desktop pet and sync companion memory safely across launches."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Redesigning the sign-in layout and highlighting pet backup perks is allowed."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.002,
+   "score": 4.59,
+   "score_note": "High support email volume, but layout redesigns historically showed no positive effect (-0.2%)."
+  },
+  {
+   "title": "Generation photo tip carousel during upload",
+   "target_step": "adoption",
+   "type": "wait_info",
+   "change": "Adds an interactive tip carousel to the upload screen showing examples of photo angles while processing.",
+   "why": "Median adoption time is high at 89s and pet generation issues generated multiple support tickets.",
+   "config": {
+    "upload_photos": {
+     "show_time_estimate": true,
+     "tip_delay_seconds": 4,
+     "components": [
+      {
+       "type": "tip_carousel",
+       "text": "High contrast photos lead to clearer desktop pet animations.",
+       "style": "calm",
+       "action": "open_tip"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a photo tip carousel to the upload screen is allowed within onboarding."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 2,
+    "confidence": 2,
+    "cost": 1
+   },
+   "predicted_lift": 0.025,
+   "score": 8.77,
+   "score_note": "Combines high drop adoption step with processing wait info, which previously performed well (+2.2%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 159.7
+  },
+  {
+   "title": "Desktop readiness audio chime notification",
+   "target_step": "home",
+   "type": "notification",
+   "change": "Plays a soft audio notification chime on the waiting screen when the pet finish state is ready.",
+   "why": "The waiting step has a long mean time of 2336s, causing users to minimize or switch away from the desktop pet app.",
+   "config": {
+    "waiting": {
+     "notify_when_ready": true,
+     "components": [
+      {
+       "type": "sound",
+       "asset": "asset:chime_ready",
+       "style": "playful",
+       "action": "play"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding a audio notification chime on readiness to the waiting screen is permitted."
+   },
+   "sub": {
+    "impact": 1,
+    "evidence": 1,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.006,
+   "score": 2.58,
+   "score_note": "Low drop step with no support mail; notification changes previously yielded negative results (-0.6%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 159.7
+  },
+  {
+   "title": "System tray icon positioning hint on home intro",
+   "target_step": "finish",
+   "type": "hint",
+   "change": "Displays an explicit hint on home_intro showing where the pet lives in the system tray when hidden.",
+   "why": "3 support emails reported users unable to find, control, or unhide their pet after setup, leading to drop-off in finish step (71.6%).",
+   "config": {
+    "home_intro": {
+     "hint": "Look for your pet's icon in the system tray near your desktop clock to summon or hide your pet anytime."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding desktop positioning instructions on home_intro is allowed."
+   },
+   "sub": {
+    "impact": 3,
+    "evidence": 3,
+    "confidence": 0,
+    "cost": 1
+   },
+   "predicted_lift": -0.035,
+   "score": 5.94,
+   "score_note": "Strong support evidence, but hint elements on screens consistently hurt performance (-3.5%)."
+  },
+  {
+   "title": "Personality-driven path choice headlines",
+   "target_step": "choose_path",
+   "type": "copy",
+   "change": "Updates path selection headline and body copy to focus on pet companion personality styles instead of technical creation paths.",
+   "why": "Mean time on choose_path is high (514s); clear personality-driven copy helps decision velocity.",
+   "config": {
+    "choose_path": {
+     "headline": "How would you like to meet your pet?",
+     "body": "Pick a ready-made loyal friend or upload photos to bring your real-life pet onto your desktop."
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Updating choose_path copy retains the required options to adopt or make your own pet."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 1,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.007,
+   "score": 6.41,
+   "score_note": "Config-only copy change for step with high decision time; matches past copy test (+0.7%).",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 159.7
+  },
+  {
+   "title": "Cloud pet backup highlight on sign-in",
+   "target_step": "sign_in",
+   "type": "incentive",
+   "change": "Adds a cloud sync status badge and hint to the sign-in screen reinforcing pet save state protection.",
+   "why": "8 support tickets complained about pets missing or reset after signing in again.",
+   "config": {
+    "sign_in": {
+     "hint": "Signing in secures your pet's memory so your friend is never lost.",
+     "components": [
+      {
+       "type": "badge",
+       "text": "Cloud Save Active",
+       "style": "highlight"
+      }
+     ]
+    }
+   },
+   "guard": {
+    "pass": true,
+    "rule": null,
+    "reason": "Adding cloud save protection details and badges to the sign-in screen is permitted."
+   },
+   "sub": {
+    "impact": 2,
+    "evidence": 3,
+    "confidence": 1,
+    "cost": 2
+   },
+   "predicted_lift": 0.01,
+   "score": 7.07,
+   "score_note": "Directly addresses major support complaints at zero build cost via simple UI badge config.",
+   "slot": "best score",
+   "share": 1.0,
+   "planned_harm": 159.7
+  }
+ ],
+ "picked": [
+  "Desktop pet shortcut and wake controls guide screen",
+  "Generation photo tip carousel during upload",
+  "Cloud pet backup highlight on sign-in",
+  "Personality-driven path choice headlines",
+  "Desktop readiness audio chime notification"
+ ],
+ "held_by_harm_budget": [],
+ "harm_budget": null,
+ "planned_harm": 735.8,
+ "decisions": [
+  {
+   "test": "sim-14",
+   "title": "Desktop pet shortcut and wake controls guide screen",
+   "target_step": "finish",
+   "type": "new_screen",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 97.0,
+   "result": {
+    "step": {
+     "control": 0.7261,
+     "treatment": 0.711,
+     "lift": -0.0207,
+     "lift_se": 0.0272,
+     "p": 0.451069
+    },
+    "finish": {
+     "control": 0.2377,
+     "treatment": 0.2493,
+     "lift": 0.0491,
+     "lift_se": 0.0478,
+     "p": 0.292441
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.2,
+   "predicted_lift": 0.071,
+   "true_lift_hidden": 0.0091,
+   "finishers_delta_hidden": 6.72
+  },
+  {
+   "test": "sim-15",
+   "title": "Generation photo tip carousel during upload",
+   "target_step": "adoption",
+   "type": "wait_info",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 159.7,
+   "result": {
+    "step": {
+     "control": 0.6887,
+     "treatment": 0.693,
+     "lift": 0.0062,
+     "lift_se": 0.0228,
+     "p": 0.784249
+    },
+    "finish": {
+     "control": 0.242,
+     "treatment": 0.244,
+     "lift": 0.0083,
+     "lift_se": 0.0459,
+     "p": 0.856679
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 8.77,
+   "predicted_lift": 0.025,
+   "true_lift_hidden": -0.0261,
+   "finishers_delta_hidden": -19.26
+  },
+  {
+   "test": "sim-16",
+   "title": "Cloud pet backup highlight on sign-in",
+   "target_step": "sign_in",
+   "type": "incentive",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 159.7,
+   "result": {
+    "step": {
+     "control": 0.7573,
+     "treatment": 0.7448,
+     "lift": -0.0165,
+     "lift_se": 0.0169,
+     "p": 0.330775
+    },
+    "finish": {
+     "control": 0.2327,
+     "treatment": 0.2343,
+     "lift": 0.0072,
+     "lift_se": 0.0471,
+     "p": 0.87873
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 7.07,
+   "predicted_lift": 0.01,
+   "true_lift_hidden": -0.0164,
+   "finishers_delta_hidden": -12.1
+  },
+  {
+   "test": "sim-17",
+   "title": "Personality-driven path choice headlines",
+   "target_step": "choose_path",
+   "type": "copy",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 159.7,
+   "result": {
+    "step": {
+     "control": 0.7603,
+     "treatment": 0.795,
+     "lift": 0.0456,
+     "lift_se": 0.0145,
+     "p": 0.001243
+    },
+    "finish": {
+     "control": 0.2513,
+     "treatment": 0.249,
+     "lift": -0.0093,
+     "lift_se": 0.0443,
+     "p": 0.834719
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "won, shipped",
+   "score": 6.41,
+   "predicted_lift": 0.007,
+   "true_lift_hidden": 0.0332,
+   "finishers_delta_hidden": 24.5
+  },
+  {
+   "test": "sim-18",
+   "title": "Desktop readiness audio chime notification",
+   "target_step": "home",
+   "type": "notification",
+   "weeks": 1,
+   "hours": null,
+   "share": 1.0,
+   "planned_harm": 159.7,
+   "result": {
+    "step": {
+     "control": 0.8454,
+     "treatment": 0.8609,
+     "lift": 0.0183,
+     "lift_se": 0.0169,
+     "p": 0.273259
+    },
+    "finish": {
+     "control": 0.2557,
+     "treatment": 0.256,
+     "lift": 0.0013,
+     "lift_se": 0.0441,
+     "p": 0.976396
+    },
+    "users_per_group": 3000
+   },
+   "outcome": "lost: no clear effect",
+   "score": 2.58,
+   "predicted_lift": -0.006,
+   "true_lift_hidden": 0.0203,
+   "finishers_delta_hidden": 14.98
+  }
+ ],
+ "shipped": [
+  "Personality-driven path choice headlines"
+ ],
+ "ends_week": 4,
+ "weights_next": {
+  "impact": 1.574,
+  "evidence": 0.282,
+  "confidence": 1.321,
+  "cost": 0.824
+ },
+ "lessons_next": [
+  "Reordering steps (moving sign-in), estimated countdown wait info, adding a pet control tutorial screen, and personality-driven copy helped performance.",
+  "Bypassing onboarding steps yielded mixed results, winning in one test but significantly hurting in another.",
+  "Major redesigns and sign-in safety hints significantly hurt performance.",
+  "Notifications, layout changes, permission checks, incentives, and most copy updates showed no clear effect.",
+  "Predictions generally overestimated actual gains, but underestimated performance for the pet control tutorial screen, countdown wait info, and personality-driven headlines."
+ ]
+}

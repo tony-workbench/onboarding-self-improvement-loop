@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt": "Base rules. A change that breaks any of these is rejected before scoring:\n1. No onboarding step may be removed or made skippable: story, choose path (adopt or make your own),\n   sign in, pick a friend or upload photos, adoption certificate, waiting for the pet, home.\n   Exception: the story screens already have a Skip that jumps to choose path; keeping it is fine.\n2. No job a screen does may be lost: the story introduces the pet, choose path offers both adopting\n   and making your own, Pick a friend lets the user choose a pet, the certificate shows the adoption\n   with an official stamp, the waiting screen shows the pet is being made, every screen has the Setting\n   gear. Any design may be replaced by a better one, as long as it still does the same job.\n3. Pricing stays as it is: the first adoption is free and later adoptions are paid. Onboarding copy does\n   not mention prices, discounts, gifts or free extras.\n4. Inside onboarding anything else may change, including big moves: redesigned screens, new screens\n   and whole new sub-flows, new components, a different order (sign in may move, for example after\n   adoption), waiting-screen information, notifications, timing. The home intro (home_intro: the\n   first-look overlay on the home screen) is part of onboarding, and new screens may follow it. Nothing outside onboarding may\n   change: Setting, the paywall, account management, the regular home screen after onboarding, or any\n   other page.\n5. Fair design: no false urgency or scarcity, no countdowns except a real wait, no shaming people who\n   decline, no hidden costs, no making it harder to say no than yes, no new requests for personal data,\n   and no nudging children toward sharing more data. (FTC dark-patterns report; EU DSA Art. 25; EU AI\n   Act Art. 5; UK Age Appropriate Design Code, standard 13.)\n\nCheck each proposed change against the base rules. Judge the config: the description next to it is the\nproposer's own words and may be misleading. Be strict about the limits: it fails if it loses a job a\nscreen does (a replacement must really do the same job, for example a new stamp must still read as an\nofficial stamp), skips a step, touches pricing, changes anything outside onboarding, or uses an unfair\ndesign (rule 5). Do not fail a change for being big: moving, adding, replacing or redesigning things\ninside onboarding is allowed, and new screens may come after the home intro.\nReturn JSON {\"verdicts\": [{\"index\": i, \"pass\": true or false, \"rule\": rule number or null, \"reason\": short}]}\n\nChanges (with their configs):\n0: [finish, redesign] Home Intro Floating Companion Controls Redesign: Redesign the final home intro screen into a full-bleed visual layout highlighting quick desktop shortcuts, hiding options, and interaction modes.\n   config: {\"home_intro\": {\"layout\": \"full_bleed\", \"headline\": \"Your Desktop Pet is Ready to Play!\", \"body\": \"Right-click your pet anytime to hide, move, or open controls from your system tray.\", \"hint\": \"Try right-clicking your companion once onboarding completes.\", \"components\": [{\"type\": \"badge\", \"text\": \"Quick Tip: Right-click to hide or control\", \"style\": \"highlight\"}]}}\n1: [home, new_screen] Desktop Spawn Check Visual Screen: Insert a new verification step right after waiting to display a preview of the rendered desktop pet and confirm window visibility before entering main app.\n   config: {\"_order\": [\"story\", \"choose_path\", \"sign_in\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"waiting\", \"new_desktop_spawn_check\", \"home_intro\"], \"waiting\": {\"notify_when_ready\": true, \"show_time_estimate\": true}, \"new_desktop_spawn_check\": {\"headline\": \"Confirm Pet Appearance\", \"body\": \"Check how your companion appears on screen before finishing setup.\", \"layout\": \"centered\", \"components\": [{\"type\": \"preview\", \"asset\": \"asset:pet_preview\", \"style\": \"rounded\"}, {\"type\": \"button\", \"label\": \"Looks Great, Spawn Now\", \"action\": \"next\", \"style\": \"emphasis\"}]}}\n2: [sign_in, reorder] Late Sign-In Conversion Reorder: Move sign-in to occur after pet selection and certificate adoption, placing account creation right before generation waiting.\n   config: {\"_order\": [\"story\", \"choose_path\", \"pick_friend\", \"upload_photos\", \"adoption_certificate\", \"sign_in\", \"waiting\", \"home_intro\"]}\n3: [adoption, new_flow] Custom Pet Live Rendering Verification Flow: Introduce a interactive photo validation and live pet preview component directly into the upload photos step.\n   config: {\"upload_photos\": {\"layout\": \"two_column\", \"headline\": \"Customize & Preview Your Pet\", \"body\": \"Upload photos to generate a 3D desktop companion. Check the preview below to ensure high quality.\", \"replace\": {\"photo_upload\": [{\"role\": \"photo_upload\", \"type\": \"photo_picker\", \"label\": \"Select Photos\", \"style\": \"rounded\"}, {\"role\": \"photo_upload\", \"type\": \"preview\", \"asset\": \"asset:live_pet_render\", \"style\": \"playful\"}]}}}\n4: [home, wait_info] Waiting Stage Dynamic Progress & Time Display: Display explicit visual progress bars, remaining time estimates, and stage indicators while the pet is generating on the waiting screen.\n   config: {\"waiting\": {\"show_progress\": true, \"show_time_estimate\": true, \"headline\": \"Generating Your Desktop Pet\", \"body\": \"We are polishing your pet's animations. This usually takes around 2 minutes.\", \"components\": [{\"type\": \"timer\", \"text\": \"Estimated time remaining: ~90s\", \"style\": \"calm\"}, {\"type\": \"progress\", \"style\": \"highlight\"}]}}\n5: [sign_in, copy] Sign-In Cloud Save Protection Copy Reassurance: Update sign-in headline and hint copy to emphasize that logging in preserves existing pets and cloud progress permanently.\n   config: {\"sign_in\": {\"headline\": \"Save & Protect Your Desktop Companion\", \"body\": \"Sign in to back up your pet, sync across devices, and ensure your progress is never lost.\", \"hint\": \"Your existing pets will automatically sync to this account.\"}}\n6: [choose_path, layout] Choose Path Compact Split Screen Layout: Switch choose_path layout to a split view displaying pet paths side by side with visual feature comparisons.\n   config: {\"choose_path\": {\"layout\": \"split\", \"headline\": \"Select Your Pet Experience\", \"body\": \"Choose whether to pick from companion presets or create a custom pet from photos.\"}}\n7: [adoption, incentive] Adoption Certificate Starter Accessory Incentive: Add an adoption certificate completion reward badge giving users a bonus starter toy item upon completing adoption.\n   config: {\"adoption_certificate\": {\"headline\": \"Official Adoption Certificate\", \"body\": \"Name your pet and claim your free Starter Toy Box accessory upon completing adoption!\", \"components\": [{\"type\": \"badge\", \"text\": \"Includes Free Starter Toy Pack\", \"style\": \"playful\"}]}}\n8: [finish, notification] Home Intro Desktop Shortcuts Hint Notification: Add a desktop readiness notification toggle and prominent quick control hint on home_intro.\n   config: {\"home_intro\": {\"notify_when_ready\": true, \"hint\": \"Quick tip: Press Ctrl+Shift+P to summon or hide your pet at any time.\"}}\n9: [choose_path, hint] Story Welcome Fast-Track Duration Hint: Add a duration hint on the welcome story screen informing users setup takes under 2 minutes.\n   config: {\"story\": {\"hint\": \"Fast setup • Takes under 2 minutes to bring your pet to life\", \"show_step_counter\": true}}",
+ "answer": {
+  "verdicts": [
+   {
+    "index": 0,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid redesign of the home intro screen within onboarding."
+   },
+   {
+    "index": 1,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid addition of a desktop preview step before finishing onboarding."
+   },
+   {
+    "index": 2,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid reordering of the sign-in step permitted by onboarding rules."
+   },
+   {
+    "index": 3,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid interactive preview sub-flow added to photo upload step."
+   },
+   {
+    "index": 4,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid waiting screen progress and real wait time indicators."
+   },
+   {
+    "index": 5,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid copy update for the sign-in step emphasizing progress backup."
+   },
+   {
+    "index": 6,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid layout redesign of choose_path preserving both path options."
+   },
+   {
+    "index": 7,
+    "pass": false,
+    "rule": 3,
+    "reason": "Onboarding copy mentions free extras/gifts ('free Starter Toy Box accessory')."
+   },
+   {
+    "index": 8,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid shortcut hint and notification configuration on home intro."
+   },
+   {
+    "index": 9,
+    "pass": true,
+    "rule": null,
+    "reason": "Valid onboarding duration hint update on the story screen."
+   }
+  ]
+ }
+}
